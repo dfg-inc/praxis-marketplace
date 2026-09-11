@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-alpha.20
+
+- Bilingual VitePress docs (English default, Russian under `/ru/`): role pipeline, shared context, handoffs, BA / Architect / Developer / Quality
+- Phase 1 readiness gate and remaining deterministic local gaps (see monorepo release notes)
+
 ## 0.1.0-alpha.19
 
 - Standalone BA / Developer export (`npm run export:standalone`)

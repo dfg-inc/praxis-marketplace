@@ -1,20 +1,26 @@
-# Praxis Marketplace
+# Praxis
 
-Documentation and install guides for Praxis role plugins.
+Role plugins and the machine pipeline that moves a work package from requirements to review.
 
-Role plugins (**praxis-ba**, **praxis-architect**, **praxis-developer**) are licensed under **Apache-2.0**. Company infra plugins (e.g. Jira) remain closed.
+**BA** → **Architect** → **Developer** → **Quality**
 
-## Pipeline
+Apache-2.0 role plugins: **praxis-ba**, **praxis-architect**, **praxis-developer** (the open-source lineup). The same tree will be published on **GitHub**; until that URL is live, clone the GitLab origin below.
 
-Local Phase 1 critical path is executable end-to-end:
+Quality (`apps/quality-service`) and Jira stay **UNLICENSED** company infra. They are not part of the public plugin lineup and are **not** required for the BA→Architect→Developer machine path.
 
-**BA** (canon validate + handoff) → **Architect** (design package) → **Developer** (implement + arbiter) → **Quality** (`review-path` + persisted result).
+## Start here
 
-See monorepo `tools/e2e` for the deterministic fixture.
+- **[Getting started](/guide/start)** — clone, `npm install`, Claude Code, first session
+- [How the four roles work together](/guide/)
+- [Shared context (`.project`, knowledge, session)](/guide/context)
+- [Handoff contracts](/guide/handoffs)
+- [CLI / smoke / verify](/guide/run)
 
-## Sections
+## Plugins
 
-- [Plugins](/plugins/) — BA, Architect, Developer install and tools
-- [Method](/method/) — roles and RBPIV cycle
-- [Catalog](/catalog/) — version lineup
-- [Changelog](/changelog)
+- [praxis-ba](/plugins/ba)
+- [praxis-architect](/plugins/architect)
+- [praxis-developer](/plugins/developer)
+- [Quality service](/plugins/quality)
+
+Also: [method](/method/), [catalog](/catalog/), [changelog](/changelog).
