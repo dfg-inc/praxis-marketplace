@@ -2,12 +2,46 @@
 
 Ревью, аудиты и метрики для работы, которая уже прошла верификацию Developer.
 
-**Лицензия:** UNLICENSED (внутренний контур) · **Пакет:** `@praxis/quality-service` · **Путь:** `apps/quality-service`  
-Это **не** Apache-плагин Claude и не позиция публичного каталога ([каталог](/catalog/)).
+Две части:
 
-## Как работает
+| Что | Путь | Как запускать |
+|-----|------|----------------|
+| Плагин Claude **praxis-quality** | `plugins/quality` | `make qa WP=PRX-12 REPO=…` |
+| HTTP/CLI **quality-service** | `apps/quality-service` | `docker compose up quality-service` или `praxis-quality.mjs` |
 
-Quality принимает `developer.quality.handoff` (и опционально `quality.mr.context`):
+**Лицензия:** UNLICENSED (внутренний контур). Не Apache-плагин публичного каталога ([каталог](/catalog/)).
+
+Готовые фразы: **[работа в сессии](/ru/guide/sessions)**.
+
+## Сессия QA (Claude)
+
+```bash
+make quality-up
+make qa WP=PRX-12 REPO=/path/to/product
+```
+
+```
+/session-start
+WP PRX-12. Проверь локально (/verify-work-package).
+Исходники продукта не меняй.
+```
+
+Команды install/build/test/coverage/start — только из `.project` → `quality:`. Тестовые записи на диск — `PRAXIS_QA_ALLOW_TEST_WRITES=1` и ваш список файлов.
+
+### Скиллы плагина
+
+| Скилл | Когда | Что получается |
+|-------|-------|----------------|
+| `session-start` | Старт | `.project`, knowledge, роль `qa` / стадия `quality`. Дальше ждёт ключ WP |
+| `verify-work-package` | WP claimed / ready-for-qa | Локальный прогон + отчёт `.praxis-jira/quality/<WP>.md` |
+
+Не выдумывать данные Jira. Canonical tickets only.
+
+Машинный отчёт без чата: `make quality-report WP=PRX-12` (после verify).
+
+## Сервис ревью (HTTP/CLI)
+
+Quality-service принимает `developer.quality.handoff` (и опционально `quality.mr.context`):
 
 1. Валидирует handoff через `@praxis/contracts`
 2. Требует, чтобы обязательные verification-проверки были `passed`
@@ -55,6 +89,6 @@ docker compose up --build quality-service
 
 Если daemon недоступен — Node CLI/HTTP. Статическая проверка compose/Dockerfile: `npm run verify:docker`.
 
-## Скилл
+## Скилл сервиса
 
 Локально у приложения (не публичный плагин): `apps/quality-service/skills/propose-rule-from-findings`.

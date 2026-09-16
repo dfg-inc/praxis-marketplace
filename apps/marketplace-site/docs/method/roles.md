@@ -9,4 +9,6 @@
 
 Jira is company infra (UNLICENSED), not a public role plugin.
 
-Human gates sit on irreversible choices: vision confirm, WP plan approve, architecture council/decisions, Developer `--approve`, Quality does not replace those gates.
+Human gates sit on irreversible choices: vision confirm, WP plan approve, architecture council/decisions, Developer claim and `--approve`. Quality does not replace those gates.
+
+How to invoke skills in chat: [Working in a session](/guide/sessions).

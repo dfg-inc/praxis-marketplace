@@ -11,6 +11,7 @@ Quality (`apps/quality-service`) и Jira остаются **UNLICENSED** (кор
 ## С чего начать
 
 - **[С чего начать](/ru/guide/start)** — клон, `npm install`, Claude Code, первая сессия
+- **[Работа в сессии](/ru/guide/sessions)** — скиллы, что писать в чат, как забрать WP
 - [Как связаны четыре роли](/ru/guide/)
 - [Общий контекст (`.project`, knowledge, сессия)](/ru/guide/context)
 - [Контракты handoff](/ru/guide/handoffs)

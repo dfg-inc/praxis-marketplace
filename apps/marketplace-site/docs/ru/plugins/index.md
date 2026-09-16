@@ -13,10 +13,10 @@ Praxis поставляет **ролевые плагины Claude Code** и о�
 
 ## Установка (Claude Code)
 
-По шагам (клон, `npm install`, локальные папки плагинов, первый чат): **[С чего начать](/ru/guide/start)**.
+По шагам (клон, `npm install`, локальные папки плагинов, первый чат): **[С чего начать](/ru/guide/start)**. Что писать в сессии и как забрать WP: **[работа в сессии](/ru/guide/sessions)**.
 
 Ролевые плагины (**praxis-ba**, **praxis-architect**, **praxis-developer**) — **Apache-2.0**, это линейка для GitHub / open source. Корпоративная инфраструктура (**Quality**, **Jira**) остаётся UNLICENSED и в эту линейку не входит.
 
 Пакетов **ещё нет** на публичном npm. Установка — `npm install` в git-клоне ([с чего начать](/ru/guide/start)). Claude Code указывайте на `plugins/ba`, `plugins/architect`, `plugins/developer`.
 
-Конвейер: [как роли связаны](/ru/guide/). Машинный CLI: [запуск](/ru/guide/run).
+Конвейер: [как роли связаны](/ru/guide/). Сессии и скиллы: [работа в сессии](/ru/guide/sessions). Машинный CLI: [запуск](/ru/guide/run).

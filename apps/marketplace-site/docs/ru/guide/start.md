@@ -162,16 +162,18 @@ Git-URL отдельных marketplace-репозиториев может ещ�
 
 Если вы разрабатываете сам Praxis — откройте монорепозиторий в Claude Code и включите те же папки.
 
-Quality так **не** включается. Это сервис Node/Docker. См. [Quality](/ru/plugins/quality).
+Quality в Claude включается как `plugins/quality` (`make qa`). HTTP-сервис — отдельно. См. [Quality](/ru/plugins/quality) и [работу в сессии](/ru/guide/sessions).
 
 ### 3. Первая сессия (что писать в чат)
 
 Рабочая директория Claude Code — **продуктовый** репозиторий.
 
+Готовые тексты, каталог скиллов и **как забрать Jira WP**: **[работа в сессии](/ru/guide/sessions)**. Кратко по ролям:
+
 **Аналитик**
 
 1. Попросите начать сессию BA (скилл `session-start`) — должны увидеть версию плагина, `.project`, knowledge вкл/выкл.
-2. Зафиксируйте запрос на изменение словами клиента (`capture-cr`).
+2. С Jira: `/jira-analyze-epic` по ключу эпика. Без Jira: зафиксируйте запрос словами клиента (`capture-cr`).
 3. Grill и план impact set (`grill-cr` / `ba-plan-slice`), затем confirm тем CLI, который назовёт скилл (`praxis-ba cr confirm …`).
 4. Требования, work package, approve плана — это **пишет** `wp/<WP>/handoffs/ba-architect.handoff.json` для архитектора.
 
@@ -192,7 +194,7 @@ Canon — дерево требований (`canon/` или как у вас з
 
 **Разработчик**
 
-1. Session-start роли developer.
+1. Session-start роли developer. С Jira: сразу ключ WP, затем `/claim-work-package` (чужой claim не перебивать).
 2. Принять design-пакет, исследование, план.
 3. **Не реализовывать, пока человек не утвердил** (CLI `--approve` или гейт скилла).
 4. Реализация + final-arbiter; после зелёного появляется `design/<WP>/dev/quality-handoff.json`.

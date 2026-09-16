@@ -13,10 +13,10 @@ Company-only **Jira** (`@praxis/jira`, UNLICENSED) is not a public role plugin a
 
 ## Install (Claude Code)
 
-Step-by-step (clone, `npm install`, local plugin folders, first chat): **[Getting started](/guide/start)**.
+Step-by-step (clone, `npm install`, local plugin folders, first chat): **[Getting started](/guide/start)**. What to type in session and how to claim a WP: **[Working in a session](/guide/sessions)**.
 
 Role plugins (**praxis-ba**, **praxis-architect**, **praxis-developer**) are **Apache-2.0** and are the GitHub / open-source lineup. Company infra (**Quality**, **Jira**) stays UNLICENSED and is not in that lineup.
 
 Packages are **not** on the public npm registry yet. Install is `npm install` in a git clone ([Getting started](/guide/start)). Point Claude Code at `plugins/ba`, `plugins/architect`, `plugins/developer`.
 
-Pipeline: [how roles work together](/guide/). Machine CLI: [Run and verify](/guide/run).
+Pipeline: [how roles work together](/guide/). Sessions and skills: [Working in a session](/guide/sessions). Machine CLI: [Run and verify](/guide/run).

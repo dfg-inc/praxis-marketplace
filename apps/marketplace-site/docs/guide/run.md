@@ -109,11 +109,25 @@ curl -s http://127.0.0.1:8787/health
 docker compose up --build quality-service
 ```
 
+## Claude roles (Jira)
+
+```bash
+make ba         EPIC=PRX-1  REPO=/path/to/product
+make architect  EPIC=PRX-1  REPO=/path/to/product
+make developer  WP=PRX-12   REPO=/path/to/product
+make qa         WP=PRX-12   REPO=/path/to/product
+```
+
+What to type, skill catalogs, claiming a WP: **[Working in a session](/guide/sessions)**.
+
 ## This documentation site
 
 ```bash
+docker compose --profile docs up --build marketplace-site
+# http://localhost:4173/  — sessions: /guide/sessions
+
 npm run dev -w @praxis/marketplace-site
-npm run build -w @praxis/marketplace-site
+# http://localhost:5173/
 ```
 
 English is the default locale; Russian is under `/ru/`.

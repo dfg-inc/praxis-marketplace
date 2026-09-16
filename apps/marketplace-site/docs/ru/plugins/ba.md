@@ -22,6 +22,64 @@ BA готовит **вход** для архитектуры и разработ
 
 На старте сессии плагин читает [`.project` и knowledge](/ru/guide/context) и проверяет версию.
 
+Готовые фразы для чата: **[работа в сессии](/ru/guide/sessions)**.
+
+## Сессия
+
+```bash
+make ba EPIC=PRX-1 REPO=/path/to/product
+```
+
+Или в уже открытом Claude Code с `praxis-ba`:
+
+```
+/session-start
+Эпик PRX-1. Проанализируй эпик (/jira-analyze-epic).
+В Jira ничего не пиши, пока я не подтвержу.
+```
+
+Canon без Jira:
+
+```
+/session-start
+/capture-cr — слова клиента ниже.
+Потом /grill-cr и нарезка. Confirm только после моего «да».
+```
+
+Slash-команда = имя скилла: `/prepare-wp`, `/status`.
+
+## Скиллы
+
+Вызов: `/<имя>` или обычным текстом («зафиксируй CR», «подготовь WP»).
+
+### Каждый день
+
+| Скилл | Когда | Что получается |
+|-------|-------|----------------|
+| `session-start` | Первое сообщение сессии | Версия плагина, `.project`, knowledge. Канон не меняет |
+| `jira-analyze-epic` | Есть Epic в Jira (`PRX-1`) | Stories с AC, proposal, preview записи. Live-write только после вашего confirm. **Не** зовите рядом `create-story` |
+| `status` | В любой момент | Сводка канона: vision, CR, WP, баги. Read-only |
+| `capture-cr` | Пришёл запрос на изменение | CR словами клиента (Verbatim vs Interpretation). Ещё не confirm |
+| `grill-cr` | После `capture-cr` | Интервью один вопрос за раз + recommended answer |
+| `ba-plan-slice` | Внутри grill, до confirm | Нарезка: одна история = одно FR; файл impacts для `cr confirm` |
+| `shape-requirement` | CR confirmed, impact set известен | Новые FR/NFR/BR (`spawns`) или правка существующих (`amends`) |
+| `prepare-wp` | Срез требований готов к handoff | Папка `wp/<id>/`, гейт definition-of-ready |
+| `approve-plan` | WP в статусе `ready`, есть `plan.md` | Ваше «да» → `plan-approved` + `ba-architect.handoff.json` |
+| `accept` | Поставка доказана | Baseline требований WP. Единственный путь в `baselines/` |
+
+### Старт продукта и слой вокруг канона
+
+| Скилл | Когда | Что получается |
+|-------|-------|----------------|
+| `confirm-vision` | Новый продукт или смена vision | Человеческий гейт `vision confirm`. Без него нет CR/WP |
+| `ba-scaffold` | Пустой проект, один раз | `inputs/`, `shared/`, glossary, NFR-каталог. **Не** создаёт `canon/` |
+| `ba-onboard` | Код есть, требований нет | Реверс контекста из кода → первый срез в `capture-cr` |
+| `ba-code-surface-scan` | Только из `ba-onboard` | Сырой список роутов/UI, без смысла |
+| `ba-lint` | После любой записи в канон | `praxis-ba validate`. FAIL нельзя обойти руками |
+| `goals` | Трассировка к целям | Страницы целей, `goal_ids` на требованиях |
+| `one-pager` | Клиенту нужна одна страница | One-pager с живого FR (нужны назначение и AC) |
+| `capture-bug` | Баг на **поставленный** FR | Запись в `bugs/`. Баги mid-WP живут в инженерных доках репо |
+
 ## Как реализовано
 
 | Часть | Где |
@@ -32,7 +90,7 @@ BA готовит **вход** для архитектуры и разработ
 | Bootstrap | `plugins/ba/tools/session-bootstrap.mjs` |
 | Манифест Claude | `plugins/ba/.claude-plugin/plugin.json` |
 
-**Скиллы:** `session-start`, `confirm-vision`, `capture-cr`, `grill-cr`, `ba-plan-slice`, `shape-requirement`, `prepare-wp`, `approve-plan`, `accept`, `capture-bug`, `status`, `goals`, `one-pager`, `ba-scaffold`, `ba-onboard`, `ba-code-surface-scan`, `ba-lint`.
+**Скиллы** — таблица выше. Исходники: `plugins/ba/skills/`.
 
 ## CLI
 

@@ -11,6 +11,7 @@ Quality (`apps/quality-service`) and Jira stay **UNLICENSED** company infra. The
 ## Start here
 
 - **[Getting started](/guide/start)** — clone, `npm install`, Claude Code, first session
+- **[Working in a session](/guide/sessions)** — skills, what to type, how to claim a WP
 - [How the four roles work together](/guide/)
 - [Shared context (`.project`, knowledge, session)](/guide/context)
 - [Handoff contracts](/guide/handoffs)

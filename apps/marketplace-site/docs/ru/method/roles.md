@@ -9,4 +9,6 @@
 
 Jira — корпоративная инфраструктура (UNLICENSED), не публичный ролевой плагин.
 
-Человеческие гейты стоят на необратимых шагах: confirm vision, approve плана WP, council/решения архитектора, Developer `--approve`. Quality эти гейты не заменяет.
+Человеческие гейты стоят на необратимых шагах: confirm vision, approve плана WP, council/решения архитектора, Developer claim и `--approve`. Quality эти гейты не заменяет.
+
+Как вызывать скиллы в чате: [работа в сессии](/ru/guide/sessions).

@@ -19,6 +19,7 @@ const ruNav = [
 const enSidebar = {
   "/guide/": [
     { text: "Getting started", link: "/guide/start" },
+    { text: "Working in a session", link: "/guide/sessions" },
     { text: "How roles work together", link: "/guide/" },
     { text: "Shared context", link: "/guide/context" },
     { text: "Handoffs and data", link: "/guide/handoffs" },
@@ -42,6 +43,7 @@ const enSidebar = {
 const ruSidebar = {
   "/ru/guide/": [
     { text: "С чего начать", link: "/ru/guide/start" },
+    { text: "Работа в сессии", link: "/ru/guide/sessions" },
     { text: "Как роли связаны", link: "/ru/guide/" },
     { text: "Общий контекст", link: "/ru/guide/context" },
     { text: "Handoff и данные", link: "/ru/guide/handoffs" },

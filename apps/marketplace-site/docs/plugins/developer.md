@@ -16,6 +16,70 @@ Developer role: accept an architecture package, plan with an approval gate, impl
 
 Optional: `mr-intention` and `mr-preview-remote` (GitLab/GitHub payload **preview**, no live create unless you separately grant credentials and permission).
 
+Copy-paste scripts and claim flow: **[Working in a session](/guide/sessions)**.
+
+## How to claim a WP
+
+A Jira Work Package (`PRX-12`) must be **claimed** or you do not own it.
+
+```bash
+make developer WP=PRX-12 REPO=/path/to/product
+```
+
+```
+/session-start
+WP PRX-12.
+Re-read members in Jira; drop superseded.
+Claim it (/claim-work-package).
+Then /accept-work-package. I approve the plan; code only after approve.
+```
+
+Claim does: assignee on you, In Progress, `praxis.claim`, local `.praxis-jira/claims/PRX-12.json`.
+
+| Situation | Action |
+|-----------|--------|
+| Unclaimed / your previous claim | `/claim-work-package` — take or resume |
+| `claim denied: held by …` | Not yours. Force-release only with explicit human `--confirm` |
+| No canonical members | Return to Architect (empty or superseded-only) |
+
+A canon folder `wp/WP-…` is **not** claimed. Claim is a Jira key only.
+
+## Session after claim
+
+`accept-work-package` → research → `create-plan` → **you** approve (`validate-plan`) → `implement-plan` → `final-arbiter` → `mr-intention`.
+
+Tiny bounded fix: `/caveman` instead of the full plan ceremony.
+
+## Skills
+
+### Take work and plan
+
+| Skill | When | What you get |
+|-------|------|----------------|
+| `session-start` | Start | `.project`, knowledge, role `developer` / stage `implement` |
+| `claim-work-package` | Jira WP ready for development | Claim for the current account. Someone else's active claim → refuse |
+| `accept-work-package` | Architect published design | Handoff check. Incomplete → `status: returned`. Journal `design/<WP>/dev/acceptance.md` |
+| `research-codebase` | After accept | Research **inside** the context slice |
+| `load-stack-rules` | Before planning | Stack rules from knowledge / `.project` |
+| `classify-scale` | Before planning | `exploratory` / `limited` / `architectural` |
+| `present-design-options` | Several implementation paths | Options (UI preview when relevant). You choose |
+| `create-plan` | Enough research | `design/<WP>/dev/plan.md` as `draft`. No implementation yet |
+| `validate-plan` | Plan exists | Completeness, slice, testability + **your** approve |
+| `plan-status` | Session dropped | Phase journal that survives context compression |
+| `caveman` | Scale bounded, ceremony is overhead | Short path without a full plan |
+
+### Implement
+
+| Skill | When | What you get |
+|-------|------|----------------|
+| `implement-plan` | Plan `approved` | Phases in order; red verify → `repair-loop`, not the next phase |
+| `tdd` | Phase marked `TDD: yes` | Red → green → refactor |
+| `repair-loop` | Verify failed | Round journal; escalation; human on exhaustion |
+| `final-arbiter` | All phases green | Build / test / lint. Required before Quality handoff |
+| `mr-intention` | Arbiter green | MR intention + `developer.quality.handoff` |
+| `plan-archive` | WP closed | Archive the plan for audit |
+| `request-architecture-deviation` | Need to leave the slice / ADR | Request to Architect. Do not code outside the boundary |
+
 ## Implementation
 
 | Piece | Location |
@@ -27,7 +91,7 @@ Optional: `mr-intention` and `mr-preview-remote` (GitLab/GitHub payload **previe
 | Governance / MR preview | `plugins/developer/tools/developer-governance.mjs` |
 | Session bootstrap | `plugins/developer/tools/session-bootstrap.mjs` |
 
-**Skills:** `session-start`, `accept-work-package`, `research-codebase`, `load-stack-rules`, `classify-scale`, `create-plan`, `validate-plan`, `present-design-options`, `implement-plan`, `tdd`, `caveman`, `final-arbiter`, `repair-loop`, `plan-status`, `plan-archive`, `mr-intention`, `request-architecture-deviation`.
+**Skills** — table above. Sources: `plugins/developer/skills/`.
 
 ## CLI examples
 

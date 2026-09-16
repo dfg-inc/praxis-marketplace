@@ -162,16 +162,18 @@ Then in Claude Code:
 
 If you develop Praxis itself, open the monorepo in Claude Code and still enable the same folders.
 
-Quality is **not** enabled this way. It is a Node/Docker service. See [Quality](/plugins/quality).
+Quality in Claude is `plugins/quality` (`make qa`). The HTTP service is separate. See [Quality](/plugins/quality) and [Working in a session](/guide/sessions).
 
 ### 3. First session (what to actually type)
 
 Open the **product** repository as the Claude Code working directory.
 
+Copy-paste scripts, skill catalogs, and **how to claim a Jira WP**: **[Working in a session](/guide/sessions)**. Short version:
+
 **Business analyst**
 
 1. Ask to start a BA session (skill `session-start`) — you should see plugin version, `.project`, knowledge on/off.
-2. Capture a change request in the client’s words (`capture-cr`).
+2. With Jira: `/jira-analyze-epic` on the epic key. Without Jira: capture a change request in the client’s words (`capture-cr`).
 3. Grill and plan the impact set (`grill-cr` / `ba-plan-slice`), then confirm with the CLI gate the skill tells you (`praxis-ba cr confirm …`).
 4. Shape requirements, prepare a work package, approve the plan — that **writes** `wp/<WP>/handoffs/ba-architect.handoff.json` for Architect.
 
@@ -192,7 +194,7 @@ The canon directory is the requirements tree (`canon/` or whatever your project 
 
 **Developer**
 
-1. Session-start for developer.
+1. Session-start for developer. With Jira: name the WP key, then `/claim-work-package` (do not steal another claim).
 2. Accept the design package; research; write a plan.
 3. **Stop until a human approves** (CLI `--approve` or the skill gate).
 4. Implement + final-arbiter; on green, `design/<WP>/dev/quality-handoff.json` appears.

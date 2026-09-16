@@ -16,6 +16,61 @@ Architecture role: intake a BA work package, record decisions, produce a Develop
 
 Architect does not apply code edits. The change-spec is **input** for Developer.
 
+Copy-paste scripts: **[Working in a session](/guide/sessions)**.
+
+## Session
+
+```bash
+make architect EPIC=PRX-1 REPO=/path/to/product
+```
+
+```
+/session-start
+Epic PRX-1. Read the BA handoff only if readyForArchitecture=true.
+/intake-audit, then /jira-plan-epic (Work Packages).
+Jira writes after I confirm.
+```
+
+Canon without Jira: path `wp/<id>/handoffs/ba-architect.handoff.json`, then design package and developer emit.
+
+Architect does **not** claim WPs and does not edit product code.
+
+## Skills
+
+### Intake and Jira
+
+| Skill | When | What you get |
+|-------|------|----------------|
+| `session-start` | Session start | `.project`, knowledge, role `architect` / stage `plan` |
+| `intake-audit` | First step on a WP | Completeness / contradictions / feasibility. Fail → return to BA. File `architecture/audits/<WP>-intake-audit.md` |
+| `jira-plan-epic` | BA Jira handoff exists | Technical design, Jira Work Packages. Do **not** overwrite BA User Story / AC |
+
+### Design
+
+| Skill | When | What you get |
+|-------|------|----------------|
+| `grill` | Ambiguity needs pressure | Adversarial interview, one question, recommended answer |
+| `context-map` | After green intake | Systems/contexts the WP touches |
+| `divergence-points` | Two implementers would diverge | Points that need decisions |
+| `present-alternatives` | Per divergence point | Options with tradeoffs; human still chooses |
+| `lens-review` | Before a decision | Reliability / security / cost / ops / migration |
+| `error-cost-gate` | Before an ADR | Whether council is mandatory (rollback cost) |
+| `council` | Gate said required, or you asked | Multiple perspectives; **human decides** |
+| `record-decision` | Choice made | ADR: scope, rule, rejected alternatives. Missing rejects → refuse |
+| `nfr-budget` | Measurable NFR | Metric, limit, how and when to verify |
+| `platform-contract` | Cross-platform exchange | Contract + compatibility policy |
+| `design-package` | ADRs accepted | `design/<WP>/`: index, diagrams, decisions, `change-intent.json` |
+| `decompose-features` | Package assembled | Features/stories with `readyForDev` |
+| `context-slice` | Before Developer handoff | In slice / out of slice / non-negotiables |
+| `initial-estimate` | Need a delivery order | Estimate and recommended build order |
+
+### After implementation
+
+| Skill | When | What you get |
+|-------|------|----------------|
+| `accept-deviation` | Developer filed `request-architecture-deviation` | Accept as an ADR change |
+| `verify-against-decisions` | Code already exists | Check against ADRs and NFR budget spend |
+
 ## Implementation
 
 | Piece | Location |
@@ -26,7 +81,7 @@ Architect does not apply code edits. The change-spec is **input** for Developer.
 | Governance CLI | `plugins/architect/tools/architecture-governance.mjs` |
 | Session bootstrap | `plugins/architect/tools/session-bootstrap.mjs` |
 
-**Skills:** `session-start`, `intake-audit`, `grill`, `council`, `context-map`, `context-slice`, `divergence-points`, `present-alternatives`, `lens-review`, `record-decision`, `nfr-budget`, `error-cost-gate`, `platform-contract`, `decompose-features`, `design-package`, `initial-estimate`, `verify-against-decisions`, `accept-deviation`.
+**Skills** — table above. Sources: `plugins/architect/skills/`.
 
 Governance verbs include: `classify-error-cost`, `record-council`, `assert-record-decision`, `write-platform-contract`, `list-platform-contracts`, `detect-missing-contracts`, `build-plan`, `submit-deviation`, `decide-deviation`, `conformance`, `intake-audit`, `context-map`, `divergence-points`, `alternatives`, `lens-review`, `record-decision`, `nfr-budget`.
 

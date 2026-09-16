@@ -1,6 +1,6 @@
 # How roles work together
 
-New to Praxis? Start with **[Getting started](/guide/start)** (clone, packages, Claude Code, first session).
+New to Praxis? Start with **[Getting started](/guide/start)** (clone, packages, Claude Code). What to type per role: **[Working in a session](/guide/sessions)**.
 
 Praxis splits delivery into four roles. Each role owns a different artifact set. They do **not** share an internal API. They exchange **versioned JSON handoffs** plus markdown packages on disk.
 
