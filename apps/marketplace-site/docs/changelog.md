@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-alpha.35
+
+- Desktop-first documentation: shared Markdown in `docs/user` feeds this Marketplace site and the VitePress docs portal
+- Runtime MCPB + independent role ZIPs; Developer complete no longer means Jira Done
+
 ## 0.1.0-alpha.20
 
 - Bilingual VitePress docs (English default, Russian under `/ru/`): role pipeline, shared context, handoffs, BA / Architect / Developer / Quality

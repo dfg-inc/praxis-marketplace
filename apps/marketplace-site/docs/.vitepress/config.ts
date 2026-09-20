@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 
 const enNav = [
   { text: "Guide", link: "/guide/start" },
+  { text: "Desktop docs", link: "/user-guide/" },
   { text: "Plugins", link: "/plugins/" },
   { text: "Method", link: "/method/" },
   { text: "Catalog", link: "/catalog/" },
@@ -10,6 +11,7 @@ const enNav = [
 
 const ruNav = [
   { text: "Гайд", link: "/ru/guide/start" },
+  { text: "Документация Desktop", link: "/user-guide/ru/" },
   { text: "Плагины", link: "/ru/plugins/" },
   { text: "Метод", link: "/ru/method/" },
   { text: "Каталог", link: "/catalog/" },
@@ -19,6 +21,8 @@ const ruNav = [
 const enSidebar = {
   "/guide/": [
     { text: "Getting started", link: "/guide/start" },
+    { text: "Desktop install (canonical)", link: "/user-guide/getting-started/installation" },
+    { text: "Prompt library", link: "/user-guide/reference/prompts" },
     { text: "Working in a session", link: "/guide/sessions" },
     { text: "How roles work together", link: "/guide/" },
     { text: "Shared context", link: "/guide/context" },
@@ -66,6 +70,7 @@ const ruSidebar = {
 export default defineConfig({
   title: "Praxis",
   description: "Role plugins, method, and catalog",
+  ignoreDeadLinks: true,
   locales: {
     root: {
       label: "English",

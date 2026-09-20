@@ -36,6 +36,8 @@ Then /accept-work-package. I approve the plan; code only after approve.
 
 Claim does: assignee on you, In Progress, `praxis.claim`, local `.praxis-jira/claims/PRX-12.json`.
 
+**Developer complete** (alpha.35) writes verification evidence and a Quality handoff. It does **not** mark Jira Done. Full Desktop guide: [Developer complete](/user-guide/plugins/developer).
+
 | Situation | Action |
 |-----------|--------|
 | Unclaimed / your previous claim | `/claim-work-package` — take or resume |

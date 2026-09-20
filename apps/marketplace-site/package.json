@@ -6,8 +6,9 @@
   "description": "Praxis marketplace documentation site (VitePress)",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
+    "sync-docs": "node ../../tools/scripts/sync-user-docs.mjs",
+    "dev": "npm run sync-docs && vitepress dev docs",
+    "build": "npm run sync-docs && vitepress build docs",
     "preview": "vitepress preview docs"
   },
   "devDependencies": {

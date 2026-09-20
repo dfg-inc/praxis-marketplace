@@ -1,27 +1,30 @@
 # Praxis
 
-Role plugins and the machine pipeline that moves a work package from requirements to review.
+Role plugins and a shared Runtime that move a work package from requirements to review.
 
 **BA** → **Architect** → **Developer** → **Quality**
 
-Apache-2.0 role plugins: **praxis-ba**, **praxis-architect**, **praxis-developer** (the open-source lineup). The same tree will be published on **GitHub**; until that URL is live, clone the GitLab origin below.
+## For people installing Praxis
 
-Quality (`apps/quality-service`) and Jira stay **UNLICENSED** company infra. They are not part of the public plugin lineup and are **not** required for the BA→Architect→Developer machine path.
+Use **Claude Desktop / Cowork**:
 
-## Start here
+- [Desktop installation](/user-guide/getting-started/installation)
+- [Jira credentials](/user-guide/getting-started/credentials)
+- [Role plugins (independent ZIPs)](/user-guide/plugins/overview)
+- [Prompt library](/user-guide/reference/prompts)
+- [Full tutorial](/user-guide/workflows/full-e2e)
 
-- **[Getting started](/guide/start)** — clone, `npm install`, Claude Code, first session
-- **[Working in a session](/guide/sessions)** — skills, what to type, how to claim a WP
+Artifacts: `claude-extensions/praxis-runtime.mcpb` plus `claude-plugins/praxis-*.zip`.
+
+## Marketplace catalog
+
+Apache-2.0 role plugins: **praxis-ba**, **praxis-architect**, **praxis-developer**. Quality service and Jira orchestration stay **UNLICENSED** company infra.
+
+- [Getting started (Desktop first)](/guide/start)
+- [Working in a session](/guide/sessions)
 - [How the four roles work together](/guide/)
-- [Shared context (`.project`, knowledge, session)](/guide/context)
+- [Shared context](/guide/context)
 - [Handoff contracts](/guide/handoffs)
-- [CLI / smoke / verify](/guide/run)
-
-## Plugins
-
-- [praxis-ba](/plugins/ba)
-- [praxis-architect](/plugins/architect)
-- [praxis-developer](/plugins/developer)
-- [Quality service](/plugins/quality)
-
-Also: [method](/method/), [catalog](/catalog/), [changelog](/changelog).
+- [CLI / smoke / verify](/guide/run) — advanced / CI
+- [praxis-ba](/plugins/ba) · [architect](/plugins/architect) · [developer](/plugins/developer) · [quality](/plugins/quality)
+- [method](/method/) · [catalog](/catalog/) · [changelog](/changelog)
