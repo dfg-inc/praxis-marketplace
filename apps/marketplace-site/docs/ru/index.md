@@ -6,10 +6,10 @@
 
 ## Установка в Claude Desktop
 
-- [Установка](/user-guide/ru/getting-started/installation)
-- [Jira](/user-guide/ru/getting-started/credentials)
-- [Плагины](/user-guide/ru/plugins/overview)
-- [Сценарий](/user-guide/ru/workflows/full-e2e)
+- [Installation](/user-guide/getting-started/installation)
+- [Jira credentials](/user-guide/getting-started/credentials)
+- [Role plugins](/user-guide/plugins/overview)
+- [Full tutorial](/user-guide/workflows/full-e2e)
 
 ## Каталог Marketplace
 

@@ -2,13 +2,13 @@
 
 **Обычная установка — Claude Desktop / Cowork.** Не клонируйте монорепозиторий и не экспортируйте `PRAXIS_JIRA_*`, если вы просто пользуетесь Praxis.
 
-Канонические страницы (те же файлы, что у VitePress-портала):
+Канонические страницы Desktop (English user guide — тот же Markdown, что у VitePress):
 
-1. [Установка](/user-guide/ru/getting-started/installation)
-2. [Учётные данные Jira](/user-guide/ru/getting-started/credentials)
-3. [Плагины ролей](/user-guide/ru/plugins/overview)
-4. [Полный сценарий](/user-guide/ru/workflows/full-e2e)
-5. [Диагностика](/user-guide/ru/reference/troubleshooting)
+1. [Installation](/user-guide/getting-started/installation)
+2. [Jira credentials](/user-guide/getting-started/credentials)
+3. [Role plugins](/user-guide/plugins/overview)
+4. [Full tutorial](/user-guide/workflows/full-e2e)
+5. [Troubleshooting](/user-guide/reference/troubleshooting)
 
 Файлы релиза: `claude-extensions/praxis-runtime.mcpb` и `claude-plugins/praxis-*.zip`. Инструкции alpha.29 про `.mcp.json` устарели.
 
