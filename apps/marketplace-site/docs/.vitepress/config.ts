@@ -11,7 +11,7 @@ const enNav = [
 
 const ruNav = [
   { text: "Гайд", link: "/ru/guide/start" },
-  { text: "Документация Desktop", link: "/user-guide/ru/" },
+  { text: "Desktop docs", link: "/user-guide/" },
   { text: "Плагины", link: "/ru/plugins/" },
   { text: "Метод", link: "/ru/method/" },
   { text: "Каталог", link: "/catalog/" },
