@@ -77,7 +77,10 @@ curl -s http://127.0.0.1:8787/health
 | `GET` | `/health` | Liveness |
 | `GET` | `/metrics?project=` | Metrics |
 | `POST` | `/reviews/path` | Path review + persist |
+| `POST` | `/reviews/work-package` | Work Package review + persist (no Jira) |
+| `GET` | `/reviews` | List persisted reviews |
 | `GET` | `/reviews/:id` | Persisted review |
+| `POST` | `/reviews/:id/applied` | Mark review applied after Quality Apply |
 
 `POST /reviews/path` body: `{ "projectId", "path", "handoff" }`. Contract errors → 4xx. A completed failing review → **200** with `verdict: "fail"`.
 
