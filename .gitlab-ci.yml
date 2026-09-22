@@ -32,11 +32,19 @@ build_marketplace:
     - npm run build
     - npm run accept:marketplace
     - test -f apps/marketplace-site/docs/.vitepress/dist/index.html
+  artifacts:
+    paths:
+      - apps/marketplace-site/docs/.vitepress/dist/
+      - docs/user/
+    expire_in: 1 hour
 
 site_artifact:
   stage: package
-  needs: [build_marketplace]
+  needs:
+    - job: build_marketplace
+      artifacts: true
   script:
+    - test -f apps/marketplace-site/docs/.vitepress/dist/index.html
     - mkdir -p public
     - cp -R apps/marketplace-site/docs/.vitepress/dist/. public/
     - |
