@@ -1,22 +1,26 @@
 # Плагины
 
-Praxis поставляет **ролевые плагины Claude Code** и отдельный сервис Quality.
+Установите **Praxis Runtime** один раз, затем только нужный role ZIP. Обычная установка — Claude Desktop / Cowork с GitLab Releases: [С чего начать](/ru/guide/start) и [Каталог](/catalog/).
 
-| Компонент | Пакет | Лицензия | Документация |
-|-----------|-------|----------|--------------|
-| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/ru/plugins/ba) |
-| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/ru/plugins/architect) |
-| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/ru/plugins/developer) |
-| praxis-quality | `@praxis/quality-service` | UNLICENSED | [Quality](/ru/plugins/quality) |
+| Компонент | Пакет | Лицензия | Документация | Releases |
+|-----------|-------|----------|--------------|----------|
+| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/ru/plugins/ba) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
+| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/ru/plugins/architect) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
+| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/ru/plugins/developer) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
+| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/ru/plugins/quality) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
 
-Корпоративный **Jira** (`@praxis/jira`, UNLICENSED) не публичный ролевой плагин и не нужен для цепочки BA→Architect→Developer→Quality.
+Runtime: [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) (`praxis-runtime.mcpb`).
 
-## Установка (Claude Code)
+Корпоративный **Jira** (`@praxis/jira`, UNLICENSED) не публичный ролевой плагин.
 
-По шагам (клон, `npm install`, локальные папки плагинов, первый чат): **[С чего начать](/ru/guide/start)**. Что писать в сессии и как забрать WP: **[работа в сессии](/ru/guide/sessions)**.
+## Установка (Claude Desktop)
 
-Ролевые плагины (**praxis-ba**, **praxis-architect**, **praxis-developer**) — **Apache-2.0**, это линейка для GitHub / open source. Корпоративная инфраструктура (**Quality**, **Jira**) остаётся UNLICENSED и в эту линейку не входит.
+1. Скачайте Runtime MCPB и нужные ZIP с Release-ссылок (или из [Каталога](/catalog/)).
+2. Следуйте [Desktop installation](/user-guide/getting-started/installation).
+3. Сессии: [работа в сессии](/ru/guide/sessions).
 
-Пакетов **ещё нет** на публичном npm. Установка — `npm install` в git-клоне ([с чего начать](/ru/guide/start)). Claude Code указывайте на `plugins/ba`, `plugins/architect`, `plugins/developer`.
+Не клонируйте Praxis-mono, не берите временные CI job artifacts и не ставьте роли с публичного npm через `npm install -g`.
 
-Конвейер: [как роли связаны](/ru/guide/). Сессии и скиллы: [работа в сессии](/ru/guide/sessions). Машинный CLI: [запуск](/ru/guide/run).
+## Advanced (исходники продукта / CI)
+
+Если вы разрабатываете **репозиторий продукта**, используйте его `npm run verify` и при необходимости Claude Code directory plugins. Это путь для maintainers, не для обычных Desktop-пользователей. См. [запуск](/ru/guide/run).

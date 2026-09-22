@@ -1,22 +1,26 @@
 # Plugins
 
-Praxis ships **Claude Code role plugins** plus a separate Quality service.
+Install **Praxis Runtime** once, then only the role ZIP you need. Ordinary install is Claude Desktop / Cowork from GitLab Releases — see [Getting started](/guide/start) and the [Catalog](/catalog/).
 
-| Component | Package | License | Docs |
-|-----------|---------|---------|------|
-| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/plugins/ba) |
-| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/plugins/architect) |
-| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/plugins/developer) |
-| praxis-quality | `@praxis/quality-service` | UNLICENSED | [Quality](/plugins/quality) |
+| Component | Package | License | Docs | Releases |
+|-----------|---------|---------|------|----------|
+| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/plugins/ba) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
+| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/plugins/architect) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
+| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/plugins/developer) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
+| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/plugins/quality) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
 
-Company-only **Jira** (`@praxis/jira`, UNLICENSED) is not a public role plugin and is not required for the BA→Architect→Developer→Quality chain.
+Runtime: [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) (`praxis-runtime.mcpb`).
 
-## Install (Claude Code)
+Company-only **Jira** (`@praxis/jira`, UNLICENSED) is not a public role plugin.
 
-Step-by-step (clone, `npm install`, local plugin folders, first chat): **[Getting started](/guide/start)**. What to type in session and how to claim a WP: **[Working in a session](/guide/sessions)**.
+## Install (Claude Desktop)
 
-Role plugins (**praxis-ba**, **praxis-architect**, **praxis-developer**) are **Apache-2.0** and are the GitHub / open-source lineup. Company infra (**Quality**, **Jira**) stays UNLICENSED and is not in that lineup.
+1. Download Runtime MCPB + role ZIPs from the Release links above (or the [Catalog](/catalog/)).
+2. Follow [Desktop installation](/user-guide/getting-started/installation).
+3. Sessions and skills: [Working in a session](/guide/sessions).
 
-Packages are **not** on the public npm registry yet. Install is `npm install` in a git clone ([Getting started](/guide/start)). Point Claude Code at `plugins/ba`, `plugins/architect`, `plugins/developer`.
+Do **not** clone Praxis-mono, do not use temporary CI job artifacts, and do not `npm install -g` role packages from the public npm registry.
 
-Pipeline: [how roles work together](/guide/). Sessions and skills: [Working in a session](/guide/sessions). Machine CLI: [Run and verify](/guide/run).
+## Advanced (product source / CI)
+
+If you develop a **product repository**, use that repo’s own `npm run verify` and optional Claude Code directory plugins. That path is for maintainers — not ordinary Desktop users. See [Run and verify](/guide/run).

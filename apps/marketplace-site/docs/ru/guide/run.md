@@ -1,6 +1,8 @@
 # Запуск и проверка
 
-Сначала пройдите [С чего начать](/ru/guide/start). Команды — из корня **монорепозитория** Praxis, после `npm install` и `npm run build`.
+Страница для **maintainers / CI**. Обычные Desktop-пользователи ставят продукты с GitLab Releases ([Каталог](/catalog/), [Installation](/user-guide/getting-started/installation)) и эти команды не запускают.
+
+Сначала пройдите [С чего начать](/ru/guide/start). Команды — из корня **репозитория продукта**, который вы разрабатываете (не Praxis-mono), после `npm install` и `npm run build`.
 
 ## Проверить, что стоит (первая команда)
 

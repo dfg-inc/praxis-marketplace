@@ -117,4 +117,6 @@ That last command writes [BA→Architect handoff](/guide/handoffs).
 
 ## Install in a host repo
 
-See [Getting started](/guide/start): clone the monorepo, `npm install`, then enable `plugins/ba` as a **directory** marketplace. Do not `npm install @praxis/ba` from the public registry.
+Ordinary users: install from that product’s GitLab Release ZIP via [Getting started](/guide/start) / [Desktop installation](/user-guide/getting-started/installation). Do not clone Praxis-mono and do not `npm install @praxis/ba` from the public registry.
+
+Maintainers working from a product source checkout may enable `plugins/ba` as a **directory** marketplace for Claude Code.

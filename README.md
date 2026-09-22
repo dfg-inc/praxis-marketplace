@@ -1,7 +1,12 @@
 # praxis-marketplace
 
-Public Marketplace site. Catalog pins Runtime MCPB + four independent role ZIPs from their **GitLab Releases** (Generic Package Registry), not Praxis-mono archives and not ephemeral CI job artifacts.
+Marketplace site. Catalog pins Runtime MCPB + four independent role ZIPs from their **GitLab Releases** (Generic Package Registry), not Praxis-mono archives and not ephemeral CI job artifacts.
 
+**Production URL (GitLab Pages, unique domain):** https://praxis-marketplace-833761.pages.jetru.by
+
+**Docs portal:** https://praxis-docs-e263c2.pages.jetru.by
+
+Access: project is **private**; sign into `gl.jetru.by` before opening Pages. VitePress `base` is `/` because unique domain is enabled.
 
 ## Local development
 
@@ -13,7 +18,7 @@ npm run verify
 
 ## CI
 
-`build_marketplace` fetches private `praxis-docs` with `CI_JOB_TOKEN`, syncs Markdown, builds VitePress, runs acceptance.
+`build_marketplace` fetches private `praxis-docs` with `CI_JOB_TOKEN`, syncs Markdown, builds VitePress, runs acceptance. Push to `master` then deploys via the GitLab `pages` job.
 
 **Required GitLab setting:** on `praxis-docs` → Job token permissions → allow inbound from `praxis-marketplace`.
 
@@ -25,7 +30,3 @@ Optional CI variables:
 | `PRAXIS_DOCS_REF` | Git ref to sync | `master` |
 
 Do **not** store PATs in the repository. Do not log token values.
-
-## Release
-
-Static site artifact (`public/`). No production deploy in default CI.

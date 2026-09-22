@@ -1,8 +1,8 @@
 # Working in a session
 
-For someone who opened Claude Code and must run a role **without a Praxis maintainer**: which skills exist, what to type, how to claim a Work Package.
+For someone who opened Claude Desktop / Cowork (or Claude Code) and must run a role **without a Praxis maintainer**: which skills exist, what to type, how to claim a Work Package.
 
-Plugins must already be enabled ([Getting started](/guide/start)). The working directory is the **product** repository, not the Praxis monorepo.
+Ordinary install is Desktop extensions from GitLab Releases ([Getting started](/guide/start), [Catalog](/catalog/)). The working directory is the **product** repository, not Praxis-mono.
 
 ## How to invoke skills
 
@@ -26,11 +26,14 @@ GDS on Jira uses keys like `PRX-12`. Canon folders `WP-…` are requirements, no
 
 ## Daily loop (Jira)
 
-From the **Praxis monorepo** root (Claude Code, `.env.praxis.local`, plugins installed into the product):
+**Desktop / Cowork users:** open the product repo in Claude and run the role Skill — no Make targets required.
+
+**Maintainers (optional product-source tooling):** from a product checkout with plugins installed:
 
 ```bash
+# Example maintainer helpers (not the ordinary Desktop install path)
 # Install plugins into the product repo (once per version)
-make install-test VERSION=0.1.0-alpha.25 TEST_REPO=/path/to/product
+make install-test VERSION=0.1.0-alpha.44 TEST_REPO=/path/to/product
 
 # Each target opens Claude Code in REPO
 make ba         EPIC=PRX-1  REPO=/path/to/product

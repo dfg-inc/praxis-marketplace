@@ -117,4 +117,4 @@ node plugins/ba/canon-graph/bin/praxis-ba.mjs wp approve-plan \
 
 ## Установка в хост-репозиторий
 
-См. [с чего начать](/ru/guide/start): клон монорепозитория, `npm install`, затем `plugins/ba` как marketplace типа **directory**. Не ставьте `@praxis/ba` с публичного npm.
+См. [с чего начать](/ru/guide/start) / [Desktop installation](/user-guide/getting-started/installation): обычные пользователи ставят ZIP с GitLab Release. Не клонируйте Praxis-mono и не ставьте `@praxis/ba` с публичного npm. Maintainers могут подключить `plugins/ba` как directory marketplace в Claude Code.

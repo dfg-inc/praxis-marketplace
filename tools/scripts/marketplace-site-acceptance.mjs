@@ -40,6 +40,19 @@ for (const p of catalog.plugins) {
   const doc = join(docs, "plugins", `${p.name.replace("praxis-", "")}.md`);
   if (!existsSync(doc)) fail(`missing plugin page ${relative(root, doc)}`);
 }
+if (!catalogPage.includes("praxis-runtime.mcpb")) fail("catalog page missing Runtime MCPB");
+if (!catalogPage.includes("GitLab Release")) fail("catalog page must point at GitLab Releases");
+if (/\/-\/jobs\/\d+\/artifacts/.test(catalogPage)) fail("catalog must not link temporary CI artifacts");
+const indexPage = readFileSync(join(docs, "index.md"), "utf8");
+if (!indexPage.includes("praxis-runtime.mcpb")) fail("index missing Runtime asset");
+for (const url of [
+  "https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases",
+  "https://praxis-docs-e263c2.pages.jetru.by",
+]) {
+  if (!catalogPage.includes(url) && !indexPage.includes(url)) {
+    fail(`missing required URL ${url} in catalog or index`);
+  }
+}
 
 const roleRoots = {
   ba: baRoot,

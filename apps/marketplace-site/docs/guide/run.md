@@ -1,6 +1,8 @@
 # Run and verify
 
-Use this page **after** [Getting started](/guide/start). Commands are from the Praxis **monorepo** root, with `npm install` and `npm run build` already done.
+Advanced / CI page for **product maintainers**. Ordinary Desktop users install from GitLab Releases ([Catalog](/catalog/), [Desktop installation](/user-guide/getting-started/installation)) and do not run these commands.
+
+Use this page **after** [Getting started](/guide/start). Commands are from the **product repository** root you are developing (not Praxis-mono), with that repo’s `npm install` / `npm run build` already done.
 
 ## Prove it works (first command)
 

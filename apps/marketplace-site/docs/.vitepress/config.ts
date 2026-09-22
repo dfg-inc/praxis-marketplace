@@ -1,20 +1,24 @@
 import { defineConfig } from "vitepress";
 
+const DOCS_URL = "https://praxis-docs-e263c2.pages.jetru.by";
+
 const enNav = [
   { text: "Guide", link: "/guide/start" },
-  { text: "Desktop docs", link: "/user-guide/" },
+  { text: "Catalog", link: "/catalog/" },
   { text: "Plugins", link: "/plugins/" },
   { text: "Method", link: "/method/" },
-  { text: "Catalog", link: "/catalog/" },
+  { text: "Desktop docs", link: "/user-guide/" },
+  { text: "Docs portal", link: `${DOCS_URL}/` },
   { text: "Changelog", link: "/changelog" },
 ];
 
 const ruNav = [
   { text: "Гайд", link: "/ru/guide/start" },
-  { text: "Desktop docs", link: "/user-guide/" },
+  { text: "Каталог", link: "/catalog/" },
   { text: "Плагины", link: "/ru/plugins/" },
   { text: "Метод", link: "/ru/method/" },
-  { text: "Каталог", link: "/catalog/" },
+  { text: "Desktop docs", link: "/user-guide/" },
+  { text: "Docs portal", link: `${DOCS_URL}/` },
   { text: "Changelog", link: "/changelog" },
 ];
 
@@ -68,7 +72,9 @@ const ruSidebar = {
 };
 
 export default defineConfig({
-  title: "Praxis",
+  // Unique-domain GitLab Pages: https://praxis-marketplace-833761.pages.jetru.by
+  base: "/",
+  title: "Praxis Marketplace",
   description: "Role plugins, method, and catalog",
   ignoreDeadLinks: true,
   locales: {
