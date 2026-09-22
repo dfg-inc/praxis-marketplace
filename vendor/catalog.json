@@ -1,33 +1,43 @@
 {
   "schemaVersion": 1,
   "updated": "2026-09-22",
-  "channel": "gitlab-products",
-  "channelNote": "Artifacts come from independent GitLab product CI jobs, not Praxis-mono archives",
+  "channel": "gitlab-releases",
+  "channelNote": "Install from each product GitLab Releases (Generic Package Registry). Not Praxis-mono archives. Not ephemeral CI job artifacts.",
   "distribution": {
     "runtime": {
       "repository": "engineering/ai-tooling/praxis-runtime",
-      "artifact": "praxis-runtime.mcpb"
+      "releases": "https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases",
+      "artifact": "praxis-runtime.mcpb",
+      "genericPackage": "praxis-runtime"
     },
     "roles": [
       {
         "name": "praxis-ba",
         "repository": "engineering/ai-tooling/praxis-ba",
-        "artifact": "praxis-ba.zip"
+        "releases": "https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases",
+        "artifact": "praxis-ba.zip",
+        "genericPackage": "praxis-ba"
       },
       {
         "name": "praxis-architect",
         "repository": "engineering/ai-tooling/praxis-architect",
-        "artifact": "praxis-architect.zip"
+        "releases": "https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases",
+        "artifact": "praxis-architect.zip",
+        "genericPackage": "praxis-architect"
       },
       {
         "name": "praxis-developer",
         "repository": "engineering/ai-tooling/praxis-developer",
-        "artifact": "praxis-developer.zip"
+        "releases": "https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases",
+        "artifact": "praxis-developer.zip",
+        "genericPackage": "praxis-developer"
       },
       {
         "name": "praxis-quality",
         "repository": "engineering/ai-tooling/praxis-quality",
-        "artifact": "praxis-quality.zip"
+        "releases": "https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases",
+        "artifact": "praxis-quality.zip",
+        "genericPackage": "praxis-quality"
       }
     ],
     "docs": {
@@ -38,7 +48,7 @@
     },
     "core": {
       "repository": "engineering/ai-tooling/praxis-core",
-      "packages": "vendor tgz / optional Package Registry"
+      "packages": "tracked vendor/*.tgz default; optional GitLab npm Package Registry via manual publish_registry"
     }
   },
   "plugins": [

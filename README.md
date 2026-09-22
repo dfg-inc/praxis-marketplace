@@ -1,6 +1,7 @@
 # praxis-marketplace
 
-Public Marketplace site. Catalog pins Runtime MCPB + four independent role ZIPs from their GitLab product repos (not Praxis-mono archives).
+Public Marketplace site. Catalog pins Runtime MCPB + four independent role ZIPs from their **GitLab Releases** (Generic Package Registry), not Praxis-mono archives and not ephemeral CI job artifacts.
+
 
 ## Local development
 
