@@ -1,0 +1,56 @@
+# praxis-marketplace — GitLab CI
+# Requires job-token allowlist on praxis-docs for this project (inbound).
+# Variables (optional overrides): PRAXIS_DOCS_PROJECT_PATH, PRAXIS_DOCS_REF
+# No production deploy in this pipeline.
+stages:
+  - verify
+  - package
+
+default:
+  image: node:22-bookworm
+  interruptible: true
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [.npm/]
+  before_script:
+    - node -v && npm -v
+    - npm ci --cache .npm --prefer-offline
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  PRAXIS_DOCS_PROJECT_PATH: "engineering/ai-tooling/praxis-docs"
+  PRAXIS_DOCS_REF: "master"
+
+build_marketplace:
+  stage: verify
+  script:
+    - node tools/scripts/fetch-docs-ci.mjs
+    - export PRAXIS_DOCS_USER="$CI_PROJECT_DIR/docs/user"
+    - test -f "$PRAXIS_DOCS_USER/index.md"
+    - npm run sync-docs
+    - npm run build
+    - npm run accept:marketplace
+    - test -f apps/marketplace-site/docs/.vitepress/dist/index.html
+
+site_artifact:
+  stage: package
+  needs: [build_marketplace]
+  script:
+    - mkdir -p public
+    - cp -R apps/marketplace-site/docs/.vitepress/dist/. public/
+    - |
+      python3 - <<'PY'
+      import hashlib, json, pathlib
+      files = sorted(p for p in pathlib.Path("public").rglob("*") if p.is_file())
+      assert files, "empty marketplace site"
+      sample = [{"file": str(p), "sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "bytes": p.stat().st_size} for p in files[:40]]
+      pathlib.Path("dist-marketplace-checksums.json").write_text(json.dumps({"fileCount": len(files), "sample": sample}, indent=2) + "\n")
+      print("files", len(files))
+      PY
+  artifacts:
+    paths:
+      - public/
+      - dist-marketplace-checksums.json
+    expire_in: 30 days
+    name: "praxis-marketplace-site-$CI_COMMIT_SHORT_SHA"

@@ -19,6 +19,8 @@ tmp/
 **/.vitepress/dist/
 apps/marketplace-site/docs/.vitepress/dist/
 apps/marketplace-site/docs/user-guide/
+# Fetched from praxis-docs in CI (never commit)
+docs/user/
 
 # Runtime / local DBs
 *.sqlite

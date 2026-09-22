@@ -1,8 +1,46 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-09-21",
-  "channel": "local-mirror",
-  "channelNote": "Public URL assigned after EXTERNAL domain/TLS + mirror sync",
+  "updated": "2026-09-22",
+  "channel": "gitlab-products",
+  "channelNote": "Artifacts come from independent GitLab product CI jobs, not Praxis-mono archives",
+  "distribution": {
+    "runtime": {
+      "repository": "engineering/ai-tooling/praxis-runtime",
+      "artifact": "praxis-runtime.mcpb"
+    },
+    "roles": [
+      {
+        "name": "praxis-ba",
+        "repository": "engineering/ai-tooling/praxis-ba",
+        "artifact": "praxis-ba.zip"
+      },
+      {
+        "name": "praxis-architect",
+        "repository": "engineering/ai-tooling/praxis-architect",
+        "artifact": "praxis-architect.zip"
+      },
+      {
+        "name": "praxis-developer",
+        "repository": "engineering/ai-tooling/praxis-developer",
+        "artifact": "praxis-developer.zip"
+      },
+      {
+        "name": "praxis-quality",
+        "repository": "engineering/ai-tooling/praxis-quality",
+        "artifact": "praxis-quality.zip"
+      }
+    ],
+    "docs": {
+      "repository": "engineering/ai-tooling/praxis-docs"
+    },
+    "marketplace": {
+      "repository": "engineering/ai-tooling/praxis-marketplace"
+    },
+    "core": {
+      "repository": "engineering/ai-tooling/praxis-core",
+      "packages": "vendor tgz / optional Package Registry"
+    }
+  },
   "plugins": [
     {
       "name": "praxis-ba",
@@ -21,16 +59,12 @@
       "package": "@praxis/developer",
       "version": "0.1.0-alpha.44",
       "license": "Apache-2.0"
-    }
-  ],
-  "unpublished": [
-    {
-      "name": "praxis-quality",
-      "reason": "company-only quality-service — not in public lineup"
     },
     {
-      "name": "praxis-jira",
-      "reason": "company-only Jira mediator — UNLICENSED, not published"
+      "name": "praxis-quality",
+      "package": "@praxis/quality",
+      "version": "0.1.0-alpha.44",
+      "license": "UNLICENSED"
     }
   ]
 }

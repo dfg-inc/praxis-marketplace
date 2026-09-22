@@ -7,10 +7,11 @@
     "apps/*"
   ],
   "scripts": {
+    "fetch:docs": "node tools/scripts/fetch-docs-ci.mjs",
     "sync-docs": "node tools/scripts/sync-user-docs.mjs",
     "build": "npm run build -w @praxis/marketplace-site",
     "accept:marketplace": "node tools/scripts/marketplace-site-acceptance.mjs",
-    "verify": "npm run sync-docs && npm run build && npm run accept:marketplace"
+    "verify": "npm run fetch:docs && npm run sync-docs && npm run build && npm run accept:marketplace"
   },
   "engines": {
     "node": ">=20"
