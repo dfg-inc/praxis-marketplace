@@ -1,0 +1,42 @@
+{
+  "name": "praxis",
+  "owner": {
+    "name": "Praxis"
+  },
+  "metadata": {
+    "description": "Praxis role plugins and the Jira runtime. Core is a library dependency and is not an installable plugin. SimpleOne is not installable.",
+    "version": "0.1.0-alpha.47"
+  },
+  "plugins": [
+    {
+      "name": "praxis-runtime",
+      "source": "./plugins/praxis-runtime",
+      "description": "Claude Code plugin for Praxis Runtime. The MCPB bundle remains at claude-extensions/praxis-runtime.mcpb for classic Desktop.",
+      "version": "0.1.0-alpha.47"
+    },
+    {
+      "name": "praxis-ba",
+      "source": "./plugins/praxis-ba",
+      "description": "Business analysis skills, including local capture without Jira.",
+      "version": "0.1.0-alpha.47"
+    },
+    {
+      "name": "praxis-architect",
+      "source": "./plugins/praxis-architect",
+      "description": "Architecture decisions. Approving a decision does not confirm story behavior.",
+      "version": "0.1.0-alpha.47"
+    },
+    {
+      "name": "praxis-developer",
+      "source": "./plugins/praxis-developer",
+      "description": "Implementation skills for accepted work packages.",
+      "version": "0.1.0-alpha.47"
+    },
+    {
+      "name": "praxis-quality",
+      "source": "./plugins/praxis-quality",
+      "description": "Verification skills. Verdicts stay separate from story confirmation.",
+      "version": "0.1.0-alpha.47"
+    }
+  ]
+}
