@@ -1,0 +1,22 @@
+{
+  "name": "@praxis/developer",
+  "version": "0.1.0-alpha.47",
+  "private": true,
+  "description": "praxis-developer Claude Code plugin",
+  "license": "Apache-2.0",
+  "scripts": {
+    "accept-work-package": "node ./tools/accept-work-package.mjs",
+    "developer-governance": "node ./tools/developer-governance.mjs",
+    "final-arbiter": "node ./tools/final-arbiter.mjs",
+    "run-work-package": "node ./tools/run-work-package.mjs",
+    "request-architecture-deviation": "node ./tools/request-architecture-deviation.mjs",
+    "session-bootstrap": "node ./tools/session-bootstrap.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@praxis/plugin-sdk": "file:../../vendor/praxis-plugin-sdk-0.1.0-alpha.47.tgz"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
