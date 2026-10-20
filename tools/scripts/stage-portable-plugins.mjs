@@ -7,6 +7,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, rmSync, readFileSync, writeFi
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import * as esbuild from "esbuild";
 
 const marketplaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const splitRoot = resolve(marketplaceRoot, "..");
@@ -32,6 +33,22 @@ for (const entry of entries) {
     recursive: true,
     filter: (src) => !src.includes("node_modules") && !src.includes("/.git/"),
   });
+  // The source bootstrap imports @praxis/plugin-sdk, which an installed plugin does not have. Ship a
+  // self-contained .cjs next to it, bundled from the source repository where the SDK resolves.
+  const bootstrap = join(entry.source, "tools", "session-bootstrap.mjs");
+  if (existsSync(bootstrap)) {
+    esbuild.buildSync({
+      entryPoints: [bootstrap],
+      outfile: join(dest, "tools", "session-bootstrap.cjs"),
+      bundle: true,
+      platform: "node",
+      target: "node20",
+      format: "cjs",
+      logLevel: "silent",
+      banner: { js: "var __import_meta_url = require('url').pathToFileURL(__filename).href;" },
+      define: { "import.meta.url": "__import_meta_url" },
+    });
+  }
   const st = lstatSync(dest);
   if (st.isSymbolicLink()) {
     throw new Error(`${dest} is still a symlink`);
