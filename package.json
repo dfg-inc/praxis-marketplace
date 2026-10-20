@@ -21,5 +21,8 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@praxis/catalog": "file:vendor/praxis-catalog-0.1.0-alpha.44.tgz"
+  },
+  "devDependencies": {
+    "esbuild": "0.21.5"
   }
 }
