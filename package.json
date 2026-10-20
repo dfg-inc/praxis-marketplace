@@ -11,7 +11,9 @@
     "sync-docs": "node tools/scripts/sync-user-docs.mjs",
     "build": "npm run build -w @praxis/marketplace-site",
     "accept:marketplace": "node tools/scripts/marketplace-site-acceptance.mjs",
-    "verify": "npm run fetch:docs && npm run sync-docs && npm run build && npm run accept:marketplace"
+    "verify": "npm run fetch:docs && npm run sync-docs && npm run build && npm run accept:marketplace",
+    "check:rc": "node tools/scripts/verify-release-candidate.mjs",
+    "test:rc": "node --test tools/scripts/verify-release-candidate.test.mjs"
   },
   "engines": {
     "node": ">=20"
