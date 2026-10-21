@@ -26,4 +26,4 @@ Praxis Core is not a plugin.
 
 `praxis-runtime` exposes MCP tools via `.mcp.json` → `server/praxis-mcp.cjs --role runtime` (zero skills is intentional).
 
-Default `PRAXIS_SECURITY_MODE` is secure. Protected writes require the isolated broker/executor.
+Protected writes (Git, Jira, confirming a Story) are approved by you: Praxis shows the exact action in the client's approval dialog and runs it only if you approve. A client without that dialog is reported by `praxis_doctor` as an unverified fallback.
