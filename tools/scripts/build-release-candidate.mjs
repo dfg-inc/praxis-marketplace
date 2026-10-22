@@ -27,6 +27,7 @@ const outDir = join(marketplaceRoot, "release-candidate");
 const pluginsOut = join(outDir, "plugins");
 
 const entries = [
+  { name: "praxis", repo: "praxis-marketplace", sourceRel: "plugins/praxis" },
   { name: "praxis-ba", repo: "praxis-ba", sourceRel: "plugins/ba" },
   { name: "praxis-architect", repo: "praxis-architect", sourceRel: "plugins/architect" },
   { name: "praxis-developer", repo: "praxis-developer", sourceRel: "plugins/developer" },
@@ -98,7 +99,7 @@ for (const entry of entries) {
   }
   plugins.push({
     name: entry.name,
-    version: pkg.version || "0.1.0-alpha.47",
+    version: pkg.version || "0.1.0-alpha.48",
     sourceRepository: entry.repo,
     sourceRevision: head,
     sourceBranch: branch,
@@ -116,21 +117,7 @@ for (const entry of entries) {
 }
 
 cpSync(join(marketplaceRoot, ".claude-plugin/marketplace.json"), join(outDir, ".claude-plugin/marketplace.json"));
-const marketplaceManifest = {
-  name: "praxis",
-  owner: { name: "Praxis" },
-  metadata: {
-    description: "Release-candidate staged marketplace. Built locally; not published.",
-    version: "0.1.0-alpha.47",
-  },
-  plugins: plugins.map((plugin) => ({
-    name: plugin.name,
-    source: `./plugins/${plugin.name}`,
-    description: `${plugin.name} RC`,
-    version: plugin.version,
-  })),
-};
-writeFileSync(join(outDir, ".claude-plugin/marketplace.json"), `${JSON.stringify(marketplaceManifest, null, 2)}\n`);
+// The release candidate ships the real marketplace manifest (entries, dependencies, versions), not a rewritten copy.
 
 const host = {
   node: process.version,

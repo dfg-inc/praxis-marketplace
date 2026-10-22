@@ -15046,6 +15046,1119 @@ function parseScopedPrecedentFile(path, level) {
   };
 }
 
+// ../praxis-developer/node_modules/@praxis/contracts/dist/git-host.js
+var GitHostProviderSchema = external_exports.enum(["gitlab", "github"]);
+var CreateMergeRequestRequestSchema = external_exports.object({
+  contract: external_exports.literal("developer.merge-request.remote-preview"),
+  version: external_exports.literal("0.1.0"),
+  provider: GitHostProviderSchema,
+  method: external_exports.literal("POST"),
+  url: external_exports.string().url(),
+  headers: external_exports.record(external_exports.string()),
+  body: external_exports.record(external_exports.unknown()),
+  dryRun: external_exports.literal(true),
+  wouldWrite: external_exports.literal(false),
+  missingCredentials: external_exports.boolean(),
+  blockedReason: external_exports.string().optional()
+});
+var CiProviderPreviewSchema = external_exports.object({
+  contract: external_exports.literal("quality.ci.provider-preview"),
+  version: external_exports.literal("0.1.0"),
+  provider: GitHostProviderSchema,
+  method: external_exports.literal("GET"),
+  url: external_exports.string().url(),
+  dryRun: external_exports.literal(true),
+  wouldWrite: external_exports.literal(false),
+  missingCredentials: external_exports.boolean(),
+  blockedReason: external_exports.string().optional()
+});
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/user-approval.js
+var import_node_async_hooks = require("node:async_hooks");
+var USER_APPROVAL_TTL_MS = 10 * 60 * 1e3;
+var channelStore = new import_node_async_hooks.AsyncLocalStorage();
+var lease = new import_node_async_hooks.AsyncLocalStorage();
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/story.js
+var RequirementIdSchema = external_exports.string().regex(/^(REQ-[A-Z][A-Z0-9]*-\d{3,}|[A-Z][A-Z0-9]*-(?:FR|NFR|BR)\d+)$/);
+var StoryIdSchema = external_exports.string().regex(/^US-[A-Z][A-Z0-9]*-\d{3,}$/);
+var CoverageStatusSchema = external_exports.enum([
+  "PASS",
+  "FAIL",
+  "PASS_WITH_RISKS",
+  "BLOCKED",
+  "NOT_VERIFIED"
+]);
+var StoryCriterionSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  given: external_exports.string().min(1),
+  when: external_exports.string().min(1),
+  then: external_exports.string().min(1)
+});
+var UserStorySchema = external_exports.object({
+  id: StoryIdSchema,
+  requirementIds: external_exports.array(RequirementIdSchema).min(1),
+  actor: external_exports.string().min(1),
+  narrative: external_exports.string().min(1),
+  objective: external_exports.string().min(1),
+  userValue: external_exports.string().min(1),
+  preconditions: external_exports.array(external_exports.string()).default([]),
+  happyPath: external_exports.array(external_exports.string()).min(1),
+  alternatives: external_exports.array(external_exports.string()).default([]),
+  negative: external_exports.array(external_exports.string()).default([]),
+  edgeCases: external_exports.array(external_exports.string()).default([]),
+  businessRules: external_exports.array(external_exports.string()).default([]),
+  acceptanceCriteria: external_exports.array(StoryCriterionSchema).min(1),
+  expectedResults: external_exports.array(external_exports.string()).min(1),
+  dependencies: external_exports.array(external_exports.string()).default([]),
+  assumptionIds: external_exports.array(external_exports.string()).default([]),
+  unresolvedDecisionIds: external_exports.array(external_exports.string()).default([]),
+  serviceIds: external_exports.array(external_exports.string()).default([]),
+  revision: external_exports.number().int().positive(),
+  status: external_exports.enum(["proposed", "confirmed", "superseded"]),
+  confirmedBehavior: external_exports.boolean(),
+  stale: external_exports.boolean().default(false)
+});
+var CoverageEntrySchema = external_exports.object({
+  /** Absent for requirement-only evidence: a work item verified without a Story. */
+  storyId: StoryIdSchema.optional(),
+  /** Story revision this scenario verified. Older revisions are not evidence for the current one. */
+  storyRevision: external_exports.number().int().positive().optional(),
+  requirementId: RequirementIdSchema,
+  acceptanceCriterionId: external_exports.string().min(1),
+  scenarioId: external_exports.string().min(1),
+  kind: external_exports.enum(["happy", "alternative", "negative", "edge", "contract", "security"]),
+  serviceId: external_exports.string().min(1),
+  repository: external_exports.string().default(""),
+  implementationPath: external_exports.string().default(""),
+  testRef: external_exports.string().default(""),
+  evidence: external_exports.array(external_exports.string()).default([]),
+  findingId: external_exports.string().optional(),
+  status: CoverageStatusSchema,
+  critical: external_exports.boolean().default(false)
+});
+var ChangeRecordSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  findingId: external_exports.string().min(1),
+  storyIds: external_exports.array(StoryIdSchema).default([]),
+  requirementIds: external_exports.array(RequirementIdSchema).default([]),
+  serviceId: external_exports.string().min(1),
+  repository: external_exports.string().min(1),
+  branch: external_exports.string().min(1),
+  baseSha: external_exports.string().min(1),
+  commitSha: external_exports.string().min(1),
+  files: external_exports.array(external_exports.string()).default([]),
+  remote: external_exports.string().optional(),
+  changeRequest: external_exports.string().optional(),
+  mrStatus: external_exports.enum(["opened", "blocked", "not_requested"]),
+  authorRole: external_exports.literal("quality")
+});
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/workflow.js
+var WORKFLOW_CONTRACT_VERSION = "1.0.0";
+var WorkflowStageSchema = external_exports.enum([
+  "draft",
+  "clarification_required",
+  "ready",
+  "in_progress",
+  "review_required",
+  "changes_requested",
+  "blocked",
+  "approved",
+  "completed"
+]);
+var WorkflowRoleSchema = external_exports.enum([
+  "user",
+  "ba",
+  "architect",
+  "developer",
+  "quality"
+]);
+var ClarificationClassSchema = external_exports.enum([
+  "blocking",
+  "non_blocking",
+  "recommendation",
+  "informational"
+]);
+var SideEffectSchema = external_exports.enum([
+  "read",
+  "local_write",
+  "external_mutate",
+  "destructive"
+]);
+var QualityVerdictSchema = external_exports.enum([
+  "PASS",
+  "PASS_WITH_RISKS",
+  "FAIL"
+]);
+var RequirementIdSchema2 = external_exports.string().regex(/^(REQ-[A-Z][A-Z0-9]*-\d{3,}|[A-Z][A-Z0-9]*-(?:FR|NFR|BR)\d+)$/);
+var WorkItemSourceSchema = external_exports.enum([
+  "local",
+  "markdown",
+  "repository",
+  "jira",
+  "simpleone"
+]);
+var WorkTrackingProviderSchema = external_exports.enum(["local", "jira", "simpleone"]);
+var WorkItemRelationSchema = external_exports.enum(["depends-on", "blocks", "relates-to", "derived-from"]);
+var WorkItemLinkSchema = external_exports.object({
+  repository: external_exports.string().min(1),
+  workItemId: external_exports.string().min(1),
+  relation: WorkItemRelationSchema
+});
+var WorkItemSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  projectId: external_exports.string().min(1),
+  title: external_exports.string().min(1),
+  source: WorkItemSourceSchema,
+  /** Optional external key. Never the work item's identity. */
+  jiraIssueKey: external_exports.string().min(1).optional(),
+  /** Tracker that owns the external record. Local work leaves this unset. */
+  provider: WorkTrackingProviderSchema.optional(),
+  /** External record id (Jira id or SimpleOne sys_id). Not the Praxis id. */
+  externalId: external_exports.string().min(1).optional(),
+  /** Human-facing external number (PROJ-1, STR0001234). */
+  externalNumber: external_exports.string().min(1).optional(),
+  /** Instance base URL or tenant id. Distinguishes two trackers of the same kind. */
+  instanceId: external_exports.string().min(1).optional(),
+  status: WorkflowStageSchema,
+  revision: external_exports.number().int().nonnegative(),
+  links: external_exports.array(WorkItemLinkSchema).optional()
+});
+var AcceptanceCriterionSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  requirementId: RequirementIdSchema2,
+  statement: external_exports.string().min(1),
+  revision: external_exports.number().int().positive()
+});
+var RequirementSchema = external_exports.object({
+  id: RequirementIdSchema2,
+  statement: external_exports.string().min(1),
+  revision: external_exports.number().int().positive(),
+  status: external_exports.enum(["proposed", "approved", "superseded"]),
+  acceptanceCriteria: external_exports.array(AcceptanceCriterionSchema),
+  serviceIds: external_exports.array(external_exports.string()),
+  assumptionIds: external_exports.array(external_exports.string())
+});
+var ServiceSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  name: external_exports.string().min(1),
+  kind: external_exports.enum([
+    "application",
+    "module",
+    "api",
+    "worker",
+    "frontend",
+    "persistence",
+    "external"
+  ]),
+  repository: external_exports.string().optional(),
+  localPath: external_exports.string().optional(),
+  remoteUrl: external_exports.string().optional(),
+  branch: external_exports.string().optional(),
+  commitSha: external_exports.string().optional(),
+  changeRequest: external_exports.string().optional(),
+  responsibilities: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(RequirementIdSchema2),
+  dependsOn: external_exports.array(external_exports.string()),
+  status: WorkflowStageSchema
+});
+var ArtifactRefSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  path: external_exports.string().min(1),
+  revision: external_exports.number().int().positive(),
+  role: WorkflowRoleSchema
+});
+var RoleHandoffSchema = external_exports.object({
+  contract: external_exports.literal("praxis.role.handoff"),
+  version: external_exports.literal(WORKFLOW_CONTRACT_VERSION),
+  workflowId: external_exports.string().min(1),
+  workItemId: external_exports.string().min(1),
+  handoffId: external_exports.string().min(1),
+  sourceRole: WorkflowRoleSchema,
+  targetRole: WorkflowRoleSchema,
+  serviceIds: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(RequirementIdSchema2),
+  acceptanceCriterionIds: external_exports.array(external_exports.string()),
+  storyIds: external_exports.array(external_exports.string()).default([]),
+  artifactRefs: external_exports.array(ArtifactRefSchema),
+  decisions: external_exports.array(external_exports.string()),
+  assumptions: external_exports.array(external_exports.string()),
+  openQuestions: external_exports.array(external_exports.string()),
+  risks: external_exports.array(external_exports.string()),
+  blockers: external_exports.array(external_exports.string()),
+  decisionRecords: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    statement: external_exports.string(),
+    confirmed: external_exports.boolean(),
+    revision: external_exports.number().int().positive(),
+    rationale: external_exports.string().optional(),
+    notes: external_exports.string().optional()
+  })).default([]),
+  notes: external_exports.string().optional(),
+  /** Carried-forward items this handoff declares resolved (exact text). Audit only. */
+  resolved: external_exports.array(external_exports.string()).default([]),
+  nextActions: external_exports.array(external_exports.string()),
+  readiness: external_exports.enum(["ready", "partial", "blocked"]),
+  evidenceRefs: external_exports.array(external_exports.string()),
+  revision: external_exports.number().int().positive(),
+  supersedes: external_exports.string().optional(),
+  fingerprint: external_exports.string().min(1)
+});
+var FindingSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+  serviceIds: external_exports.array(external_exports.string()),
+  owner: WorkflowRoleSchema,
+  summary: external_exports.string().min(1),
+  evidence: external_exports.array(external_exports.string()).min(1),
+  status: external_exports.enum(["open", "resolved"]),
+  severity: external_exports.enum(["critical", "high", "medium", "low"]).optional(),
+  storyIds: external_exports.array(external_exports.string()).optional(),
+  acceptanceCriterionIds: external_exports.array(external_exports.string()).optional(),
+  repository: external_exports.string().optional(),
+  file: external_exports.string().optional(),
+  expected: external_exports.string().optional(),
+  observed: external_exports.string().optional(),
+  reproduction: external_exports.array(external_exports.string()).optional(),
+  suggestion: external_exports.string().optional()
+});
+var VerdictRecordSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  scope: external_exports.enum(["requirement", "service", "feature"]),
+  scopeId: external_exports.string().min(1),
+  verdict: QualityVerdictSchema,
+  evidenceRefs: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(RequirementIdSchema2),
+  stale: external_exports.boolean(),
+  invalidatedBy: external_exports.string().optional()
+});
+var CapabilitySchema = external_exports.object({
+  id: external_exports.string().min(1),
+  plugin: external_exports.string().min(1),
+  description: external_exports.string().min(1),
+  intents: external_exports.array(external_exports.string()),
+  stages: external_exports.array(WorkflowStageSchema),
+  roles: external_exports.array(WorkflowRoleSchema),
+  inputs: external_exports.array(external_exports.string()),
+  outputs: external_exports.array(external_exports.string()),
+  dependencies: external_exports.array(external_exports.string()),
+  sideEffect: SideEffectSchema,
+  activation: external_exports.enum(["guidance", "suggested", "explicit"]),
+  version: external_exports.string().min(1),
+  installed: external_exports.boolean()
+});
+var WorkflowStateSchema = external_exports.object({
+  contract: external_exports.literal("praxis.workflow.state"),
+  version: external_exports.literal(WORKFLOW_CONTRACT_VERSION),
+  workflowId: external_exports.string().min(1),
+  projectId: external_exports.string().min(1),
+  workItem: WorkItemSchema,
+  requirements: external_exports.array(RequirementSchema),
+  services: external_exports.array(ServiceSchema),
+  handoffs: external_exports.array(RoleHandoffSchema),
+  findings: external_exports.array(FindingSchema),
+  verdicts: external_exports.array(VerdictRecordSchema),
+  decisions: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    statement: external_exports.string(),
+    confirmed: external_exports.boolean(),
+    revision: external_exports.number().int().positive(),
+    rationale: external_exports.string().optional(),
+    notes: external_exports.string().optional()
+  })),
+  openQuestions: external_exports.array(external_exports.string()).default([]),
+  risks: external_exports.array(external_exports.string()).default([]),
+  blockers: external_exports.array(external_exports.string()).default([]),
+  notes: external_exports.string().optional(),
+  assumptions: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    statement: external_exports.string(),
+    requirementIds: external_exports.array(RequirementIdSchema2)
+  })),
+  implementationUnits: external_exports.array(external_exports.object({
+    id: external_exports.string().min(1),
+    serviceId: external_exports.string().min(1),
+    requirementIds: external_exports.array(RequirementIdSchema2),
+    path: external_exports.string().min(1),
+    summary: external_exports.string().min(1),
+    contractRef: external_exports.string().optional(),
+    stale: external_exports.boolean()
+  })).default([]),
+  stories: external_exports.array(UserStorySchema).default([]),
+  coverage: external_exports.array(CoverageEntrySchema).default([]),
+  changes: external_exports.array(ChangeRecordSchema).default([]),
+  stage: WorkflowStageSchema,
+  history: external_exports.array(external_exports.object({
+    revision: external_exports.number().int().positive(),
+    stage: WorkflowStageSchema,
+    note: external_exports.string()
+  }))
+});
+var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
+  external_exports.object({
+    action: external_exports.literal("open"),
+    projectId: external_exports.string().min(1),
+    title: external_exports.string().min(1),
+    request: external_exports.string().min(1),
+    source: WorkItemSourceSchema.optional(),
+    jiraIssueKey: external_exports.string().min(1).optional(),
+    sequence: external_exports.number().int().positive().optional()
+  }),
+  external_exports.object({
+    // Resolved by the workflow store, which owns the index of work items.
+    action: external_exports.literal("select-work-item"),
+    workItemId: external_exports.string().min(1)
+  }),
+  external_exports.object({
+    action: external_exports.literal("link-work-item"),
+    target: WorkItemLinkSchema,
+    remove: external_exports.boolean().optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("add-requirement"),
+    id: RequirementIdSchema2,
+    statement: external_exports.string().min(1),
+    acceptanceCriteria: external_exports.array(external_exports.string().min(1)).min(1),
+    serviceIds: external_exports.array(external_exports.string()).optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("handoff"),
+    sourceRole: WorkflowRoleSchema,
+    targetRole: WorkflowRoleSchema,
+    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    serviceIds: external_exports.array(external_exports.string()).default([]),
+    nextActions: external_exports.array(external_exports.string()).default([]),
+    openQuestions: external_exports.array(external_exports.string()).default([]),
+    assumptions: external_exports.array(external_exports.string()).default([]),
+    blockers: external_exports.array(external_exports.string()).default([]),
+    risks: external_exports.array(external_exports.string()).optional(),
+    notes: external_exports.string().optional(),
+    resolved: external_exports.array(external_exports.string()).default([]),
+    readiness: external_exports.enum(["ready", "partial", "blocked"])
+  }),
+  external_exports.object({
+    action: external_exports.literal("revise-requirement"),
+    id: RequirementIdSchema2,
+    statement: external_exports.string().min(1)
+  }),
+  external_exports.object({
+    action: external_exports.literal("set-service"),
+    service: ServiceSchema
+  }),
+  external_exports.object({
+    action: external_exports.literal("clarify"),
+    role: WorkflowRoleSchema,
+    known: external_exports.array(external_exports.string()).default([]),
+    questions: external_exports.array(external_exports.object({
+      id: external_exports.string().min(1),
+      prompt: external_exports.string().min(1),
+      alreadyKnown: external_exports.boolean().optional(),
+      contradictsApproved: external_exports.boolean().optional(),
+      safeAssumption: external_exports.boolean().optional(),
+      assumption: external_exports.string().min(1).optional(),
+      changesBehavior: external_exports.boolean().optional()
+    })).default([])
+  }),
+  external_exports.object({
+    action: external_exports.literal("record-decision"),
+    id: external_exports.string().min(1),
+    statement: external_exports.string().min(1),
+    /** Recording a decision never confirms it; confirmation is a human act (confirm-decision) that needs the user's approval. */
+    confirmed: external_exports.boolean().default(false),
+    rationale: external_exports.string().optional(),
+    notes: external_exports.string().optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("confirm-decision"),
+    id: external_exports.string().min(1),
+    revision: external_exports.number().int().positive(),
+    contentFingerprint: external_exports.string().regex(/^sha256:[a-f0-9]{64}$/)
+  }),
+  external_exports.object({
+    action: external_exports.literal("record-context"),
+    openQuestions: external_exports.array(external_exports.string()).optional(),
+    risks: external_exports.array(external_exports.string()).optional(),
+    blockers: external_exports.array(external_exports.string()).optional(),
+    notes: external_exports.string().optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("confirm-story"),
+    id: StoryIdSchema,
+    revision: external_exports.number().int().positive(),
+    contentFingerprint: external_exports.string().regex(/^sha256:[a-f0-9]{64}$/)
+  }),
+  external_exports.object({
+    action: external_exports.literal("record-implementation"),
+    id: external_exports.string().min(1),
+    serviceId: external_exports.string().min(1),
+    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    path: external_exports.string().min(1),
+    summary: external_exports.string().min(1),
+    contractRef: external_exports.string().optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("feature-verdict")
+  }),
+  external_exports.object({
+    action: external_exports.literal("add-story"),
+    id: StoryIdSchema,
+    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    actor: external_exports.string().min(1),
+    narrative: external_exports.string().min(1),
+    objective: external_exports.string().min(1),
+    userValue: external_exports.string().min(1),
+    preconditions: external_exports.array(external_exports.string()).default([]),
+    happyPath: external_exports.array(external_exports.string()).min(1),
+    alternatives: external_exports.array(external_exports.string()).default([]),
+    negative: external_exports.array(external_exports.string()).default([]),
+    edgeCases: external_exports.array(external_exports.string()).default([]),
+    businessRules: external_exports.array(external_exports.string()).default([]),
+    acceptanceCriteria: external_exports.array(external_exports.object({
+      id: external_exports.string().min(1),
+      given: external_exports.string().min(1),
+      when: external_exports.string().min(1),
+      then: external_exports.string().min(1)
+    })).min(1),
+    expectedResults: external_exports.array(external_exports.string()).min(1),
+    dependencies: external_exports.array(external_exports.string()).default([]),
+    assumptionIds: external_exports.array(external_exports.string()).default([]),
+    unresolvedDecisionIds: external_exports.array(external_exports.string()).default([]),
+    serviceIds: external_exports.array(external_exports.string()).default([]),
+    confirmedBehavior: external_exports.boolean()
+  }),
+  external_exports.object({
+    action: external_exports.literal("locate-repositories")
+  }),
+  external_exports.object({
+    action: external_exports.literal("verify-stories"),
+    independentRerun: external_exports.boolean().optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("prepare-fix"),
+    serviceId: external_exports.string().min(1),
+    authorized: external_exports.boolean(),
+    existingBranch: external_exports.string().min(1).optional()
+  }),
+  external_exports.object({
+    action: external_exports.literal("record-verification"),
+    independentRerun: external_exports.boolean().default(false),
+    testsGreen: external_exports.boolean().optional(),
+    scenarios: external_exports.array(CoverageEntrySchema).default([]),
+    findings: external_exports.array(FindingSchema).default([])
+  }),
+  external_exports.object({
+    action: external_exports.literal("record-change"),
+    change: ChangeRecordSchema
+  }),
+  external_exports.object({
+    action: external_exports.literal("quality-check"),
+    requirementId: RequirementIdSchema2,
+    observedBehavior: external_exports.enum(["partial-success", "all-or-nothing", "unspecified"]).optional(),
+    implementationSource: external_exports.string().min(1).optional(),
+    serviceId: external_exports.string().min(1).optional(),
+    testsGreen: external_exports.boolean().optional(),
+    developerClaimsPass: external_exports.boolean().optional()
+  })
+]);
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/action-plan.js
+var import_node_crypto = require("node:crypto");
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/authority.js
+var DecisionKindSchema = external_exports.enum([
+  "architecture_decision",
+  "story_behavior",
+  "requirement_acceptance",
+  "development_action",
+  "quality_verdict",
+  "git_operation",
+  "issue_tracker_mutation"
+]);
+var SINGLE_AUTHORITY_OPERATIONS = ["git_commit", "git_push", "merge_request", "merge", "deploy", "release"];
+var TRACKER_OPERATIONS = ["external_record_create", "external_record_update", "external_state_change"];
+var RECORD_OPERATIONS = ["external_record_update", "repository_edit"];
+var DECISION_KIND_OPERATIONS = {
+  requirement_acceptance: RECORD_OPERATIONS,
+  architecture_decision: RECORD_OPERATIONS,
+  story_behavior: RECORD_OPERATIONS,
+  development_action: ["repository_edit", "validation_with_side_effects", "external_state_change"],
+  quality_verdict: ["external_state_change", "external_record_update", "repository_edit"],
+  git_operation: SINGLE_AUTHORITY_OPERATIONS,
+  issue_tracker_mutation: TRACKER_OPERATIONS
+};
+function authorityProblems(plan) {
+  const problems = [];
+  const allowed = DECISION_KIND_OPERATIONS[plan.decisionKind];
+  for (const operation of plan.operations) {
+    if (!allowed.includes(operation)) {
+      problems.push(`operation ${operation} is not covered by a ${plan.decisionKind} approval`);
+    }
+  }
+  const single = plan.operations.filter((operation) => SINGLE_AUTHORITY_OPERATIONS.includes(operation));
+  if (single.length > 1) {
+    problems.push(`${single.join(" and ")} are separate approvals and cannot share one plan`);
+  }
+  return problems;
+}
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/approval.js
+var ApprovalOperationSchema = external_exports.enum([
+  "external_record_create",
+  "external_record_update",
+  "external_state_change",
+  "repository_edit",
+  "validation_with_side_effects",
+  "git_commit",
+  "git_push",
+  "merge_request",
+  "merge",
+  "deploy",
+  "release"
+]);
+function canonicalize(value) {
+  if (Array.isArray(value))
+    return value.map(canonicalize);
+  if (value && typeof value === "object") {
+    const source = value;
+    const out = {};
+    for (const key of Object.keys(source).sort()) {
+      if (source[key] !== void 0)
+        out[key] = canonicalize(source[key]);
+    }
+    return out;
+  }
+  return value;
+}
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/action-plan.js
+var ACTION_PLAN_CONTRACT = "praxis.action.plan";
+var ACTION_PLAN_VERSION = 1;
+var ActionPlanBaseSchema = external_exports.object({
+  contract: external_exports.literal(ACTION_PLAN_CONTRACT),
+  version: external_exports.literal(ACTION_PLAN_VERSION),
+  planId: external_exports.string().min(1),
+  role: WorkflowRoleSchema.exclude(["user"]),
+  decisionKind: DecisionKindSchema,
+  summary: external_exports.string().min(1),
+  provider: WorkTrackingProviderSchema,
+  instanceId: external_exports.string().min(1),
+  operations: external_exports.array(ApprovalOperationSchema).min(1),
+  workItemIds: external_exports.array(external_exports.string()).default([]),
+  storyIds: external_exports.array(external_exports.string()).default([]),
+  decisionIds: external_exports.array(external_exports.string()).default([]),
+  repositories: external_exports.array(external_exports.string()).default([]),
+  branch: external_exports.string().optional(),
+  remote: external_exports.string().optional(),
+  actions: external_exports.array(external_exports.object({
+    action: external_exports.string().min(1),
+    description: external_exports.string().min(1),
+    targets: external_exports.array(external_exports.string()).default([]),
+    /** Exact approved change for fixture writes. Bound into the plan fingerprint. */
+    content: external_exports.string().optional()
+  })).min(1),
+  risks: external_exports.array(external_exports.string()).default([]),
+  sideEffects: external_exports.array(external_exports.string()).default([]),
+  createdAt: external_exports.string().datetime(),
+  expiresAt: external_exports.string().datetime()
+});
+var ActionPlanSchema = ActionPlanBaseSchema.extend({
+  fingerprint: external_exports.string().regex(/^sha256:[a-f0-9]{64}$/)
+}).superRefine((plan, ctx) => {
+  for (const problem of authorityProblems(plan))
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, message: problem, path: ["operations"] });
+  if (plan.actions.length !== 1) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, message: "a plan authorizes exactly one action; split it into separate plans", path: ["actions"] });
+  }
+  const { fingerprint, ...body } = plan;
+  if (fingerprint !== actionPlanFingerprint(body)) {
+    ctx.addIssue({ code: external_exports.ZodIssueCode.custom, message: "plan fingerprint does not match the plan's content", path: ["fingerprint"] });
+  }
+});
+function actionPlanFingerprint(body) {
+  const digest = (0, import_node_crypto.createHash)("sha256").update(JSON.stringify(canonicalize(body))).digest("hex");
+  return `sha256:${digest}`;
+}
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/jira-orchestration.js
+var ContractMeta = external_exports.object({
+  contract: external_exports.string().min(1),
+  version: external_exports.string().regex(/^\d+\.\d+\.\d+$/)
+});
+var PraxisRoleSchema = external_exports.enum(["ba", "architect", "developer", "qa"]);
+var RichTextInlineSchema = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("text"), text: external_exports.string() }),
+  external_exports.object({ type: external_exports.literal("code"), text: external_exports.string() }),
+  external_exports.object({
+    type: external_exports.literal("link"),
+    href: external_exports.string(),
+    text: external_exports.string()
+  }),
+  external_exports.object({ type: external_exports.literal("issueRef"), key: external_exports.string() })
+]);
+var RichTextBlockSchema = external_exports.discriminatedUnion("type", [
+  external_exports.object({
+    type: external_exports.literal("heading"),
+    level: external_exports.union([
+      external_exports.literal(1),
+      external_exports.literal(2),
+      external_exports.literal(3),
+      external_exports.literal(4),
+      external_exports.literal(5),
+      external_exports.literal(6)
+    ]),
+    text: external_exports.string()
+  }),
+  external_exports.object({
+    type: external_exports.literal("paragraph"),
+    inlines: external_exports.array(RichTextInlineSchema)
+  }),
+  external_exports.object({
+    type: external_exports.literal("bulletList"),
+    items: external_exports.array(external_exports.array(RichTextInlineSchema))
+  }),
+  external_exports.object({
+    type: external_exports.literal("orderedList"),
+    items: external_exports.array(external_exports.array(RichTextInlineSchema))
+  }),
+  external_exports.object({
+    type: external_exports.literal("codeBlock"),
+    language: external_exports.string().optional(),
+    text: external_exports.string()
+  }),
+  external_exports.object({
+    type: external_exports.literal("table"),
+    headers: external_exports.array(external_exports.string()),
+    rows: external_exports.array(external_exports.array(external_exports.string()))
+  })
+]);
+var PraxisRichTextDocumentSchema = external_exports.object({
+  version: external_exports.literal(1),
+  blocks: external_exports.array(RichTextBlockSchema)
+});
+var EpicLifecycleSchema = external_exports.enum([
+  "analysis",
+  "architecture",
+  "development",
+  "quality",
+  "done"
+]);
+var TicketLifecycleSchema = external_exports.enum([
+  "ready-for-architecture",
+  "ready-for-development",
+  "in-progress",
+  "ready-for-qa",
+  "blocked",
+  "done"
+]);
+var WorkPackageLifecycleSchema = external_exports.enum([
+  "ready",
+  "claimed",
+  "in-progress",
+  "ready-for-qa",
+  "blocked",
+  "qa-passed",
+  "done"
+]);
+var WorkPackageClaimSchema = external_exports.object({
+  workPackageId: external_exports.string().min(1),
+  jiraWorkPackageKey: external_exports.string().min(1),
+  actor: external_exports.string().min(1),
+  jiraAccountId: external_exports.string().min(1),
+  claimedAt: external_exports.string().min(1),
+  claimToken: external_exports.string().min(1),
+  memberIssueKeys: external_exports.array(external_exports.string()),
+  expectedState: WorkPackageLifecycleSchema,
+  state: external_exports.enum(["active", "implementation-complete", "released"])
+});
+var PraxisWorkPackageSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  jiraIssueKey: external_exports.string().min(1),
+  epicKey: external_exports.string().min(1),
+  title: external_exports.string().min(1),
+  storyKeys: external_exports.array(external_exports.string()),
+  taskKeys: external_exports.array(external_exports.string()),
+  dependencyWorkPackages: external_exports.array(external_exports.string()),
+  estimatedHours: external_exports.number().nonnegative().optional(),
+  architectureDecisionIds: external_exports.array(external_exports.string()),
+  platformContractIds: external_exports.array(external_exports.string()),
+  status: WorkPackageLifecycleSchema,
+  claim: WorkPackageClaimSchema.nullable()
+});
+var JiraBaHandoffSchema = ContractMeta.extend({
+  contract: external_exports.literal("jira.ba.architect.handoff"),
+  epicKey: external_exports.string().min(1),
+  storyKeys: external_exports.array(external_exports.string()),
+  canonicalStoryKeys: external_exports.array(external_exports.string()),
+  supersededStoryKeys: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(external_exports.string()),
+  baArtifacts: external_exports.array(external_exports.string()),
+  openQuestions: external_exports.array(external_exports.string()),
+  nfrs: external_exports.array(external_exports.string()),
+  businessRules: external_exports.array(external_exports.string()),
+  constraints: external_exports.array(external_exports.string()),
+  acceptanceSummary: external_exports.string(),
+  dependencies: external_exports.array(external_exports.string()),
+  proposalReady: external_exports.boolean(),
+  readyForArchitecture: external_exports.boolean()
+}).superRefine((h, ctx) => {
+  if (h.readyForArchitecture && h.canonicalStoryKeys.length === 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "readyForArchitecture=true requires canonicalStoryKeys.length > 0"
+    });
+  }
+});
+var JiraBaProposalStorySchema = external_exports.object({
+  logicalId: external_exports.string().min(1),
+  artifactId: external_exports.string().min(1),
+  summary: external_exports.string().min(1),
+  userStory: external_exports.object({
+    asA: external_exports.string().min(1),
+    iWant: external_exports.string().min(1),
+    soThat: external_exports.string().min(1)
+  }),
+  businessContext: external_exports.string().min(1),
+  acceptanceCriteria: external_exports.array(external_exports.object({
+    given: external_exports.string().min(1),
+    when: external_exports.string().min(1),
+    then: external_exports.string().min(1)
+  })).min(1),
+  outOfScope: external_exports.array(external_exports.string()),
+  dependencies: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(external_exports.string()).min(1)
+});
+var JiraBaProposalSchema = ContractMeta.extend({
+  contract: external_exports.literal("jira.ba.proposal"),
+  epicKey: external_exports.string().min(1),
+  stories: external_exports.array(JiraBaProposalStorySchema),
+  nfrs: external_exports.array(external_exports.string()),
+  businessRules: external_exports.array(external_exports.string()),
+  openQuestions: external_exports.array(external_exports.string())
+});
+var JiraWriteOpStateSchema = external_exports.enum([
+  "planned",
+  "creating",
+  "created",
+  "verified",
+  "committed"
+]);
+var JiraWriteJournalEntrySchema = external_exports.object({
+  operationId: external_exports.string().min(1),
+  role: PraxisRoleSchema,
+  operationType: external_exports.string().min(1),
+  artifactId: external_exports.string().min(1),
+  epicKey: external_exports.string().optional(),
+  jiraIssueKey: external_exports.string().optional(),
+  state: JiraWriteOpStateSchema,
+  provider: external_exports.enum(["cloud", "datacenter"]),
+  projectKey: external_exports.string().min(1),
+  startedAt: external_exports.string().min(1),
+  completedAt: external_exports.string().optional(),
+  detail: external_exports.string().optional()
+});
+var JiraOperationJournalEntrySchema = external_exports.object({
+  operationId: external_exports.string().min(1),
+  artifactId: external_exports.string().min(1),
+  jiraIssueKey: external_exports.string().optional(),
+  result: external_exports.enum(["ok", "skipped", "failed"]),
+  timestamp: external_exports.string().min(1),
+  provider: external_exports.enum(["cloud", "datacenter"]),
+  kind: external_exports.string().min(1),
+  detail: external_exports.string().optional()
+});
+var BaJiraWriteActionSchema = external_exports.enum([
+  "CREATE",
+  "UPDATE",
+  "UNCHANGED",
+  "SUPERSEDED"
+]);
+var BaJiraWritePlanItemSchema = external_exports.object({
+  action: BaJiraWriteActionSchema,
+  artifactId: external_exports.string().min(1),
+  jiraIssueKey: external_exports.string().optional(),
+  supersededBy: external_exports.string().optional(),
+  summary: external_exports.string().optional()
+});
+var QualityWpReportSchema = ContractMeta.extend({
+  contract: external_exports.literal("quality.work-package.report"),
+  workPackageId: external_exports.string().min(1),
+  jiraWorkPackageKey: external_exports.string().min(1),
+  memberIssueResults: external_exports.array(external_exports.object({
+    jiraIssueKey: external_exports.string(),
+    acceptanceCriteria: external_exports.array(external_exports.string()),
+    coveredBy: external_exports.array(external_exports.string()),
+    result: external_exports.enum(["pass", "fail", "unverified"])
+  })),
+  buildResult: external_exports.enum(["pass", "fail", "skipped"]),
+  testResult: external_exports.enum(["pass", "fail", "skipped"]),
+  tests: external_exports.object({
+    total: external_exports.number(),
+    pass: external_exports.number(),
+    fail: external_exports.number()
+  }),
+  coverage: external_exports.object({
+    lines: external_exports.number().optional(),
+    branches: external_exports.number().optional(),
+    functions: external_exports.number().optional(),
+    statements: external_exports.number().optional()
+  }).nullable(),
+  runtimeVerification: external_exports.enum(["pass", "fail", "unavailable"]),
+  runtimeReason: external_exports.string().optional(),
+  findings: external_exports.array(external_exports.unknown()),
+  blockingFindings: external_exports.array(external_exports.unknown()),
+  potentialRisks: external_exports.array(external_exports.string()),
+  addedTests: external_exports.array(external_exports.string()),
+  sourceChangesGuard: external_exports.enum(["pass", "fail"]),
+  overallVerdict: external_exports.enum(["pass", "fail", "blocked"]),
+  developerEvidence: external_exports.object({
+    workPackageId: external_exports.string().optional(),
+    jiraWorkPackageKey: external_exports.string().optional(),
+    canonicalStoryKeys: external_exports.array(external_exports.string()).optional(),
+    requirementIds: external_exports.array(external_exports.string()).optional(),
+    hasCompletionEvidence: external_exports.boolean(),
+    hasQualityHandoff: external_exports.boolean(),
+    readyForQuality: external_exports.boolean().optional(),
+    evidencePath: external_exports.string().optional(),
+    qualityHandoffPath: external_exports.string().optional()
+  }).optional()
+});
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/index.js
+var ContractMetaSchema = external_exports.object({
+  contract: external_exports.string().min(1),
+  version: external_exports.string().regex(/^\d+\.\d+\.\d+$/)
+});
+var BaToArchitectHandoffSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("ba.architect.handoff"),
+  workPackageId: external_exports.string().min(1),
+  workPackagePath: external_exports.string().min(1),
+  requirementIds: external_exports.array(external_exports.string()).min(1),
+  visionConfirmed: external_exports.boolean(),
+  readinessChecks: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    passed: external_exports.boolean(),
+    detail: external_exports.string().optional()
+  }))
+});
+var ArchitectToDeveloperHandoffSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("architect.developer.handoff"),
+  workPackageId: external_exports.string().min(1),
+  designPackagePath: external_exports.string().min(1),
+  contextSlicePath: external_exports.string().min(1),
+  decisionIds: external_exports.array(external_exports.string()),
+  features: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    title: external_exports.string(),
+    estimateHours: external_exports.number().nonnegative().optional(),
+    dependsOn: external_exports.array(external_exports.string()).optional(),
+    readyForDev: external_exports.boolean()
+  })),
+  /** Platform/interface contract ids visible to Developer (WBS 4.9). */
+  platformContractIds: external_exports.array(external_exports.string()).optional()
+});
+var ChangeSpecChangeSchema = external_exports.object({
+  file: external_exports.string().min(1),
+  description: external_exports.string().optional(),
+  op: external_exports.enum(["edit", "create"]).optional(),
+  match: external_exports.string().optional(),
+  replace: external_exports.string().optional(),
+  content: external_exports.string().optional(),
+  /** @deprecated Prefer `content` with `op: "create"`. */
+  write: external_exports.string().optional()
+}).superRefine((c, ctx) => {
+  const op = c.op ?? (c.content !== void 0 || c.write !== void 0 ? "create" : "edit");
+  if (op === "edit") {
+    if (c.match === void 0 || c.replace === void 0) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: "edit changes require match and replace"
+      });
+    }
+  } else if (op === "create") {
+    if (c.content === void 0 && c.write === void 0) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: "create changes require content (or legacy write)"
+      });
+    }
+  }
+});
+var AcceptanceCheckSchema = external_exports.union([
+  external_exports.object({
+    type: external_exports.literal("contains").optional(),
+    file: external_exports.string().min(1),
+    contains: external_exports.string().min(1)
+  }),
+  external_exports.object({
+    type: external_exports.literal("npm-test")
+  })
+]);
+var ChangeSpecSchema = external_exports.object({
+  workPackageId: external_exports.string().min(1).optional(),
+  requirementIds: external_exports.array(external_exports.string()).optional(),
+  decisionIds: external_exports.array(external_exports.string()).optional(),
+  productRootHint: external_exports.string().optional(),
+  researchGlobs: external_exports.array(external_exports.string()).optional(),
+  changes: external_exports.array(ChangeSpecChangeSchema).min(1),
+  acceptanceChecks: external_exports.array(AcceptanceCheckSchema).optional(),
+  features: external_exports.array(external_exports.object({
+    id: external_exports.string(),
+    title: external_exports.string(),
+    estimateHours: external_exports.number().nonnegative().optional(),
+    dependsOn: external_exports.array(external_exports.string()).optional(),
+    readyForDev: external_exports.boolean()
+  })).min(1),
+  design: external_exports.record(external_exports.unknown()).optional(),
+  /** Repo-relative paths that MUST appear in changes[].file before readyForDev. */
+  requiredMachineFiles: external_exports.array(external_exports.string()).optional(),
+  verificationPolicy: external_exports.object({
+    requireTests: external_exports.boolean().optional(),
+    requireBuild: external_exports.boolean().optional(),
+    requireLint: external_exports.boolean().optional()
+  }).optional()
+});
+var VerificationCheckSchema = external_exports.object({
+  status: external_exports.enum(["passed", "failed", "skipped"]),
+  required: external_exports.boolean()
+});
+var VerificationSchema = external_exports.object({
+  build: VerificationCheckSchema,
+  tests: VerificationCheckSchema,
+  lint: VerificationCheckSchema,
+  packageCriteria: VerificationCheckSchema
+});
+var DeveloperToQualityHandoffSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("developer.quality.handoff"),
+  /** Work package this handoff claims to deliver (required identity). */
+  workPackageId: external_exports.string().min(1),
+  mergeRequestRef: external_exports.string().min(1),
+  intention: external_exports.string().min(1),
+  requirementIds: external_exports.array(external_exports.string()),
+  decisionIds: external_exports.array(external_exports.string()),
+  verification: VerificationSchema,
+  /** Optional machine AC checks Quality can execute against the product tree. */
+  acceptanceChecks: external_exports.array(AcceptanceCheckSchema).optional(),
+  jiraWorkPackageKey: external_exports.string().optional(),
+  canonicalStoryKeys: external_exports.array(external_exports.string()).optional(),
+  evidencePath: external_exports.string().optional()
+});
+var DeveloperCompletionEvidenceSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("developer.completion.evidence"),
+  workPackageId: external_exports.string().min(1),
+  jiraWorkPackageKey: external_exports.string().min(1),
+  canonicalStoryKeys: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(external_exports.string()),
+  implementationScope: external_exports.array(external_exports.string()),
+  changedProductFiles: external_exports.array(external_exports.string()),
+  acceptanceChecks: external_exports.array(AcceptanceCheckSchema),
+  verification: external_exports.object({
+    command: external_exports.string().min(1),
+    exitCode: external_exports.number(),
+    ok: external_exports.boolean(),
+    passed: external_exports.number().optional(),
+    failed: external_exports.number().optional(),
+    total: external_exports.number().optional(),
+    timestamp: external_exports.string().min(1)
+  }),
+  implementationStatus: external_exports.literal("complete"),
+  readyForQuality: external_exports.literal(true)
+});
+var QualityMrContextSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.mr.context"),
+  projectId: external_exports.string().min(1),
+  workPackageId: external_exports.string().min(1),
+  mergeRequestRef: external_exports.string().min(1),
+  repositoryPath: external_exports.string().min(1),
+  baseBranch: external_exports.string().min(1),
+  headBranch: external_exports.string().min(1),
+  baseSha: external_exports.string().min(1),
+  headSha: external_exports.string().min(1),
+  changedFiles: external_exports.array(external_exports.string()),
+  requirementIds: external_exports.array(external_exports.string()),
+  decisionIds: external_exports.array(external_exports.string()),
+  verification: VerificationSchema.optional(),
+  qualityHandoff: DeveloperToQualityHandoffSchema.optional()
+});
+var QualityAuditReportSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.audit.report"),
+  auditId: external_exports.number().int().nonnegative(),
+  projectId: external_exports.string().min(1),
+  auditedPath: external_exports.string().min(1),
+  timestamp: external_exports.string().min(1),
+  scope: external_exports.string().min(1),
+  checksPerformed: external_exports.array(external_exports.string()),
+  findings: external_exports.array(external_exports.unknown()),
+  findingsBySeverity: external_exports.record(external_exports.number()),
+  findingsByCategory: external_exports.record(external_exports.number()),
+  evidence: external_exports.array(external_exports.string()),
+  summary: external_exports.object({
+    total: external_exports.number(),
+    blocking: external_exports.number(),
+    warnings: external_exports.number()
+  }),
+  verdict: external_exports.enum(["pass", "fail"]),
+  remediation: external_exports.array(external_exports.string()),
+  unresolvedHighRisk: external_exports.array(external_exports.unknown()),
+  tool: external_exports.object({
+    name: external_exports.string(),
+    version: external_exports.string()
+  })
+});
+var QualityRollbackEventSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.rollback.event"),
+  projectId: external_exports.string().min(1),
+  workPackageId: external_exports.string().optional(),
+  mergeRequestRef: external_exports.string().min(1),
+  affectedRef: external_exports.string().min(1),
+  reason: external_exports.string().min(1),
+  trigger: external_exports.string().min(1),
+  timestamp: external_exports.string().optional(),
+  reviewId: external_exports.number().int().positive().optional(),
+  findingIds: external_exports.array(external_exports.string()).optional(),
+  status: external_exports.string().min(1),
+  evidence: external_exports.string().min(1)
+});
+var QualityHotfixEventSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.hotfix.event"),
+  projectId: external_exports.string().min(1),
+  rollbackId: external_exports.number().int().positive(),
+  hotfixRef: external_exports.string().min(1),
+  reason: external_exports.string().min(1),
+  workPackageId: external_exports.string().optional(),
+  reviewId: external_exports.number().int().positive().optional(),
+  verification: external_exports.string().min(1),
+  timestamp: external_exports.string().optional()
+});
+var QualityReturnEventSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.return.event"),
+  projectId: external_exports.string().min(1),
+  workPackageId: external_exports.string().min(1),
+  mergeRequestRef: external_exports.string().min(1),
+  reviewId: external_exports.number().int().positive(),
+  targetRole: external_exports.literal("developer"),
+  blockingFindingIds: external_exports.array(external_exports.string()).min(1),
+  reason: external_exports.string().min(1),
+  source: external_exports.enum(["qa", "code-review"]),
+  status: external_exports.enum(["open", "resolved"]),
+  returnedAt: external_exports.string().optional(),
+  resolvedAt: external_exports.string().optional(),
+  followUpReviewId: external_exports.number().int().positive().optional()
+});
+var QualityNormProposalSchema = ContractMetaSchema.extend({
+  contract: external_exports.literal("quality.norm.proposal"),
+  fingerprint: external_exports.string().min(1),
+  occurrenceCount: external_exports.number().int().positive(),
+  sourceIds: external_exports.array(external_exports.string()).min(1),
+  evidence: external_exports.string().min(1),
+  proposedRuleId: external_exports.string().min(1),
+  topic: external_exports.string().min(1),
+  projectId: external_exports.string().min(1),
+  status: external_exports.literal("proposed"),
+  createdBy: external_exports.literal("quality"),
+  binding: external_exports.literal(false)
+});
+
 // ../praxis-developer/node_modules/@praxis/project-config/dist/index.js
 var import_node_fs2 = require("node:fs");
 var import_node_path2 = require("node:path");

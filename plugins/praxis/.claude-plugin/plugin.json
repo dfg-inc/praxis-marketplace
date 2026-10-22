@@ -1,0 +1,17 @@
+{
+  "name": "praxis",
+  "version": "0.1.0-alpha.48",
+  "description": "Praxis: requirements, architecture, implementation and verification as one local workflow. Installs Praxis Runtime and the BA, Architect, Developer and Quality roles.",
+  "author": {
+    "name": "Praxis"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["praxis", "requirements", "architecture", "workflow", "quality"],
+  "dependencies": [
+    "praxis-runtime",
+    "praxis-ba",
+    "praxis-architect",
+    "praxis-developer",
+    "praxis-quality"
+  ]
+}
