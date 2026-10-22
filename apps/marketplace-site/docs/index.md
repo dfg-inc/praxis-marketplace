@@ -1,5 +1,7 @@
 # Praxis Marketplace
 
+> **Install from Claude:** Customize → Plugins → Add → Add marketplace → `dfg-inc/praxis-marketplace` → **Praxis** → Add. Praxis Runtime and the four roles install automatically (Claude Code, Desktop Code, Cowork). Claude Desktop **Chat** additionally needs `praxis-runtime.mcpb` from the Runtime release below.
+
 Choose **Runtime** or a role, open its Release, install in Claude Desktop / Cowork.
 
 **BA** → **Architect** → **Developer** → **Quality**
@@ -8,15 +10,15 @@ Choose **Runtime** or a role, open its Release, install in Claude Desktop / Cowo
 
 - [Product catalog — versions, compatibility, Release downloads](/catalog/)
 
-Current wave: **v0.1.0-alpha.44** (independent tags per product).
+Current wave: **v0.1.0-alpha.48** (independent tags per product).
 
 | Product | Install asset | Releases |
 |---------|---------------|----------|
-| Runtime | `praxis-runtime.mcpb` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) |
-| BA | `praxis-ba.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
-| Architect | `praxis-architect.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
-| Developer | `praxis-developer.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
-| Quality | `praxis-quality.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
+| Runtime | `praxis-runtime.mcpb` | [Release](https://github.com/dfg-inc/praxis-runtime/releases/tag/v0.1.0-alpha.48) |
+| BA | `praxis-ba.zip` | [Release](https://github.com/dfg-inc/praxis-ba/releases/tag/v0.1.0-alpha.48) |
+| Architect | `praxis-architect.zip` | [Release](https://github.com/dfg-inc/praxis-architect/releases/tag/v0.1.0-alpha.48) |
+| Developer | `praxis-developer.zip` | [Release](https://github.com/dfg-inc/praxis-developer/releases/tag/v0.1.0-alpha.48) |
+| Quality | `praxis-quality.zip` | [Release](https://github.com/dfg-inc/praxis-quality/releases/tag/v0.1.0-alpha.48) |
 
 ## Desktop install and docs
 
@@ -28,7 +30,7 @@ Use **Claude Desktop / Cowork** (not a monorepo clone):
 - [Role plugins](/user-guide/plugins/overview)
 - [Prompt library](/user-guide/reference/prompts)
 - [Full tutorial](/user-guide/workflows/full-e2e)
-- Full Docs portal: https://praxis-docs-e263c2.pages.jetru.by
+- Full Docs portal: https://github.com/dfg-inc/praxis-docs
 
 ## Method and advanced guides
 

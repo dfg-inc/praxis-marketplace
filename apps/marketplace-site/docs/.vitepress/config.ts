@@ -1,6 +1,6 @@
 import { defineConfig } from "vitepress";
 
-const DOCS_URL = "https://praxis-docs-e263c2.pages.jetru.by";
+const DOCS_URL = "https://github.com/dfg-inc/praxis-docs";
 
 const enNav = [
   { text: "Guide", link: "/guide/start" },
@@ -72,7 +72,7 @@ const ruSidebar = {
 };
 
 export default defineConfig({
-  // Unique-domain GitLab Pages: https://praxis-marketplace-833761.pages.jetru.by
+  // Unique-domain GitLab Pages: https://github.com/dfg-inc/praxis-marketplace
   base: "/",
   title: "Praxis Marketplace",
   description: "Role plugins, method, and catalog",

@@ -1,15 +1,15 @@
 # Plugins
 
-Install **Praxis Runtime** once, then only the role ZIP you need. Ordinary install is Claude Desktop / Cowork from GitLab Releases — see [Getting started](/guide/start) and the [Catalog](/catalog/).
+Install from the marketplace (see the note above), or for Claude Desktop Chat install **Praxis Runtime** once and then only the role ZIP you need. Ordinary install is Claude Desktop / Cowork from GitHub Releases — see [Getting started](/guide/start) and the [Catalog](/catalog/).
 
 | Component | Package | License | Docs | Releases |
 |-----------|---------|---------|------|----------|
-| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/plugins/ba) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
-| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/plugins/architect) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
-| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/plugins/developer) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
-| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/plugins/quality) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
+| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/plugins/ba) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-ba/releases/tag/v0.1.0-alpha.48) |
+| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/plugins/architect) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-architect/releases/tag/v0.1.0-alpha.48) |
+| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/plugins/developer) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-developer/releases/tag/v0.1.0-alpha.48) |
+| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/plugins/quality) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-quality/releases/tag/v0.1.0-alpha.48) |
 
-Runtime: [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) (`praxis-runtime.mcpb`).
+Runtime: [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-runtime/releases/tag/v0.1.0-alpha.48) (`praxis-runtime.mcpb`).
 
 Company-only **Jira** (`@praxis/jira`, UNLICENSED) is not a public role plugin.
 

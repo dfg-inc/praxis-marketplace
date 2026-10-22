@@ -2,7 +2,7 @@
 
 For someone who opened Claude Desktop / Cowork (or Claude Code) and must run a role **without a Praxis maintainer**: which skills exist, what to type, how to claim a Work Package.
 
-Ordinary install is Desktop extensions from GitLab Releases ([Getting started](/guide/start), [Catalog](/catalog/)). The working directory is the **product** repository, not Praxis-mono.
+Ordinary install is Desktop extensions from GitHub Releases ([Getting started](/guide/start), [Catalog](/catalog/)). The working directory is the **product** repository, not Praxis-mono.
 
 ## How to invoke skills
 
