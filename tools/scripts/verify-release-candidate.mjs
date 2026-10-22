@@ -22,6 +22,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ENTRIES = [
+  { name: "praxis", sourceRel: "praxis-marketplace/plugins/praxis" },
   { name: "praxis-ba", sourceRel: "praxis-ba/plugins/ba" },
   { name: "praxis-architect", sourceRel: "praxis-architect/plugins/architect" },
   { name: "praxis-developer", sourceRel: "praxis-developer/plugins/developer" },
@@ -102,7 +103,7 @@ export function verify({ splitRoot, rc, installedExtension, installedPlugins }) 
       const manifest = join(installedPlugins, dir, ".claude-plugin", "plugin.json");
       if (!existsSync(manifest)) continue;
       const name = JSON.parse(readFileSync(manifest, "utf8")).name;
-      const entry = ENTRIES.find((item) => item.name === name && item.name !== "praxis-runtime");
+      const entry = ENTRIES.find((item) => item.name === name && item.name !== "praxis-runtime" && item.name !== "praxis");
       if (!entry) continue;
       const source = join(splitRoot, entry.sourceRel);
       const have = skills(join(installedPlugins, dir));

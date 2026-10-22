@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { verify } from "./verify-release-candidate.mjs";
 
 const script = join(dirname(fileURLToPath(import.meta.url)), "verify-release-candidate.mjs");
-const PLUGINS = { "praxis-ba": "praxis-ba/plugins/ba", "praxis-architect": "praxis-architect/plugins/architect", "praxis-developer": "praxis-developer/plugins/developer", "praxis-quality": "praxis-quality/plugins/quality", "praxis-runtime": "praxis-runtime/plugins/runtime" };
+const PLUGINS = { "praxis-ba": "praxis-ba/plugins/ba", "praxis-architect": "praxis-architect/plugins/architect", "praxis-developer": "praxis-developer/plugins/developer", "praxis-quality": "praxis-quality/plugins/quality", "praxis-runtime": "praxis-runtime/plugins/runtime", "praxis": "praxis-marketplace/plugins/praxis" };
 
 function put(root, path, body) {
   mkdirSync(dirname(join(root, path)), { recursive: true });
