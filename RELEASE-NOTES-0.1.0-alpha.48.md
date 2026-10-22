@@ -25,6 +25,8 @@ Adding **Praxis** installs Praxis Runtime, BA, Architect, Developer and Quality.
 - Approvals show the exact action (the file to be written, the commit, the Quality apply plan).
 - The workflow acceptance suite was updated to the current approval model.
 
+- Marketplace builds now carry BA's generated `canon-graph/dist` (a `.gitignore` rule had silently dropped it) and a self-contained `bin/praxis-ba.cjs`, the CLI that the BA skills (`ba-lint`, `approve-plan`, ...) call. A check (`check:outputs`) keeps outputs tracked and runnable.
+
 ## Changes to the install flow
 
 - Marketplace (GitHub) replaces manual role ZIP uploads for Claude Code, Desktop Code and Cowork. Role ZIPs and the `.mcpb` remain available for Claude Desktop **Chat**.
@@ -42,7 +44,7 @@ Adding **Praxis** installs Praxis Runtime, BA, Architect, Developer and Quality.
 ## Known limitations
 
 - **UI NOT YET VERIFIED:** the Claude Customize → Plugins flow was not driven through the real interface; CLI results are not a UI pass. See the UI acceptance scenario in the release report.
-- The marketplace and docs repositories are not on GitHub yet (`dfg-inc/praxis-marketplace` is created at publish time).
+- This repository distributes the plugins only. The website and documentation are on the praxis-website repository (praxis.dfuture.co).
 - Trusted Client / "Always allow" is a standing permission, not proof that a person confirmed each action.
 - Real Claude Desktop Chat behaviour of the new build is not verified (Desktop's own tool-permission prompt is outside Praxis).
 - Plugin MCP server environment inheritance for `PRAXIS_APPROVAL_MODE` in a live Claude Code session is not verified.

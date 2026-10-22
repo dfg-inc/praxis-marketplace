@@ -49,6 +49,26 @@ for (const entry of entries) {
       define: { "import.meta.url": "__import_meta_url" },
     });
   }
+  // BA skills (ba-lint, approve-plan, accept ...) call ${CLAUDE_PLUGIN_ROOT}/bin/praxis-ba.cjs. The canon-graph CLI needs
+  // zod, yaml and gray-matter, which an installed plugin does not have, so ship it as one self-contained file.
+  const baCli = join(entry.source, "canon-graph", "bin", "praxis-ba.mjs");
+  if (entry.name === "praxis-ba" && existsSync(baCli)) {
+    // The entry uses top-level await, so it is bundled as ESM; bin/praxis-ba.cjs is the path the skills call.
+    esbuild.buildSync({
+      entryPoints: [baCli],
+      outfile: join(dest, "bin", "praxis-ba.bundle.mjs"),
+      bundle: true,
+      platform: "node",
+      target: "node20",
+      format: "esm",
+      logLevel: "silent",
+      banner: { js: "import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);" },
+    });
+    writeFileSync(
+      join(dest, "bin", "praxis-ba.cjs"),
+      "#!/usr/bin/env node\n// Self-contained praxis-ba CLI (canon-graph bundled; no node_modules needed).\nimport(require('node:url').pathToFileURL(require('node:path').join(__dirname, 'praxis-ba.bundle.mjs')).href).catch((error) => {\n  console.error(error && error.stack ? error.stack : String(error));\n  process.exit(1);\n});\n",
+    );
+  }
   const st = lstatSync(dest);
   if (st.isSymbolicLink()) {
     throw new Error(`${dest} is still a symlink`);

@@ -1,4 +1,4 @@
-name: Praxis CI
+name: Praxis Marketplace CI
 
 on:
   push:
@@ -13,7 +13,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
       - run: node tools/scripts/check-marketplace.mjs
+      - run: node tools/scripts/check-plugin-outputs.mjs
       - run: node --test tools/scripts/verify-release-candidate.test.mjs
-      # The documentation site (npm run verify) is built by the GitLab pipeline: it syncs praxis-docs.
