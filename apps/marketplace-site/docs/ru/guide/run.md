@@ -1,6 +1,6 @@
 # Запуск и проверка
 
-Страница для **maintainers / CI**. Обычные Desktop-пользователи ставят продукты с GitLab Releases ([Каталог](/catalog/), [Installation](/user-guide/getting-started/installation)) и эти команды не запускают.
+Страница для **maintainers / CI**. Обычные Desktop-пользователи ставят продукты с GitHub Releases ([Каталог](/catalog/), [Installation](/user-guide/getting-started/installation)) и эти команды не запускают.
 
 Сначала пройдите [С чего начать](/ru/guide/start). Команды — из корня **репозитория продукта**, который вы разрабатываете (не Praxis-mono), после `npm install` и `npm run build`.
 
@@ -51,7 +51,7 @@ Architect и Developer — то же с `plugins/architect` и `plugins/develope
     "praxis-ba": {
       "source": {
         "source": "url",
-        "url": "git@gl.jetru.by:engineering/ai-tooling/praxis-ba.git",
+        "url": "https://github.com/dfg-inc/praxis-ba.git",
         "ref": "v0.1.0-alpha.20"
       }
     }

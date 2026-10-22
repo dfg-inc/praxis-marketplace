@@ -1,5 +1,7 @@
 # Praxis Marketplace
 
+> **Установка из Claude:** Customize → Plugins → Add → Add marketplace → `dfg-inc/praxis-marketplace` → **Praxis** → Add. Runtime и четыре роли ставятся автоматически (Claude Code, Desktop Code, Cowork). Для Claude Desktop **Chat** дополнительно нужен `praxis-runtime.mcpb` из релиза Runtime ниже.
+
 Выберите **Runtime** или роль, откройте Release, установите в Claude Desktop / Cowork.
 
 **BA** → **Architect** → **Developer** → **Quality**
@@ -8,15 +10,15 @@
 
 - [Каталог продуктов — версии, совместимость, загрузки](/catalog/)
 
-Текущая волна: **v0.1.0-alpha.44**.
+Текущая волна: **v0.1.0-alpha.48**.
 
 | Продукт | Файл | Releases |
 |---------|------|----------|
-| Runtime | `praxis-runtime.mcpb` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) |
-| BA | `praxis-ba.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
-| Architect | `praxis-architect.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
-| Developer | `praxis-developer.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
-| Quality | `praxis-quality.zip` | [Release](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
+| Runtime | `praxis-runtime.mcpb` | [Release](https://github.com/dfg-inc/praxis-runtime/releases/tag/v0.1.0-alpha.48) |
+| BA | `praxis-ba.zip` | [Release](https://github.com/dfg-inc/praxis-ba/releases/tag/v0.1.0-alpha.48) |
+| Architect | `praxis-architect.zip` | [Release](https://github.com/dfg-inc/praxis-architect/releases/tag/v0.1.0-alpha.48) |
+| Developer | `praxis-developer.zip` | [Release](https://github.com/dfg-inc/praxis-developer/releases/tag/v0.1.0-alpha.48) |
+| Quality | `praxis-quality.zip` | [Release](https://github.com/dfg-inc/praxis-quality/releases/tag/v0.1.0-alpha.48) |
 
 ## Установка в Claude Desktop
 
@@ -25,7 +27,7 @@
 - [Jira credentials](/user-guide/getting-started/credentials)
 - [Role plugins](/user-guide/plugins/overview)
 - [Full tutorial](/user-guide/workflows/full-e2e)
-- Портал документации: https://praxis-docs-e263c2.pages.jetru.by
+- Портал документации: https://github.com/dfg-inc/praxis-docs
 
 ## Гайды
 

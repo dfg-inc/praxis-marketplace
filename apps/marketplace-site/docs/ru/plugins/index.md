@@ -1,15 +1,15 @@
 # Плагины
 
-Установите **Praxis Runtime** один раз, затем только нужный role ZIP. Обычная установка — Claude Desktop / Cowork с GitLab Releases: [С чего начать](/ru/guide/start) и [Каталог](/catalog/).
+Ставьте из marketplace (см. заметку выше), либо для Claude Desktop Chat установите **Praxis Runtime** один раз и затем только нужный role ZIP. Обычная установка — Claude Desktop / Cowork с GitHub Releases: [С чего начать](/ru/guide/start) и [Каталог](/catalog/).
 
 | Компонент | Пакет | Лицензия | Документация | Releases |
 |-----------|-------|----------|--------------|----------|
-| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/ru/plugins/ba) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-ba/-/releases/v0.1.0-alpha.44) |
-| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/ru/plugins/architect) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases/v0.1.0-alpha.44) |
-| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/ru/plugins/developer) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-developer/-/releases/v0.1.0-alpha.44) |
-| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/ru/plugins/quality) | [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-quality/-/releases/v0.1.0-alpha.44) |
+| praxis-ba | `@praxis/ba` | Apache-2.0 | [BA](/ru/plugins/ba) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-ba/releases/tag/v0.1.0-alpha.48) |
+| praxis-architect | `@praxis/architect` | Apache-2.0 | [Architect](/ru/plugins/architect) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-architect/releases/tag/v0.1.0-alpha.48) |
+| praxis-developer | `@praxis/developer` | Apache-2.0 | [Developer](/ru/plugins/developer) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-developer/releases/tag/v0.1.0-alpha.48) |
+| praxis-quality | `@praxis/quality` | UNLICENSED | [Quality](/ru/plugins/quality) | [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-quality/releases/tag/v0.1.0-alpha.48) |
 
-Runtime: [v0.1.0-alpha.44](https://gl.jetru.by/engineering/ai-tooling/praxis-runtime/-/releases/v0.1.0-alpha.44) (`praxis-runtime.mcpb`).
+Runtime: [v0.1.0-alpha.48](https://github.com/dfg-inc/praxis-runtime/releases/tag/v0.1.0-alpha.48) (`praxis-runtime.mcpb`).
 
 Корпоративный **Jira** (`@praxis/jira`, UNLICENSED) не публичный ролевой плагин.
 

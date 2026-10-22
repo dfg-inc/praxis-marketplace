@@ -1,6 +1,6 @@
 # Run and verify
 
-Advanced / CI page for **product maintainers**. Ordinary Desktop users install from GitLab Releases ([Catalog](/catalog/), [Desktop installation](/user-guide/getting-started/installation)) and do not run these commands.
+Advanced / CI page for **product maintainers**. Ordinary Desktop users install from GitHub Releases ([Catalog](/catalog/), [Desktop installation](/user-guide/getting-started/installation)) and do not run these commands.
 
 Use this page **after** [Getting started](/guide/start). Commands are from the **product repository** root you are developing (not Praxis-mono), with that repo’s `npm install` / `npm run build` already done.
 
@@ -51,7 +51,7 @@ A **future** git marketplace (GitHub or GitLab) looks like this — only after t
     "praxis-ba": {
       "source": {
         "source": "url",
-        "url": "git@gl.jetru.by:engineering/ai-tooling/praxis-ba.git",
+        "url": "https://github.com/dfg-inc/praxis-ba.git",
         "ref": "v0.1.0-alpha.20"
       }
     }
