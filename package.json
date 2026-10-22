@@ -1,7 +1,7 @@
 {
   "name": "praxis-marketplace",
   "private": true,
-  "version": "0.1.0-alpha.44",
+  "version": "0.1.0-alpha.48",
   "description": "Praxis Marketplace site",
   "workspaces": [
     "apps/*"
@@ -13,7 +13,8 @@
     "accept:marketplace": "node tools/scripts/marketplace-site-acceptance.mjs",
     "verify": "npm run fetch:docs && npm run sync-docs && npm run build && npm run accept:marketplace",
     "check:rc": "node tools/scripts/verify-release-candidate.mjs",
-    "test:rc": "node --test tools/scripts/verify-release-candidate.test.mjs"
+    "test:rc": "node --test tools/scripts/verify-release-candidate.test.mjs",
+    "check:marketplace": "node tools/scripts/check-marketplace.mjs"
   },
   "engines": {
     "node": ">=20"
