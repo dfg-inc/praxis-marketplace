@@ -1,71 +1,11 @@
-# praxis-marketplace — GitLab CI + Pages deploy
-# Permanent URL (unique domain): https://praxis-marketplace-833761.pages.jetru.by
-# Requires job-token allowlist on praxis-docs for this project (inbound).
-# Variables (optional overrides): PRAXIS_DOCS_PROJECT_PATH, PRAXIS_DOCS_REF
-# VitePress base must stay "/" while unique domain is enabled.
+# praxis-marketplace: plugin distribution repository. No site is built here (the site lives in praxis-website).
 stages:
   - verify
-  - deploy
 
-default:
-  image: node:22-bookworm
-  interruptible: true
-  cache:
-    key:
-      files: [package-lock.json]
-    paths: [.npm/]
-  before_script:
-    - node -v && npm -v
-    - npm ci --cache .npm --prefer-offline
-
-variables:
-  npm_config_cache: "$CI_PROJECT_DIR/.npm"
-  PRAXIS_DOCS_PROJECT_PATH: "engineering/ai-tooling/praxis-docs"
-  PRAXIS_DOCS_REF: "master"
-  PRAXIS_MARKETPLACE_PAGES_URL: "https://praxis-marketplace-833761.pages.jetru.by"
-  PRAXIS_DOCS_PAGES_URL: "https://praxis-docs-e263c2.pages.jetru.by"
-
-build_marketplace:
+verify:
   stage: verify
+  image: node:22-bookworm
   script:
-    - node tools/scripts/fetch-docs-ci.mjs
-    - export PRAXIS_DOCS_USER="$CI_PROJECT_DIR/docs/user"
-    - test -f "$PRAXIS_DOCS_USER/index.md"
-    - npm run sync-docs
-    - npm run build
-    - npm run accept:marketplace
-    - test -f apps/marketplace-site/docs/.vitepress/dist/index.html
-  artifacts:
-    paths:
-      - apps/marketplace-site/docs/.vitepress/dist/
-      - docs/user/
-    expire_in: 1 hour
-
-pages:
-  stage: deploy
-  needs:
-    - job: build_marketplace
-      artifacts: true
-  script:
-    - test -f apps/marketplace-site/docs/.vitepress/dist/index.html
-    - mkdir -p public
-    - cp -R apps/marketplace-site/docs/.vitepress/dist/. public/
-    - |
-      python3 - <<'PY'
-      import hashlib, json, pathlib
-      files = sorted(p for p in pathlib.Path("public").rglob("*") if p.is_file())
-      assert files, "empty marketplace site"
-      sample = [{"file": str(p), "sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "bytes": p.stat().st_size} for p in files[:40]]
-      pathlib.Path("dist-marketplace-checksums.json").write_text(json.dumps({"fileCount": len(files), "sample": sample}, indent=2) + "\n")
-      print("files", len(files))
-      print("pages_url", "https://praxis-marketplace-833761.pages.jetru.by")
-      PY
-  artifacts:
-    paths:
-      - public
-      - dist-marketplace-checksums.json
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  environment:
-    name: pages
-    url: https://praxis-marketplace-833761.pages.jetru.by
+    - node tools/scripts/check-marketplace.mjs
+    - node tools/scripts/check-plugin-outputs.mjs
+    - node --test tools/scripts/verify-release-candidate.test.mjs
