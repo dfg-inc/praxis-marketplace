@@ -1,4 +1,4 @@
-# Praxis Marketplace — local beta setup (not published)
+# Praxis Marketplace — local release-candidate check (not published)
 
 ## Requirements
 
@@ -17,7 +17,7 @@ bash tools/scripts/install-claude-code.sh
 # bash tools/scripts/clean-checkout-install.sh
 ```
 
-Expected: runtime + four role plugins install; Runtime MCP reports **49** tools.
+Expected: runtime + four role plugins (and the `praxis` bundle) install; Runtime MCP reports **52** tools. The same is checked automatically by `npm run accept:marketplace-install` in praxis-runtime.
 
 ## Diagnostics
 
@@ -39,7 +39,7 @@ Rebuild Core contracts, re-vendor Runtime if it vendors Core, then rebuild the R
 - Install PASS/FAIL:
 - Tool count observed:
 - Skill that failed (name + prompt):
-- Approval path used (operator-socket / machine / none):
+- Approval mode shown by praxis_doctor (client-ui / no-dialog / trusted-client):
 - Logs attached (no secrets):
 
 ## Not in this beta package
