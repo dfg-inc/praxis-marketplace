@@ -17,10 +17,7 @@ tmp/
 # VitePress
 **/.vitepress/cache/
 **/.vitepress/dist/
-apps/marketplace-site/docs/.vitepress/dist/
-apps/marketplace-site/docs/user-guide/
 # Fetched from praxis-docs in CI (never commit)
-docs/user/
 
 # Runtime / local DBs
 *.sqlite
@@ -76,3 +73,6 @@ release-candidate/
 .praxis/**/*.log
 .praxis/quality/**/*.tmp
 # <<< praxis workflow state policy <<<
+
+# Installable plugins ship generated build outputs (for example BA canon-graph/dist). They must be tracked.
+!plugins/**/dist/

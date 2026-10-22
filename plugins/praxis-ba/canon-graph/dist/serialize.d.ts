@@ -1,0 +1,11 @@
+import type { NodeType } from './types.js';
+import type { Graph, FrontmatterFor } from './graph.js';
+export type { GraphNode, FrontmatterFor } from './graph.js';
+export declare function naturalCompare(a: string, b: string): number;
+export declare const KEY_ORDER: Record<NodeType, readonly string[]>;
+export declare const REF_ARRAY_KEYS: Record<NodeType, readonly string[]>;
+export declare function emitPage<T extends NodeType>(type: T, frontmatter: FrontmatterFor<T>, body: string): string;
+export type ExportGraph = Pick<Graph, 'epics' | 'frs' | 'nfrs' | 'brs' | 'crs' | 'wps' | 'bugs'>;
+export declare function exportPrd(graph: ExportGraph): string;
+export declare function exportRtm(graph: Graph): string;
+export declare function exportBacklog(graph: Graph): string;
