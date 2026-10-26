@@ -5621,7 +5621,8 @@ function advancePhase(state2, command, now) {
     throw missing("PHASE_GATE", `cannot enter ${command.to}: ${failures.map((f) => `${f.phase} needs ${f.missing.join("; ")}`).join(" | ")}`, { failures });
   }
   const entry = { at: iso(now), kind: "advance", from, to: command.to, reason: command.reason ?? "", invalidated: [] };
-  const next = touch({ ...state2, phase: command.to, phaseHistory: [...state2.phaseHistory, entry].slice(-200) }, now, `phase ${from} -> ${command.to}`);
+  let next = touch({ ...state2, phase: command.to, phaseHistory: [...state2.phaseHistory, entry].slice(-200) }, now, `phase ${from} -> ${command.to}`);
+  next = { ...next, sessionLog: [...next.sessionLog, { at: iso(now), summary: `moved from ${from} to ${command.to}${command.reason ? `: ${command.reason}` : ""}`, nextAction: nextStep(next).summary }].slice(-200) };
   return { state: next, duplicate: false, result: { phase: command.to, gatesMissing: failures, warnings: [...new Set(warnings)], enforced: state2.mode === "guided" } };
 }
 function returnToPhase(state2, command, now) {
@@ -8656,8 +8657,8 @@ var init_review_html = __esm({
     init_review_submission();
     init_planning();
     CSS = `
-:root{--bg:#fff;--fg:#1d2330;--muted:#5d6678;--line:#d9dde6;--card:#f7f8fb;--accent:#2457d6;--ok:#17803d;--bad:#b42318;--warn:#a15c00;--okbg:#e7f6ec;--badbg:#fdeceb}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14171f;--fg:#e6e9f0;--muted:#9aa3b5;--line:#2c3242;--card:#1c202b;--accent:#7aa2ff;--ok:#5ad08a;--bad:#ff8a80;--warn:#ffc266;--okbg:#14301f;--badbg:#3a1a18}}
+:root{--bg:#fff;--fg:#1d2330;--muted:#5d6678;--line:#d9dde6;--card:#f7f8fb;--accent:#2457d6;--ok:#17803d;--bad:#b42318;--warn:#a15c00;--okbg:#e7f6ec;--badbg:#fdeceb;--on-accent:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14171f;--fg:#e6e9f0;--muted:#9aa3b5;--line:#2c3242;--card:#1c202b;--accent:#7aa2ff;--ok:#5ad08a;--bad:#ff8a80;--warn:#ffc266;--okbg:#14301f;--badbg:#3a1a18;--on-accent:#0b1020}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
 main{max-width:980px;margin:0 auto;padding:16px 16px 120px}
 h1{font-size:22px;margin:8px 0}h2{font-size:17px;margin:0}h3{font-size:14px;margin:12px 0 4px}
@@ -8670,7 +8671,7 @@ h1{font-size:22px;margin:8px 0}h2{font-size:17px;margin:0}h3{font-size:14px;marg
 textarea,input[type=text],select{width:100%;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 textarea{min-height:44px;resize:vertical}
 button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .ac{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:8px 0;border-top:1px solid var(--line)}
 .marks{display:flex;gap:10px;align-items:center;font-size:13px}.marks label{display:flex;gap:4px;align-items:center;cursor:pointer}
@@ -8768,7 +8769,7 @@ function showOut(text){var o=$('#out');o.style.display='block';$('textarea',o).v
 function summary(s){return JSON.stringify(s,null,2)}
 $('#btn-save').addEventListener('click',function(){
   var s=collect();var text=summary(s);
-  if(!D.saveUrl){showOut(text);toast('No live connection: copy or download the decisions and give them to Claude (praxis review apply).',false);return}
+  if(!D.saveUrl){showOut(text);toast('No live connection: copy or download the decisions and give them to Claude: it records them with praxis_review_apply after you approve them in the dialog.',false);return}
   toast('Saving...',false);
   fetch(D.saveUrl,{method:'POST',headers:{'content-type':'application/json','x-praxis-review-token':D.token||''},body:JSON.stringify(s)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){
     if(!x.ok){showOut(text);toast('Not saved ('+(x.j&&x.j.error||'error')+'). Decisions are below: copy them to Claude.',true);return}
@@ -78612,7 +78613,7 @@ var import_node_fs3 = require("node:fs");
 function runtimeBuildInfo(version4) {
   let embedded = null;
   try {
-    const raw = '{"version":"0.1.0-alpha.48","sourceDigest":"b33aa2a20878b231818fe157747bf7db26899a2526332ff862bc73459097df4a","coreBaseline":"41b7347840e68ec783e621fcda3eb356ecdc19d1","inputs":29}';
+    const raw = '{"version":"0.1.0-alpha.48","sourceDigest":"eb1cd41ee1ddab0176c35625df295e120569a39175bbd197ff6a997ddfe80c34","coreBaseline":"1c2efdcae78c7050357db0de2af57cd803e40cc2","inputs":29}';
     if (raw)
       embedded = JSON.parse(raw);
   } catch {
@@ -81018,10 +81019,15 @@ ${request.description}` }, { confirmation, repo });
   return outcome(repo, id, submission.view, applied, conflicts, plan.stale, plan.summary);
 }
 function readSubmissionFile(repo, file2) {
-  const root = (0, import_node_path33.resolve)(repo);
-  const path = (0, import_node_path33.resolve)(root, file2);
-  if (path !== root && !path.startsWith(`${root}${import_node_path33.sep}`) && !path.startsWith((0, import_node_path33.join)((0, import_node_os3.homedir)(), "Downloads") + import_node_path33.sep))
+  const root = (0, import_node_fs28.realpathSync)((0, import_node_path33.resolve)(repo));
+  const downloads = (0, import_node_path33.join)((0, import_node_os3.homedir)(), "Downloads");
+  const path = (0, import_node_fs28.realpathSync)((0, import_node_path33.resolve)(root, file2));
+  const inside = path === root || path.startsWith(`${root}${import_node_path33.sep}`);
+  const inDownloads = (0, import_node_fs28.existsSync)(downloads) && path.startsWith(`${(0, import_node_fs28.realpathSync)(downloads)}${import_node_path33.sep}`);
+  if (!inside && !inDownloads)
     throw new Error("INVALID_INPUT: the decisions file must be inside the repository or in Downloads");
+  if ((0, import_node_fs28.statSync)(path).size > MAX_BODY)
+    throw new Error("INVALID_INPUT: the decisions file is too large");
   return JSON.parse((0, import_node_fs28.readFileSync)(path, "utf8"));
 }
 function json2(res, status, body2) {
