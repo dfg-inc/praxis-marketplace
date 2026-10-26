@@ -51,6 +51,11 @@ try {
   if (!existsSync(cli) || !existsSync(join(ba, "bin/praxis-ba.bundle.mjs"))) bad("praxis-ba: bin/praxis-ba.cjs (self-contained CLI) is missing");
   else {
     const bare = mkdtempSync(join(work, "canon-"));
+    // a new project has no canon: the CLI says what to do, and `init` creates it from the installed plugin alone
+    const before = run(process.execPath, [cli, "status", "--repo", bare], { cwd: bare, env: { PATH: process.env.PATH } });
+    if (!/no canon here: run praxis-ba init/.test(`${before.stdout}${before.stderr}`)) bad(`praxis-ba: status on a directory without a canon must say to run init: ${(before.stdout + before.stderr).slice(0, 200)}`);
+    const init = run(process.execPath, [cli, "init", "--repo", bare], { cwd: bare, env: { PATH: process.env.PATH } });
+    if (init.status !== 0) bad(`praxis-ba: init failed: ${(init.stderr || init.stdout).slice(0, 200)}`);
     const status = run(process.execPath, [cli, "status", "--repo", bare], { cwd: bare, env: { PATH: process.env.PATH } });
     if (status.status !== 0 && !/VERIFY-OK/.test(status.stdout)) bad(`praxis-ba: the CLI did not run in a bare directory: ${(status.stderr || status.stdout).slice(0, 200)}`);
     else if (!/VERIFY-OK/.test(status.stdout)) bad(`praxis-ba: unexpected CLI output: ${status.stdout.slice(0, 200)}`);
