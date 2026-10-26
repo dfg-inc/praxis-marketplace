@@ -9,7 +9,8 @@
     "check:rc": "node tools/scripts/verify-release-candidate.mjs",
     "test:rc": "node --test tools/scripts/verify-release-candidate.test.mjs",
     "stage": "node tools/scripts/stage-portable-plugins.mjs",
-    "verify": "npm run check:marketplace && npm run check:outputs && npm run test:rc"
+    "verify": "npm run check:marketplace && npm run check:outputs && npm run check:validate && npm run test:rc",
+    "check:validate": "node tools/scripts/validate-claude-plugins.mjs"
   },
   "engines": {
     "node": ">=20"
