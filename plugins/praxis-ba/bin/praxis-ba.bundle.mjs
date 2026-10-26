@@ -11789,7 +11789,7 @@ var init_body_refs = __esm({
 var require_kind_of = __commonJS({
   "../praxis-ba/node_modules/kind-of/index.js"(exports2, module2) {
     var toString = Object.prototype.toString;
-    module2.exports = function kindOf(val) {
+    module2.exports = function kindOf2(val) {
       if (val === void 0) return "undefined";
       if (val === null) return "null";
       var type = typeof val;
@@ -17214,13 +17214,13 @@ var init_writer = __esm({
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
 init_zod();
-var import_yaml8 = __toESM(require_dist(), 1);
+var import_yaml9 = __toESM(require_dist(), 1);
 init_ac();
 init_body_refs();
-import { existsSync as existsSync7, readFileSync as readFileSync13, readdirSync as readdirSync7 } from "node:fs";
+import { existsSync as existsSync7, readFileSync as readFileSync13, readdirSync as readdirSync8, statSync as statSync5 } from "node:fs";
 import { execSync } from "node:child_process";
 import { userInfo } from "node:os";
-import { basename as basename2, dirname as dirname9, join as join12, relative as relative7, resolve as resolve2, sep as sep4 } from "node:path";
+import { basename as basename2, dirname as dirname9, join as join13, relative as relative7, resolve as resolve2, sep as sep4 } from "node:path";
 import { parseArgs } from "node:util";
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/fmt.js
@@ -17255,6 +17255,188 @@ function formatFile(repo, path) {
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
 init_fs();
+
+// ../praxis-ba/plugins/ba/canon-graph/dist/init.js
+var import_yaml6 = __toESM(require_dist(), 1);
+init_fs();
+init_ids();
+init_schema();
+init_serialize();
+init_writer();
+import { lstatSync, mkdirSync as mkdirSync2, readdirSync as readdirSync3, realpathSync, writeFileSync as writeFileSync3 } from "node:fs";
+import { join as join4 } from "node:path";
+var CANON_FOLDERS = ["epics", "br", "cr", "wp", "bugs", "baselines"];
+var CANON_FOLDER_KEEP = ".gitkeep";
+function emptyCounters() {
+  return countersSchema.parse({
+    product: { epic: 0, cr: 0, wp: 0, bug: 0, baselineSeq: {} },
+    epics: {},
+    retired: []
+  });
+}
+var VISION_BODY = `<!-- Draft vision. Replace this body with the product vision. Leave \`status: draft\`
+in the frontmatter: only a human running \`praxis-ba vision confirm\` may set
+\`status: confirmed\`. No work package can become ready while the vision is a draft. -->
+
+State, in one or two paragraphs, what this product is for and the outcome
+it exists to produce - the single sentence a stranger could use to judge
+whether any future requirement belongs in scope. Plain prose; only the
+frontmatter status is machine-checked.
+`;
+function visionText(product) {
+  const heading = product ? `# ${product.replace(/\s+/g, " ").trim()}
+
+` : "";
+  return emitPage("vision", { type: "vision", status: "draft" }, `
+${heading}${VISION_BODY}`);
+}
+function kindOf(abs, rel) {
+  let st;
+  try {
+    st = lstatSync(abs);
+  } catch (err) {
+    if (err.code === "ENOENT")
+      return "missing";
+    throw err;
+  }
+  if (st.isSymbolicLink())
+    throw new Error(`init: ${rel} is a symbolic link; refusing to write through it`);
+  if (st.isDirectory())
+    return "dir";
+  if (st.isFile())
+    return "file";
+  throw new Error(`init: ${rel} exists but is neither a regular file nor a directory`);
+}
+function expectFile(abs, rel) {
+  const k = kindOf(abs, rel);
+  if (k === "dir")
+    throw new Error(`init: ${rel} exists but is a directory, expected a file`);
+  return k === "file";
+}
+function expectDir(abs, rel) {
+  const k = kindOf(abs, rel);
+  if (k === "file")
+    throw new Error(`init: ${rel} exists but is a file, expected a directory`);
+  return k === "dir";
+}
+function writeNew(abs, content) {
+  writeFileSync3(abs, content, { encoding: "utf8", flag: "wx" });
+}
+function epicsPresent(repo) {
+  try {
+    return readdirSync3(join4(repo, "epics"), { withFileTypes: true }).some((e) => e.isDirectory());
+  } catch {
+    return false;
+  }
+}
+async function initCanon(repoInput, options2 = {}) {
+  const dryRun = options2.dryRun === true;
+  const epicTitle = options2.epic?.trim();
+  if (options2.epic !== void 0 && !epicTitle)
+    throw new Error("init: --epic needs a non-empty title");
+  const product = options2.product?.trim();
+  if (options2.product !== void 0 && !product)
+    throw new Error("init: --product needs a non-empty name");
+  let repo;
+  try {
+    repo = realpathSync(repoInput);
+  } catch (err) {
+    if (err.code === "ENOENT")
+      throw new Error(`init: ${repoInput} does not exist; create the directory first`);
+    throw err;
+  }
+  if (!lstatSync(repo).isDirectory())
+    throw new Error(`init: ${repoInput} is a file, not a directory`);
+  const created = [];
+  const skipped = [];
+  const notes = [];
+  const actions = [];
+  const baDir = join4(repo, ".ba");
+  const baExists = expectDir(baDir, ".ba");
+  if (baExists)
+    skipped.push(".ba/");
+  else {
+    created.push(".ba/");
+    actions.push(() => mkdirSync2(baDir));
+  }
+  const configAbs = join4(baDir, "config.yaml");
+  if (baExists && expectFile(configAbs, ".ba/config.yaml")) {
+    try {
+      readCanonConfig(repo);
+    } catch (err) {
+      throw new Error(`init: ${err instanceof Error ? err.message : String(err)}; fix or remove it, init does not repair it`);
+    }
+    skipped.push(".ba/config.yaml");
+  } else {
+    const config = configSchema.parse({ canon_roots: [...DEFAULT_CANON_ROOTS] });
+    created.push(".ba/config.yaml");
+    actions.push(() => writeNew(configAbs, (0, import_yaml6.stringify)(config, { lineWidth: 0 })));
+  }
+  const countersAbs = join4(baDir, "counters.yaml");
+  if (baExists && expectFile(countersAbs, ".ba/counters.yaml")) {
+    try {
+      readCounters(repo);
+    } catch (err) {
+      throw new Error(`init: ${err instanceof Error ? err.message : String(err)}; fix or remove it, init does not repair it`);
+    }
+    skipped.push(".ba/counters.yaml");
+  } else {
+    created.push(".ba/counters.yaml");
+    actions.push(() => writeNew(countersAbs, (0, import_yaml6.stringify)(emptyCounters(), { lineWidth: 0 })));
+  }
+  for (const name of CANON_FOLDERS) {
+    const abs = join4(repo, name);
+    if (expectDir(abs, name))
+      skipped.push(`${name}/`);
+    else {
+      created.push(`${name}/`);
+      actions.push(() => {
+        mkdirSync2(abs);
+        writeNew(join4(abs, CANON_FOLDER_KEEP), "");
+      });
+    }
+  }
+  const visionAbs = join4(repo, "vision.md");
+  if (expectFile(visionAbs, "vision.md"))
+    skipped.push("vision.md");
+  else {
+    created.push("vision.md");
+    actions.push(() => writeNew(visionAbs, visionText(product)));
+  }
+  let epicPlan;
+  let epicCreateNeeded = false;
+  if (epicTitle) {
+    if (epicsPresent(repo)) {
+      notes.push("epic not created: this canon already has epics");
+    } else {
+      epicCreateNeeded = true;
+      const countersExist = baExists && kindOf(countersAbs, ".ba/counters.yaml") === "file";
+      const nextN = (countersExist ? readCounters(repo).product.epic : 0) + 1;
+      const id = `E${nextN}`;
+      epicPlan = { id, path: `epics/${id}-${slugify(epicTitle)}/index.md` };
+      created.push(epicPlan.path);
+    }
+  }
+  if (!dryRun) {
+    for (const act of actions)
+      act();
+    if (epicCreateNeeded && epicTitle) {
+      const { id } = await addEpic(repo, epicTitle);
+      epicPlan = { id, path: `epics/${id}-${slugify(epicTitle)}/index.md` };
+      const predicted = created.findIndex((p) => p.startsWith("epics/E") && p.endsWith("/index.md"));
+      if (predicted >= 0)
+        created[predicted] = epicPlan.path;
+    }
+  }
+  const next = [
+    "Edit vision.md, then confirm it with a human decision: skill confirm-vision (praxis-ba vision confirm)",
+    "Optional: skill ba-scaffold lays out the project documentation layer (project.md, glossary, inputs/, shared/); init does not create it",
+    "Then capture the first change request: skill capture-cr"
+  ];
+  return { repo, dryRun, created, skipped, ...epicPlan ? { epic: epicPlan } : {}, notes, next };
+}
+
+// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
 init_graph();
 init_gates();
 
@@ -17290,8 +17472,8 @@ function checkGoals(graph) {
 // ../praxis-ba/plugins/ba/canon-graph/dist/one-pager.js
 init_ac();
 init_writer();
-import { mkdirSync as mkdirSync2, writeFileSync as writeFileSync3 } from "node:fs";
-import { dirname as dirname3, join as join4 } from "node:path";
+import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync4 } from "node:fs";
+import { dirname as dirname3, join as join5 } from "node:path";
 function section(body, names) {
   const map = {};
   let current = "";
@@ -17387,15 +17569,15 @@ function buildOnePager(repo, id) {
     `Source: ${sourcePath}`,
     ""
   ].join("\n");
-  return { ok: true, markdown, sourcePath, outPath: join4(repo, "one-pagers", `${id}.md`) };
+  return { ok: true, markdown, sourcePath, outPath: join5(repo, "one-pagers", `${id}.md`) };
 }
 function writeOnePager(repo, id, outPath) {
   const built = buildOnePager(repo, id);
   if (!built.ok)
     return built;
   const dest = outPath ?? built.outPath;
-  mkdirSync2(dirname3(dest), { recursive: true });
-  writeFileSync3(dest, built.markdown, "utf8");
+  mkdirSync3(dirname3(dest), { recursive: true });
+  writeFileSync4(dest, built.markdown, "utf8");
   return { ...built, outPath: dest };
 }
 
@@ -17404,28 +17586,28 @@ init_ids();
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/migrate.js
 var import_gray_matter2 = __toESM(require_gray_matter(), 1);
-var import_yaml6 = __toESM(require_dist(), 1);
+var import_yaml7 = __toESM(require_dist(), 1);
 init_ac();
 init_serialize();
 init_schema();
 init_ids();
 init_writer();
 init_fs();
-import { mkdirSync as mkdirSync3, readFileSync as readFileSync6, readdirSync as readdirSync3 } from "node:fs";
+import { mkdirSync as mkdirSync4, readFileSync as readFileSync6, readdirSync as readdirSync4 } from "node:fs";
 import { createHash as createHash2 } from "node:crypto";
-import { join as join5, relative as relative3, sep as sep2 } from "node:path";
+import { join as join6, relative as relative3, sep as sep2 } from "node:path";
 function readJson(path) {
   const raw = JSON.parse(readFileSync6(path, "utf8"));
   return raw;
 }
 function tryReaddir(dir) {
   try {
-    return readdirSync3(dir);
+    return readdirSync4(dir);
   } catch {
     return [];
   }
 }
-var v1YamlEngine = { parse: (input) => (0, import_yaml6.parse)(input) };
+var v1YamlEngine = { parse: (input) => (0, import_yaml7.parse)(input) };
 function readV1WpMdFrontmatter(raw) {
   const { data } = (0, import_gray_matter2.default)(raw, { engines: { yaml: v1YamlEngine } });
   const fmUnknown = data;
@@ -17447,7 +17629,7 @@ function slugify2(title) {
   return slug === "" ? "epic" : slug;
 }
 function epicDir(outDir, epicId, slug) {
-  return join5(outDir, "epics", `${epicId}-${slug}`);
+  return join6(outDir, "epics", `${epicId}-${slug}`);
 }
 var V1_STATUS_TO_V2 = {
   active: "active",
@@ -17511,15 +17693,15 @@ function buildBrBody(ruleText, rationale) {
   return lines.join("\n");
 }
 function readCrs(v1Dir) {
-  const dir = join5(v1Dir, "cr");
-  return tryReaddir(dir).filter((f) => /^CR-\d{3}\.json$/.test(f)).map((f) => readJson(join5(dir, f))).sort((a, b) => naturalCompare(a.id, b.id));
+  const dir = join6(v1Dir, "cr");
+  return tryReaddir(dir).filter((f) => /^CR-\d{3}\.json$/.test(f)).map((f) => readJson(join6(dir, f))).sort((a, b) => naturalCompare(a.id, b.id));
 }
 function readBaselines(v1Dir) {
-  const dir = join5(v1Dir, "baselines");
-  return tryReaddir(dir).filter((f) => /^BL-\d{8}(-\d+)?\.json$/.test(f)).map((f) => readJson(join5(dir, f))).sort((a, b) => naturalCompare(a.baseline_id, b.baseline_id));
+  const dir = join6(v1Dir, "baselines");
+  return tryReaddir(dir).filter((f) => /^BL-\d{8}(-\d+)?\.json$/.test(f)).map((f) => readJson(join6(dir, f))).sort((a, b) => naturalCompare(a.baseline_id, b.baseline_id));
 }
 function readV1Vision(v1Dir) {
-  const path = join5(v1Dir, "vision.md");
+  const path = join6(v1Dir, "vision.md");
   let raw;
   try {
     raw = readFileSync6(path, "utf8");
@@ -17534,7 +17716,7 @@ function mapVisionStatus(v1Status) {
   return v1Status === "draft" || v1Status === "confirmed" ? v1Status : "confirmed";
 }
 function readWps(v1Dir) {
-  const dir = join5(v1Dir, "work-packages");
+  const dir = join6(v1Dir, "work-packages");
   const idsWithJson = /* @__PURE__ */ new Set();
   const idsWithMd = /* @__PURE__ */ new Set();
   for (const f of tryReaddir(dir)) {
@@ -17546,10 +17728,10 @@ function readWps(v1Dir) {
   const wps = [];
   for (const filenameId of /* @__PURE__ */ new Set([...idsWithJson, ...idsWithMd])) {
     if (idsWithJson.has(filenameId)) {
-      const data = readJson(join5(dir, `${filenameId}.json`));
+      const data = readJson(join6(dir, `${filenameId}.json`));
       wps.push({ id: data.wp_id, role: asRole(data.role, data.wp_id), frIds: [...data.fr_ids] });
     } else {
-      const raw = readFileSync6(join5(dir, `${filenameId}.md`), "utf8");
+      const raw = readFileSync6(join6(dir, `${filenameId}.md`), "utf8");
       const fm = readV1WpMdFrontmatter(raw);
       wps.push({ id: fm.wp_id, role: asRole(fm.role, fm.wp_id), frIds: [...fm.fr_ids] });
     }
@@ -17569,8 +17751,8 @@ function trueFrozenIds(baselineId, fileList, requirements) {
 var MIGRATED_CANON_ROOTS = [...DEFAULT_CANON_ROOTS];
 function migrate(v1Dir, outDir) {
   const written = [];
-  const product = readJson(join5(v1Dir, "product.json"));
-  const brRegistry = readJson(join5(v1Dir, "br-registry.json"));
+  const product = readJson(join6(v1Dir, "product.json"));
+  const brRegistry = readJson(join6(v1Dir, "br-registry.json"));
   const crs = readCrs(v1Dir);
   const baselines = readBaselines(v1Dir);
   const wps = readWps(v1Dir);
@@ -17580,13 +17762,13 @@ function migrate(v1Dir, outDir) {
   const pathById = /* @__PURE__ */ new Map();
   const reqStatusById = new Map(product.requirement_db.map((r) => [r.id, r.status]));
   if (v1Vision) {
-    const path = join5(outDir, "vision.md");
+    const path = join6(outDir, "vision.md");
     const status = mapVisionStatus(v1Vision.status);
     emitValidated(path, "vision", { type: "vision", status }, v1Vision.body);
     written.push(path);
   }
   for (const epic of product.epics) {
-    const path = join5(epicDir(outDir, epic.id, epicSlugById.get(epic.id)), "index.md");
+    const path = join6(epicDir(outDir, epic.id, epicSlugById.get(epic.id)), "index.md");
     emitValidated(path, "epic", { id: epic.id, type: "epic", title: epic.title, status: epic.status }, "");
     written.push(path);
   }
@@ -17594,7 +17776,7 @@ function migrate(v1Dir, outDir) {
     const slug = epicSlugById.get(req.epic_id);
     if (slug === void 0)
       throw new Error(`migrate: ${req.id} references unknown epic '${req.epic_id}'`);
-    const path = join5(epicDir(outDir, req.epic_id, slug), `${req.id}.md`);
+    const path = join6(epicDir(outDir, req.epic_id, slug), `${req.id}.md`);
     const version = parseVersion(req.current.version, req.id);
     const status = mapRequirementStatus(req.status, req.id);
     const tracesTo = [...req.cr_refs];
@@ -17619,7 +17801,7 @@ function migrate(v1Dir, outDir) {
     pathById.set(req.id, path);
   }
   for (const rule of brRegistry.rules) {
-    const path = join5(outDir, "br", `${rule.id}.md`);
+    const path = join6(outDir, "br", `${rule.id}.md`);
     const version = parseVersion(rule.current.version, rule.id);
     const status = mapRequirementStatus(rule.status, rule.id);
     const enforcement = rule.current.enforcement;
@@ -17642,7 +17824,7 @@ function migrate(v1Dir, outDir) {
     pathById.set(rule.id, path);
   }
   for (const cr of crs) {
-    const path = join5(outDir, "cr", `${cr.id}.md`);
+    const path = join6(outDir, "cr", `${cr.id}.md`);
     const fm = { id: cr.id, type: "cr", status: cr.status };
     if (cr.status === "confirmed" || cr.status === "resolved") {
       const level = cr.entry_point_confirmed ?? cr.entry_point_advisory;
@@ -17657,7 +17839,7 @@ function migrate(v1Dir, outDir) {
     written.push(path);
   }
   for (const wp of wps) {
-    const path = join5(outDir, "wp", `${wp.id}.md`);
+    const path = join6(outDir, "wp", `${wp.id}.md`);
     const allBaselined = wp.frIds.length > 0 && wp.frIds.every((id) => reqStatusById.get(id) === "baseline");
     const status = allBaselined ? "accepted" : "draft";
     const fm = { id: wp.id, type: "wp", role: wp.role, status };
@@ -17702,16 +17884,16 @@ ${deliversLines}
       accepted_by: "migrated-from-v1",
       verify_evidence_ref: "migrated-from-v1 (no VERIFY-EVIDENCE artifact; predates the v2 harness)"
     });
-    const path = join5(outDir, "baselines", baseline.baseline_id, "manifest.yaml");
-    atomicWrite(path, (0, import_yaml6.stringify)(manifest, { lineWidth: 0 }));
+    const path = join6(outDir, "baselines", baseline.baseline_id, "manifest.yaml");
+    atomicWrite(path, (0, import_yaml7.stringify)(manifest, { lineWidth: 0 }));
     written.push(path);
   }
   const counters = seedCounters(product, baselines);
-  mkdirSync3(join5(outDir, ".ba"), { recursive: true });
+  mkdirSync4(join6(outDir, ".ba"), { recursive: true });
   writeCounters(outDir, counters);
-  written.push(join5(outDir, ".ba", "counters.yaml"));
-  const configPath2 = join5(outDir, ".ba", "config.yaml");
-  atomicWrite(configPath2, (0, import_yaml6.stringify)({ canon_roots: [...MIGRATED_CANON_ROOTS] }, { lineWidth: 0 }));
+  written.push(join6(outDir, ".ba", "counters.yaml"));
+  const configPath2 = join6(outDir, ".ba", "config.yaml");
+  atomicWrite(configPath2, (0, import_yaml7.stringify)({ canon_roots: [...MIGRATED_CANON_ROOTS] }, { lineWidth: 0 }));
   written.push(configPath2);
   return { written };
 }
@@ -17773,26 +17955,26 @@ function setEquals(a, b) {
   return a.size === b.size && [...a].every((v) => b.has(v));
 }
 function readOutBaselineIds(outDir) {
-  const dir = join5(outDir, "baselines");
+  const dir = join6(outDir, "baselines");
   try {
-    return readdirSync3(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+    return readdirSync4(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
   } catch {
     return [];
   }
 }
 function readOutBaselineManifest(outDir, id) {
-  const path = join5(outDir, "baselines", id, "manifest.yaml");
+  const path = join6(outDir, "baselines", id, "manifest.yaml");
   let raw;
   try {
     raw = readFileSync6(path, "utf8");
   } catch {
     return void 0;
   }
-  return baselineManifestSchema.parse((0, import_yaml6.parse)(raw));
+  return baselineManifestSchema.parse((0, import_yaml7.parse)(raw));
 }
 function verifyParity(v1Dir, outDir) {
-  const product = readJson(join5(v1Dir, "product.json"));
-  const brRegistry = readJson(join5(v1Dir, "br-registry.json"));
+  const product = readJson(join6(v1Dir, "product.json"));
+  const brRegistry = readJson(join6(v1Dir, "br-registry.json"));
   const crs = readCrs(v1Dir);
   const baselines = readBaselines(v1Dir);
   const wps = readWps(v1Dir);
@@ -17897,7 +18079,7 @@ function verifyParity(v1Dir, outDir) {
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/migrate-v3.js
 var import_gray_matter3 = __toESM(require_gray_matter(), 1);
-var import_yaml7 = __toESM(require_dist(), 1);
+var import_yaml8 = __toESM(require_dist(), 1);
 init_zod();
 init_fs();
 init_history();
@@ -17909,10 +18091,10 @@ init_schema();
 init_scopelinks();
 init_serialize();
 init_gates();
-import { existsSync, mkdirSync as mkdirSync4, readdirSync as readdirSync4, readFileSync as readFileSync7, renameSync as renameSync3 } from "node:fs";
+import { existsSync, mkdirSync as mkdirSync5, readdirSync as readdirSync5, readFileSync as readFileSync7, renameSync as renameSync3 } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createHash as createHash3 } from "node:crypto";
-import { basename, dirname as dirname4, join as join6, resolve } from "node:path";
+import { basename, dirname as dirname4, join as join7, resolve } from "node:path";
 var backfillEntrySchema = external_exports.object({ impacts: external_exports.array(crImpactSchema) });
 var backfillMapSchema = external_exports.record(external_exports.string().regex(CR_ID), backfillEntrySchema);
 var paritySnapshotSchema = external_exports.object({
@@ -17941,7 +18123,7 @@ var crSchemaV2 = external_exports.object({
   entry_point_confirmed: external_exports.boolean().optional(),
   spawned_from_bug: external_exports.string().regex(BUG_ID).optional()
 });
-var legacyYamlEngine = { parse: (input) => (0, import_yaml7.parse)(input) };
+var legacyYamlEngine = { parse: (input) => (0, import_yaml8.parse)(input) };
 function readRawPage(path) {
   let raw;
   try {
@@ -17959,7 +18141,7 @@ function resolveLinkRoot(canonDir) {
   return readCanonConfig(canonDir)?.link_root ?? basename(resolve(canonDir));
 }
 function gitMove(src, dst, repoRoot) {
-  mkdirSync4(dirname4(dst), { recursive: true });
+  mkdirSync5(dirname4(dst), { recursive: true });
   try {
     execFileSync("git", ["mv", "--", src, dst], { cwd: repoRoot, stdio: "pipe" });
   } catch {
@@ -17971,7 +18153,7 @@ function gitMove(src, dst, repoRoot) {
   }
 }
 function flatWpPath(canonDir, id) {
-  return join6(canonDir, "wp", `${id}.md`);
+  return join7(canonDir, "wp", `${id}.md`);
 }
 function buildScopeSection(graph, refs, _linkRoot, wpId, advisories) {
   const frById = new Map(graph.frs.map((n) => [n.frontmatter.id, n]));
@@ -18040,10 +18222,10 @@ function buildScopeSection(graph, refs, _linkRoot, wpId, advisories) {
 }
 var WP_FLAT_FILE = /^WP-\d{8}-\d{3}\.md$/;
 function migrateWps(canonDir, repoRoot, graph, linkRoot, written, moved, advisories) {
-  const wpDir = join6(canonDir, "wp");
+  const wpDir = join7(canonDir, "wp");
   let entries;
   try {
-    entries = readdirSync4(wpDir, { withFileTypes: true });
+    entries = readdirSync5(wpDir, { withFileTypes: true });
   } catch {
     return;
   }
@@ -18064,9 +18246,9 @@ function migrateWps(canonDir, repoRoot, graph, linkRoot, written, moved, advisor
     const newDir = dirname4(newPath);
     let planValue = fm.plan;
     if (fm.plan !== void 0) {
-      const srcAbs = join6(repoRoot, fm.plan);
+      const srcAbs = join7(repoRoot, fm.plan);
       if (existsSync(srcAbs)) {
-        const dstAbs = join6(newDir, "plan.md");
+        const dstAbs = join7(newDir, "plan.md");
         gitMove(srcAbs, dstAbs, repoRoot);
         moved.push({ from: fm.plan, to: `wp/${id}/plan.md` });
         planValue = `wp/${id}/plan.md`;
@@ -18092,10 +18274,10 @@ function migrateWps(canonDir, repoRoot, graph, linkRoot, written, moved, advisor
 }
 var CR_FILE = /^CR-\d{3}\.md$/;
 function migrateCrs(canonDir, backfill, written, advisories) {
-  const crDir = join6(canonDir, "cr");
+  const crDir = join7(canonDir, "cr");
   let entries;
   try {
-    entries = readdirSync4(crDir, { withFileTypes: true });
+    entries = readdirSync5(crDir, { withFileTypes: true });
   } catch {
     return;
   }
@@ -18176,7 +18358,7 @@ function demoteOne(canonDir, type, frontmatter, body, path, written) {
     return;
   if (!path)
     return;
-  const abs = join6(canonDir, ...path.split("/"));
+  const abs = join7(canonDir, ...path.split("/"));
   atomicWrite(abs, emitPage(type, frontmatter, demoted));
   written.push(abs);
 }
@@ -18196,32 +18378,32 @@ function bumpBugCounterFloor(canonDir, written) {
   if (counters.product.bug >= 13)
     return;
   writeCounters(canonDir, { ...counters, product: { ...counters.product, bug: 13 } });
-  written.push(join6(canonDir, ".ba", "counters.yaml"));
+  written.push(join7(canonDir, ".ba", "counters.yaml"));
 }
 function seedLinkRootIfAbsent(canonDir, written) {
-  const path = join6(canonDir, ".ba", "config.yaml");
+  const path = join7(canonDir, ".ba", "config.yaml");
   let raw;
   try {
     raw = readFileSync7(path, "utf8");
   } catch {
     const seeded = { link_root: basename(resolve(canonDir)) };
-    atomicWrite(path, (0, import_yaml7.stringify)(seeded, { lineWidth: 0 }));
+    atomicWrite(path, (0, import_yaml8.stringify)(seeded, { lineWidth: 0 }));
     written.push(path);
     return;
   }
-  const parsed = (0, import_yaml7.parse)(raw);
+  const parsed = (0, import_yaml8.parse)(raw);
   const obj = typeof parsed === "object" && parsed !== null ? { ...parsed } : {};
   if (obj.link_root !== void 0)
     return;
   obj.link_root = basename(resolve(canonDir));
-  atomicWrite(path, (0, import_yaml7.stringify)(obj, { lineWidth: 0 }));
+  atomicWrite(path, (0, import_yaml8.stringify)(obj, { lineWidth: 0 }));
   written.push(path);
 }
 function reconcileAllCrs(canonDir, date, written) {
-  const crDir = join6(canonDir, "cr");
+  const crDir = join7(canonDir, "cr");
   let entries;
   try {
-    entries = readdirSync4(crDir, { withFileTypes: true });
+    entries = readdirSync5(crDir, { withFileTypes: true });
   } catch {
     return;
   }
@@ -18246,7 +18428,7 @@ function migrateV3(canonDir, repoRoot, backfill, date) {
   const written = [];
   const moved = [];
   const advisories = [];
-  const snapshotPath = join6(canonDir, ".ba", "cache", "migrate-v3-snapshot.json");
+  const snapshotPath = join7(canonDir, ".ba", "cache", "migrate-v3-snapshot.json");
   if (!existsSync(snapshotPath)) {
     const snapshot = snapshotForParity(canonDir, repoRoot);
     atomicWrite(snapshotPath, `${JSON.stringify(snapshot, null, 2)}
@@ -18290,7 +18472,7 @@ function readCrForSnapshot(path) {
   return void 0;
 }
 function resolvePlanAbsPath(canonDir, repoRoot, wpId, plan) {
-  return plan === `wp/${wpId}/plan.md` ? join6(canonDir, plan) : join6(repoRoot, plan);
+  return plan === `wp/${wpId}/plan.md` ? join7(canonDir, plan) : join7(repoRoot, plan);
 }
 function snapshotForParity(canonDir, repoRoot) {
   const files = walkCanonFiles(canonDir);
@@ -18462,7 +18644,7 @@ function verifyParityV3(snapshot, canonDir, repoRoot) {
   });
   const planViolations = [];
   for (const [wpId, oldHash] of Object.entries(snapshot.planFiles)) {
-    const newPath = join6(canonDir, "wp", wpId, "plan.md");
+    const newPath = join7(canonDir, "wp", wpId, "plan.md");
     let content;
     try {
       content = readFileSync7(newPath, "utf8");
@@ -18497,8 +18679,8 @@ init_reconcile();
 var import_gray_matter4 = __toESM(require_gray_matter(), 1);
 init_zod();
 init_ac();
-import { existsSync as existsSync2, readdirSync as readdirSync5, readFileSync as readFileSync8, statSync as statSync3 } from "node:fs";
-import { join as join7 } from "node:path";
+import { existsSync as existsSync2, readdirSync as readdirSync6, readFileSync as readFileSync8, statSync as statSync3 } from "node:fs";
+import { join as join8 } from "node:path";
 var BaRuleFrontmatterSchema = external_exports.object({
   id: external_exports.string().min(1),
   roles: external_exports.array(external_exports.string()).min(1),
@@ -18514,8 +18696,8 @@ function walkMarkdown(root) {
   const stack = [root];
   while (stack.length) {
     const cur = stack.pop();
-    for (const name of readdirSync5(cur)) {
-      const p = join7(cur, name);
+    for (const name of readdirSync6(cur)) {
+      const p = join8(cur, name);
       const st = statSync3(p);
       if (st.isDirectory())
         stack.push(p);
@@ -18592,10 +18774,10 @@ function evaluateBaRules(rules, graph) {
 import { fileURLToPath } from "node:url";
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/handoff.js
-import { existsSync as existsSync3, mkdirSync as mkdirSync5, readFileSync as readFileSync9, writeFileSync as writeFileSync4 } from "node:fs";
-import { dirname as dirname5, join as join8, relative as relative4 } from "node:path";
+import { existsSync as existsSync3, mkdirSync as mkdirSync6, readFileSync as readFileSync9, writeFileSync as writeFileSync5 } from "node:fs";
+import { dirname as dirname5, join as join9, relative as relative4 } from "node:path";
 function emitBaArchitectHandoff(repo, wpId, outPath) {
-  const wpIndex = join8(repo, "wp", wpId, "index.md");
+  const wpIndex = join9(repo, "wp", wpId, "index.md");
   if (!existsSync3(wpIndex)) {
     throw new Error(`WP index not found: ${wpIndex}`);
   }
@@ -18614,7 +18796,7 @@ function emitBaArchitectHandoff(repo, wpId, outPath) {
   if (uniqueReqs.length === 0) {
     throw new Error("no requirement ids found in Scope Delivers");
   }
-  const visionPath2 = join8(repo, "vision.md");
+  const visionPath2 = join9(repo, "vision.md");
   const visionConfirmed = existsSync3(visionPath2) && /status:\s*confirmed/.test(readFileSync9(visionPath2, "utf8"));
   const handoff = {
     contract: "ba.architect.handoff",
@@ -18633,9 +18815,9 @@ function emitBaArchitectHandoff(repo, wpId, outPath) {
       }
     ]
   };
-  const out = outPath ?? join8(repo, "wp", wpId, "handoffs", "ba-architect.handoff.json");
-  mkdirSync5(dirname5(out), { recursive: true });
-  writeFileSync4(out, `${JSON.stringify(handoff, null, 2)}
+  const out = outPath ?? join9(repo, "wp", wpId, "handoffs", "ba-architect.handoff.json");
+  mkdirSync6(dirname5(out), { recursive: true });
+  writeFileSync5(out, `${JSON.stringify(handoff, null, 2)}
 `);
   return { path: out, handoff };
 }
@@ -18643,7 +18825,7 @@ function emitBaArchitectHandoff(repo, wpId, outPath) {
 // ../praxis-ba/plugins/ba/canon-graph/dist/semantic-lint.js
 init_body_refs();
 import { existsSync as existsSync4, readFileSync as readFileSync10 } from "node:fs";
-import { dirname as dirname6, join as join9, relative as relative5 } from "node:path";
+import { dirname as dirname6, join as join10, relative as relative5 } from "node:path";
 var COMMITTED_STATUSES = /* @__PURE__ */ new Set([
   "active",
   "batched",
@@ -18652,8 +18834,8 @@ var COMMITTED_STATUSES = /* @__PURE__ */ new Set([
 ]);
 function loadTaxonomy(repo) {
   for (const candidate of [
-    join9(repo, "shared", "taxonomy.md"),
-    join9(repo, "..", "shared", "taxonomy.md")
+    join10(repo, "shared", "taxonomy.md"),
+    join10(repo, "..", "shared", "taxonomy.md")
   ]) {
     if (existsSync4(candidate)) {
       const text = readFileSync10(candidate, "utf8");
@@ -18667,8 +18849,8 @@ function loadTaxonomy(repo) {
 }
 function loadNfrCatalogue(repo) {
   for (const candidate of [
-    join9(repo, "shared", "nfr.md"),
-    join9(repo, "..", "shared", "nfr.md")
+    join10(repo, "shared", "nfr.md"),
+    join10(repo, "..", "shared", "nfr.md")
   ]) {
     if (existsSync4(candidate)) {
       return { text: readFileSync10(candidate, "utf8"), path: candidate };
@@ -18688,7 +18870,7 @@ function collectDocs(repo, graph) {
       status,
       epic,
       body,
-      absPath: join9(repo, rel),
+      absPath: join10(repo, rel),
       relPath: rel
     });
   };
@@ -18783,7 +18965,7 @@ function runSemanticLint(repo, graph) {
       const target = m[1];
       if (target.includes("{") || target.includes("XXX"))
         continue;
-      const abs = join9(dirname6(doc.absPath), target);
+      const abs = join10(dirname6(doc.absPath), target);
       if (!existsSync4(abs)) {
         findings.push({
           check: "markdown-links-resolve-semantic",
@@ -19013,8 +19195,8 @@ function assertBugCapture(input) {
 
 // ../praxis-ba/plugins/ba/canon-graph/dist/code-surface-scan.js
 import { createHash as createHash4 } from "node:crypto";
-import { existsSync as existsSync5, mkdirSync as mkdirSync6, readFileSync as readFileSync11, readdirSync as readdirSync6, statSync as statSync4, writeFileSync as writeFileSync5 } from "node:fs";
-import { dirname as dirname7, join as join10, relative as relative6, sep as sep3 } from "node:path";
+import { existsSync as existsSync5, mkdirSync as mkdirSync7, readFileSync as readFileSync11, readdirSync as readdirSync7, statSync as statSync4, writeFileSync as writeFileSync6 } from "node:fs";
+import { dirname as dirname7, join as join11, relative as relative6, sep as sep3 } from "node:path";
 var SKIP_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", ".git", "coverage", ".ba"]);
 var BACKEND_CALL = /\b(?:app|router|fastify|server)\.(get|post|put|patch|delete|head|options)\s*\(\s*(['"`])([^'"`]+)\2/gi;
 var ROUTE_CHAIN = /\.route\s*\(\s*(['"`])([^'"`]+)\1\s*\)\s*\.\s*(get|post|put|patch|delete)/gi;
@@ -19040,14 +19222,14 @@ function walkFiles(root) {
     const cur = stack.pop();
     let entries;
     try {
-      entries = readdirSync6(cur);
+      entries = readdirSync7(cur);
     } catch {
       continue;
     }
     for (const name of entries) {
       if (SKIP_DIRS.has(name))
         continue;
-      const p = join10(cur, name);
+      const p = join11(cur, name);
       let st;
       try {
         st = statSync4(p);
@@ -19132,8 +19314,8 @@ function loadSurfaceState(path) {
   }
 }
 function saveSurfaceState(path, state) {
-  mkdirSync6(dirname7(path), { recursive: true });
-  writeFileSync5(path, JSON.stringify(state, null, 2) + "\n");
+  mkdirSync7(dirname7(path), { recursive: true });
+  writeFileSync6(path, JSON.stringify(state, null, 2) + "\n");
 }
 function formatSurfaceReport(report, incremental) {
   const ops = incremental ? report.newOrChanged : report.operations;
@@ -19163,7 +19345,7 @@ function scanCodeSurface(opts) {
   const files = [];
   if (opts.anchors?.length) {
     for (const a of opts.anchors) {
-      const p = a.startsWith("/") ? a : join10(root, a);
+      const p = a.startsWith("/") ? a : join11(root, a);
       if (!existsSync5(p)) {
         warnings.push({ path: a, message: `\u044F\u043A\u043E\u0440\u044C ${a} \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D` });
         continue;
@@ -19213,8 +19395,8 @@ function scanCodeSurface(opts) {
 // ../praxis-ba/plugins/ba/canon-graph/dist/onboard-context.js
 init_parse();
 init_writer();
-import { existsSync as existsSync6, mkdirSync as mkdirSync7, readFileSync as readFileSync12, writeFileSync as writeFileSync6 } from "node:fs";
-import { dirname as dirname8, join as join11 } from "node:path";
+import { existsSync as existsSync6, mkdirSync as mkdirSync8, readFileSync as readFileSync12, writeFileSync as writeFileSync7 } from "node:fs";
+import { dirname as dirname8, join as join12 } from "node:path";
 var ONBOARD_CONTEXT_FILES = [
   { rel: "shared/data-model.md", template: "data-model.md", marker: /data model|сущност/i },
   { rel: "shared/integrations.md", template: "integrations.md", marker: /integrat|интеграц/i },
@@ -19229,7 +19411,7 @@ function checkOnboardContext(projectRoot) {
   const missing = [];
   const headingGaps = [];
   for (const f of ONBOARD_CONTEXT_FILES) {
-    const path = join11(projectRoot, f.rel);
+    const path = join12(projectRoot, f.rel);
     if (!existsSync6(path)) {
       missing.push(f.rel);
       continue;
@@ -19246,7 +19428,7 @@ function initOnboardContext(opts) {
   const skipped = [];
   const protectedPaths = [];
   if (opts.canonDir) {
-    const visionPath2 = join11(opts.canonDir, "vision.md");
+    const visionPath2 = join12(opts.canonDir, "vision.md");
     if (existsSync6(visionPath2)) {
       const parsed = parseFile(visionPath2, "vision");
       if (!("error" in parsed) && parsed.frontmatter.status === "confirmed") {
@@ -19261,18 +19443,18 @@ function initOnboardContext(opts) {
     }
   }
   for (const f of ONBOARD_CONTEXT_FILES) {
-    const dest = join11(opts.projectRoot, f.rel);
+    const dest = join12(opts.projectRoot, f.rel);
     if (existsSync6(dest)) {
       skipped.push(f.rel);
       continue;
     }
-    const src = join11(opts.templatesDir, f.template);
+    const src = join12(opts.templatesDir, f.template);
     if (!existsSync6(src)) {
       skipped.push(f.rel);
       continue;
     }
-    mkdirSync7(dirname8(dest), { recursive: true });
-    writeFileSync6(dest, readFileSync12(src, "utf8"));
+    mkdirSync8(dirname8(dest), { recursive: true });
+    writeFileSync7(dest, readFileSync12(src, "utf8"));
     created.push(f.rel);
   }
   return { created, skipped, protected: protectedPaths };
@@ -19356,7 +19538,10 @@ var OPTIONS = {
   templates: { type: "string" },
   init: { type: "boolean", default: false },
   project: { type: "string" },
-  canon: { type: "string" }
+  canon: { type: "string" },
+  "dry-run": { type: "boolean", default: false },
+  product: { type: "string" },
+  epic: { type: "string" }
 };
 function asString(v) {
   return typeof v === "string" ? v : void 0;
@@ -19414,7 +19599,7 @@ function ok(name, reason, extra = {}) {
   return toResult([{ name, ok: true, reason }], extra);
 }
 function bugPath(repo, id) {
-  return join12(repo, "bugs", `${id}.md`);
+  return join13(repo, "bugs", `${id}.md`);
 }
 function setWpFrontmatter(repo, wpId, patch) {
   const path = wpPath(repo, wpId);
@@ -19430,7 +19615,7 @@ function statusOfMember(graph, id) {
   return graph.frs.find((n) => n.frontmatter.id === id)?.frontmatter.status ?? graph.nfrs.find((n) => n.frontmatter.id === id)?.frontmatter.status ?? graph.brs.find((n) => n.frontmatter.id === id)?.frontmatter.status;
 }
 function isVisionConfirmed(repo) {
-  const parsed = parseFile(join12(repo, "vision.md"), "vision");
+  const parsed = parseFile(join13(repo, "vision.md"), "vision");
   if ("error" in parsed)
     return false;
   return parsed.frontmatter.status === "confirmed";
@@ -19438,8 +19623,71 @@ function isVisionConfirmed(repo) {
 function resolveLinkRoot2(repo) {
   return readCanonConfig(repo)?.link_root ?? basename2(resolve2(repo));
 }
+var NEEDS_CANON = /* @__PURE__ */ new Set([
+  "vision confirm",
+  "cr confirm",
+  "cr realize",
+  "epic add",
+  "req edit",
+  "req retire",
+  "wp prepare",
+  "wp approve-plan",
+  "wp abandon",
+  "accept",
+  "bug capture",
+  "bug resolve",
+  "id next",
+  "status",
+  "goals status",
+  "check-goals",
+  "one-pager",
+  "render",
+  "export",
+  "validate"
+]);
+function assertCanonRoot(repo) {
+  const hint = `run praxis-ba init --repo ${repo}`;
+  let baIsDir = false;
+  try {
+    baIsDir = statSync5(join13(repo, ".ba")).isDirectory();
+  } catch {
+    baIsDir = false;
+  }
+  if (!baIsDir)
+    throw new Error(`no canon here: ${hint}`);
+  if (!existsSync7(join13(repo, ".ba", "counters.yaml"))) {
+    throw new Error(`no canon here (.ba/counters.yaml is missing): ${hint}`);
+  }
+}
 async function dispatch(verb, repo, values, positionals) {
+  if (NEEDS_CANON.has(verb))
+    assertCanonRoot(repo);
   switch (verb) {
+    case "init": {
+      const r = await initCanon(repo, {
+        dryRun: values["dry-run"] === true,
+        product: asString(values.product),
+        epic: asString(values.epic)
+      });
+      const verbPhrase = r.dryRun ? "would create" : "created";
+      const checks = [
+        {
+          name: r.dryRun ? "init-dry-run" : "init",
+          ok: true,
+          reason: `${verbPhrase} ${r.created.length} path(s), ${r.skipped.length} already present, in ${r.repo}${r.dryRun ? " (nothing written)" : ""}`
+        },
+        ...r.created.map((p) => ({ name: r.dryRun ? "would-create" : "created", ok: true, reason: p })),
+        ...r.skipped.map((p) => ({ name: "skipped", ok: true, reason: `${p} (already exists, left untouched)` })),
+        ...r.notes.map((n) => ({ name: "note", ok: true, reason: n })),
+        ...r.next.map((n) => ({ name: "next", ok: true, reason: n }))
+      ];
+      const res = toResult(checks, { ...r.epic ? { id: r.epic.id, path: join13(r.repo, r.epic.path) } : {} });
+      res.json.created = r.created;
+      res.json.skipped = r.skipped;
+      res.json.dryRun = r.dryRun;
+      res.json.next = r.next;
+      return res;
+    }
     case "vision confirm": {
       const by = asString(values.by) ?? currentUser();
       const date = asString(values.date) ?? todayDate();
@@ -19512,7 +19760,7 @@ async function dispatch(verb, repo, values, positionals) {
       if (plan !== expectedPlan) {
         throw new Error(`wp approve-plan: --plan must be the canon-relative path '${expectedPlan}', got '${plan}'`);
       }
-      const planAbsPath = join12(repo, plan);
+      const planAbsPath = join13(repo, plan);
       if (!existsSync7(planAbsPath)) {
         return toResult([{ name: "plan-exists", ok: false, reason: `${planAbsPath} does not exist` }], { id: wpId });
       }
@@ -19578,7 +19826,7 @@ async function dispatch(verb, repo, values, positionals) {
     case "code-surface-scan": {
       const root = asString(values.root) ?? asString(values["repo-root"]) ?? repo;
       const anchors = splitCsv(values.anchors);
-      const statePath = asString(values.state) ?? join12(root, ".ba", "code-surface-state.json");
+      const statePath = asString(values.state) ?? join13(root, ".ba", "code-surface-state.json");
       const incremental = values.incremental === true;
       const acceptScan = values["accept-scan"] === true;
       const canon = asString(values.canon);
@@ -19652,7 +19900,7 @@ async function dispatch(verb, repo, values, positionals) {
     case "migrate-v3": {
       const repoRoot = asString(values["repo-root"]) ?? resolve2(repo, "..");
       if (values.verify === true) {
-        const snapshotPath = join12(repo, ".ba", "cache", "migrate-v3-snapshot.json");
+        const snapshotPath = join13(repo, ".ba", "cache", "migrate-v3-snapshot.json");
         const snapshot = paritySnapshotSchema.parse(JSON.parse(readFileSync13(snapshotPath, "utf8")));
         const verdict = verifyParityV3(snapshot, repo, repoRoot);
         const code2 = verdict.verdict === "VERIFY-OK" ? 0 : 1;
@@ -19831,7 +20079,7 @@ function goalsStatus(repo) {
 function rulesLint(repo, rulesDirFlag) {
   const graph = loadGraph(repo);
   const pluginRoot = resolve2(fileURLToPath(new URL("../..", import.meta.url)));
-  const rulesDir = rulesDirFlag ?? join12(pluginRoot, "rules");
+  const rulesDir = rulesDirFlag ?? join13(pluginRoot, "rules");
   const loadErrors = [];
   const rules = loadBaRules(rulesDir, loadErrors);
   const violations = evaluateBaRules(rules, graph);
@@ -19905,10 +20153,10 @@ function isValid2(w) {
   return "parsed" in w;
 }
 function readBaselineManifests(repo) {
-  const dir = join12(repo, "baselines");
+  const dir = join13(repo, "baselines");
   let entries;
   try {
-    entries = readdirSync7(dir, { withFileTypes: true });
+    entries = readdirSync8(dir, { withFileTypes: true });
   } catch {
     return { manifests: [], errors: [] };
   }
@@ -19917,7 +20165,7 @@ function readBaselineManifests(repo) {
   for (const entry of entries) {
     if (!entry.isDirectory())
       continue;
-    const manifestPath = join12(dir, entry.name, "manifest.yaml");
+    const manifestPath = join13(dir, entry.name, "manifest.yaml");
     let raw;
     try {
       raw = readFileSync13(manifestPath, "utf8");
@@ -19925,7 +20173,7 @@ function readBaselineManifests(repo) {
       continue;
     }
     try {
-      manifests.push(baselineManifestSchema.parse((0, import_yaml8.parse)(raw)));
+      manifests.push(baselineManifestSchema.parse((0, import_yaml9.parse)(raw)));
     } catch (err) {
       errors.push(`${manifestPath}: ${message(err)}`);
     }
@@ -19940,7 +20188,7 @@ function partialStateViolations(repo, pages) {
     const id = typeof fm.id === "string" ? fm.id : void 0;
     if (!baseline || !id)
       continue;
-    const manifestPath = join12(repo, "baselines", baseline, "manifest.yaml");
+    const manifestPath = join13(repo, "baselines", baseline, "manifest.yaml");
     let raw;
     try {
       raw = readFileSync13(manifestPath, "utf8");
@@ -19950,7 +20198,7 @@ function partialStateViolations(repo, pages) {
     }
     let manifest;
     try {
-      manifest = baselineManifestSchema.parse((0, import_yaml8.parse)(raw));
+      manifest = baselineManifestSchema.parse((0, import_yaml9.parse)(raw));
     } catch (err) {
       violations.push(`${id}: ${manifestPath} failed schema validation: ${message(err)}`);
       continue;
@@ -19962,10 +20210,10 @@ function partialStateViolations(repo, pages) {
   return violations;
 }
 function orphanedPendingMarkers(repo) {
-  const dir = join12(repo, ".ba", "cache");
+  const dir = join13(repo, ".ba", "cache");
   let entries;
   try {
-    entries = readdirSync7(dir, { withFileTypes: true });
+    entries = readdirSync8(dir, { withFileTypes: true });
   } catch {
     return [];
   }
@@ -20164,14 +20412,14 @@ function brokenMarkdownLinkIssues(repo, graph) {
       const rel = graph.pathOf(node.frontmatter.id);
       if (!rel)
         continue;
-      const absDir = dirname9(join12(repo, rel));
+      const absDir = dirname9(join13(repo, rel));
       for (const m of node.body.matchAll(linkRe)) {
         const href = m[1];
         if (href.includes("{") || href.includes("XXX"))
           continue;
         if (/^[a-z]+:\/\//i.test(href))
           continue;
-        const target = join12(absDir, href);
+        const target = join13(absDir, href);
         if (!existsSync7(target)) {
           issues.push(`${node.frontmatter.id}: broken link (${href}) from ${rel}`);
         }

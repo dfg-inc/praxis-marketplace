@@ -13,6 +13,11 @@ export declare function crPath(repo: string, id: string): string;
  * `epics/E{n}-slug/index.md`'s shape — `wp/<id>/index.md`, not a flat
  * `wp/<id>.md` file. */
 export declare function wpPath(repo: string, id: string): string;
+/** Kebab-cases an epic title for its directory slug (`E{n}-slug/`, §6.8).
+ * Never throws on pathological input (all-punctuation title, etc.) — falls
+ * back to the literal `epic` slug rather than minting a directory with an
+ * empty/malformed name segment. */
+export declare function slugify(title: string): string;
 /** Exported for `reconcile.ts` — see `crPath`'s doc comment for why that
  * module needs a direct, non-circular import of writer.ts's own primitives
  * rather than re-implementing them. */

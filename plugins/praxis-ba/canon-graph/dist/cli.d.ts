@@ -8,6 +8,11 @@ export type CliJson = {
     checks: Check[];
     surface?: unknown;
     warnings?: unknown;
+    /** `init` only: repo-relative paths created (or, with --dry-run, that would be created), and left untouched. */
+    created?: string[];
+    skipped?: string[];
+    dryRun?: boolean;
+    next?: string[];
 };
 export type CliResult = {
     code: number;
