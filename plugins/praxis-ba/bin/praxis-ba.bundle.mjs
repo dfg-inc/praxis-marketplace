@@ -17263,7 +17263,7 @@ init_ids();
 init_schema();
 init_serialize();
 init_writer();
-import { lstatSync, mkdirSync as mkdirSync2, readdirSync as readdirSync3, realpathSync, writeFileSync as writeFileSync3 } from "node:fs";
+import { lstatSync, mkdirSync as mkdirSync2, readdirSync as readdirSync3, realpathSync, renameSync as renameSync3, rmSync, writeFileSync as writeFileSync3 } from "node:fs";
 import { join as join4 } from "node:path";
 var CANON_FOLDERS = ["epics", "br", "cr", "wp", "bugs", "baselines"];
 var CANON_FOLDER_KEEP = ".gitkeep";
@@ -17319,8 +17319,29 @@ function expectDir(abs, rel) {
     throw new Error(`init: ${rel} exists but is a file, expected a directory`);
   return k === "dir";
 }
+var MAX_PRODUCT_LENGTH = 120;
+var undoLog = null;
 function writeNew(abs, content) {
-  writeFileSync3(abs, content, { encoding: "utf8", flag: "wx" });
+  try {
+    lstatSync(abs);
+    throw new Error(`init: ${abs} appeared since planning; refusing to overwrite`);
+  } catch (err) {
+    if (err.code !== "ENOENT")
+      throw err;
+  }
+  const tmp = `${abs}.praxis-tmp-${process.pid}`;
+  writeFileSync3(tmp, content, { encoding: "utf8", flag: "wx" });
+  try {
+    renameSync3(tmp, abs);
+  } catch (err) {
+    rmSync(tmp, { force: true });
+    throw err;
+  }
+  undoLog?.push(() => rmSync(abs, { force: true }));
+}
+function makeDir(abs) {
+  mkdirSync2(abs);
+  undoLog?.push(() => rmSync(abs, { recursive: true, force: true }));
 }
 function epicsPresent(repo) {
   try {
@@ -17337,6 +17358,8 @@ async function initCanon(repoInput, options2 = {}) {
   const product = options2.product?.trim();
   if (options2.product !== void 0 && !product)
     throw new Error("init: --product needs a non-empty name");
+  if (product && product.length > MAX_PRODUCT_LENGTH)
+    throw new Error(`init: --product is longer than ${MAX_PRODUCT_LENGTH} characters`);
   let repo;
   try {
     repo = realpathSync(repoInput);
@@ -17357,7 +17380,7 @@ async function initCanon(repoInput, options2 = {}) {
     skipped.push(".ba/");
   else {
     created.push(".ba/");
-    actions.push(() => mkdirSync2(baDir));
+    actions.push(() => makeDir(baDir));
   }
   const configAbs = join4(baDir, "config.yaml");
   if (baExists && expectFile(configAbs, ".ba/config.yaml")) {
@@ -17391,7 +17414,7 @@ async function initCanon(repoInput, options2 = {}) {
     else {
       created.push(`${name}/`);
       actions.push(() => {
-        mkdirSync2(abs);
+        makeDir(abs);
         writeNew(join4(abs, CANON_FOLDER_KEEP), "");
       });
     }
@@ -17418,14 +17441,27 @@ async function initCanon(repoInput, options2 = {}) {
     }
   }
   if (!dryRun) {
-    for (const act of actions)
-      act();
-    if (epicCreateNeeded && epicTitle) {
-      const { id } = await addEpic(repo, epicTitle);
-      epicPlan = { id, path: `epics/${id}-${slugify(epicTitle)}/index.md` };
-      const predicted = created.findIndex((p) => p.startsWith("epics/E") && p.endsWith("/index.md"));
-      if (predicted >= 0)
-        created[predicted] = epicPlan.path;
+    undoLog = [];
+    try {
+      for (const act of actions)
+        act();
+      if (epicCreateNeeded && epicTitle) {
+        const { id } = await addEpic(repo, epicTitle);
+        epicPlan = { id, path: `epics/${id}-${slugify(epicTitle)}/index.md` };
+        const predicted = created.findIndex((p) => p.startsWith("epics/E") && p.endsWith("/index.md"));
+        if (predicted >= 0)
+          created[predicted] = epicPlan.path;
+      }
+    } catch (err) {
+      for (const step of (undoLog ?? []).reverse()) {
+        try {
+          step();
+        } catch {
+        }
+      }
+      throw err;
+    } finally {
+      undoLog = null;
     }
   }
   const next = [
@@ -18091,7 +18127,7 @@ init_schema();
 init_scopelinks();
 init_serialize();
 init_gates();
-import { existsSync, mkdirSync as mkdirSync5, readdirSync as readdirSync5, readFileSync as readFileSync7, renameSync as renameSync3 } from "node:fs";
+import { existsSync, mkdirSync as mkdirSync5, readdirSync as readdirSync5, readFileSync as readFileSync7, renameSync as renameSync4 } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createHash as createHash3 } from "node:crypto";
 import { basename, dirname as dirname4, join as join7, resolve } from "node:path";
@@ -18145,7 +18181,7 @@ function gitMove(src, dst, repoRoot) {
   try {
     execFileSync("git", ["mv", "--", src, dst], { cwd: repoRoot, stdio: "pipe" });
   } catch {
-    renameSync3(src, dst);
+    renameSync4(src, dst);
     try {
       execFileSync("git", ["add", "-A"], { cwd: repoRoot, stdio: "pipe" });
     } catch {

@@ -25,4 +25,6 @@ export type InitResult = {
 };
 /** The folders a canon root carries. The engine tolerates their absence; they are created so the layout is visible. */
 export declare const CANON_FOLDERS: readonly string[];
+/** Longest product name init accepts (it becomes the vision heading). */
+export declare const MAX_PRODUCT_LENGTH = 120;
 export declare function initCanon(repoInput: string, options?: InitOptions): Promise<InitResult>;
