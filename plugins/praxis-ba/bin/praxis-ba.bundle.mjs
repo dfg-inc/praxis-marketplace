@@ -19645,7 +19645,10 @@ var NEEDS_CANON = /* @__PURE__ */ new Set([
   "export",
   "validate"
 ]);
-function assertCanonRoot(repo) {
+var READ_ONLY_VERBS = /* @__PURE__ */ new Set(["status", "goals status", "check-goals", "one-pager", "render", "export", "validate"]);
+function assertCanonRoot(repo, verb = "") {
+  if (READ_ONLY_VERBS.has(verb) && (existsSync7(join13(repo, "vision.md")) || existsSync7(join13(repo, "epics"))))
+    return;
   const hint = `run praxis-ba init --repo ${repo}`;
   let baIsDir = false;
   try {
@@ -19661,7 +19664,7 @@ function assertCanonRoot(repo) {
 }
 async function dispatch(verb, repo, values, positionals) {
   if (NEEDS_CANON.has(verb))
-    assertCanonRoot(repo);
+    assertCanonRoot(repo, verb);
   switch (verb) {
     case "init": {
       const r = await initCanon(repo, {
