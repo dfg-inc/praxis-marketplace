@@ -77,6 +77,13 @@ function checkManifest(file, label, { author = true } = {}) {
 }
 const dir0 = (f) => dirname(f);
 
+// sql-wasm.wasm is an Emscripten build: wherever it ships, the Emscripten and musl notices must ship with it.
+function requireWasmNotices(tpn, label) {
+  const text = readFileSync(tpn, "utf8");
+  if (!text.includes("Emscripten is available under 2 licenses")) fail(label, "THIRD-PARTY-NOTICES.md lacks the Emscripten licence text");
+  if (!text.includes("Rich Felker")) fail(label, "THIRD-PARTY-NOTICES.md lacks the musl copyright notice");
+}
+
 // 1. this repository
 const plugins = join(root, "plugins");
 let count = scanTree(plugins, "plugins") + scanTree(join(root, ".claude-plugin"), ".claude-plugin");
@@ -90,6 +97,11 @@ for (const d of readdirSync(plugins)) {
   const p = join(plugins, d);
   if (!statSync(p).isDirectory()) continue;
   requireLicenseFiles(p, `plugins/${d}`);
+  if (walk(p).some((f) => f.endsWith(".wasm"))) {
+    const tpn = join(p, "THIRD-PARTY-NOTICES.md");
+    if (!existsSync(tpn)) fail(`plugins/${d}`, "ships a .wasm without THIRD-PARTY-NOTICES.md");
+    else requireWasmNotices(tpn, `plugins/${d}`);
+  }
   checkManifest(join(p, ".claude-plugin", "plugin.json"), `plugins/${d}`);
 }
 requireLicenseFiles(root, "repository root");
@@ -127,6 +139,7 @@ try {
     if (a.role === "mcpb") {
       requireLicenseFiles(base, label);
       if (!existsSync(join(base, "THIRD-PARTY-NOTICES.md"))) fail(label, "THIRD-PARTY-NOTICES.md missing");
+      else requireWasmNotices(join(base, "THIRD-PARTY-NOTICES.md"), label);
       checkManifest(join(base, "manifest.json"), label);
     } else if (a.role === "zip") {
       requireLicenseFiles(base, label);
