@@ -1,6 +1,6 @@
 # Praxis 0.1.0-alpha.49 — release notes
 
-Release candidate prepared locally; **not yet published** (tags, GitHub Releases and the marketplace repository are created only after the owner confirms).
+Published on 2026-10-29 as an **alpha pre-release** (tag `v0.1.0-alpha.49`). The Runtime `.mcpb` and the four role ZIPs are attached, with their SHA-256, to the GitHub Releases `v0.1.0-alpha.49` of `dfg-inc/praxis-runtime`, `-ba`, `-architect`, `-developer` and `-quality`.
 
 ## Install in one step
 
