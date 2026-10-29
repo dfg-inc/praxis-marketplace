@@ -6,10 +6,11 @@
   "scripts": {
     "check:marketplace": "node tools/scripts/check-marketplace.mjs",
     "check:outputs": "node tools/scripts/check-plugin-outputs.mjs",
+    "check:public": "node tools/scripts/check-public-content.mjs",
     "check:rc": "node tools/scripts/verify-release-candidate.mjs",
     "test:rc": "node --test tools/scripts/verify-release-candidate.test.mjs",
     "stage": "node tools/scripts/stage-portable-plugins.mjs",
-    "verify": "npm run check:marketplace && npm run check:outputs && npm run check:validate && npm run test:rc",
+    "verify": "npm run check:marketplace && npm run check:outputs && npm run check:public && npm run check:validate && npm run test:rc",
     "check:validate": "node tools/scripts/validate-claude-plugins.mjs"
   },
   "engines": {
