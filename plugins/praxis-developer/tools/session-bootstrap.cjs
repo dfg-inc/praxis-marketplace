@@ -374,14 +374,14 @@ var require_mark = __commonJS({
   "../praxis-developer/node_modules/js-yaml/lib/js-yaml/mark.js"(exports2, module2) {
     "use strict";
     var common = require_common();
-    function Mark(name, buffer, position, line, column) {
+    function Mark2(name, buffer, position, line, column) {
       this.name = name;
       this.buffer = buffer;
       this.position = position;
       this.line = line;
       this.column = column;
     }
-    Mark.prototype.getSnippet = function getSnippet(indent, maxLength) {
+    Mark2.prototype.getSnippet = function getSnippet(indent, maxLength) {
       var head, start, tail, end, snippet;
       if (!this.buffer) return null;
       indent = indent || 4;
@@ -409,7 +409,7 @@ var require_mark = __commonJS({
       snippet = this.buffer.slice(start, end);
       return common.repeat(" ", indent) + head + snippet + tail + "\n" + common.repeat(" ", indent + this.position - start + head.length) + "^";
     };
-    Mark.prototype.toString = function toString(compact) {
+    Mark2.prototype.toString = function toString(compact) {
       var snippet, where = "";
       if (this.name) {
         where += 'in "' + this.name + '" ';
@@ -423,7 +423,7 @@ var require_mark = __commonJS({
       }
       return where;
     };
-    module2.exports = Mark;
+    module2.exports = Mark2;
   }
 });
 
@@ -1412,7 +1412,7 @@ var require_loader = __commonJS({
     "use strict";
     var common = require_common();
     var YAMLException = require_exception();
-    var Mark = require_mark();
+    var Mark2 = require_mark();
     var DEFAULT_SAFE_SCHEMA = require_default_safe();
     var DEFAULT_FULL_SCHEMA = require_default_full();
     var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1525,7 +1525,7 @@ var require_loader = __commonJS({
     function generateError(state, message) {
       return new YAMLException(
         message,
-        new Mark(state.filename, state.input, state.position, state.line, state.position - state.lineStart)
+        new Mark2(state.filename, state.input, state.position, state.line, state.position - state.lineStart)
       );
     }
     function throwError(state, message) {
@@ -15073,15 +15073,12 @@ var CiProviderPreviewSchema = external_exports.object({
   blockedReason: external_exports.string().optional()
 });
 
-// ../praxis-developer/node_modules/@praxis/contracts/dist/user-approval.js
-var import_node_async_hooks = require("node:async_hooks");
-var USER_APPROVAL_TTL_MS = 10 * 60 * 1e3;
-var channelStore = new import_node_async_hooks.AsyncLocalStorage();
-var lease = new import_node_async_hooks.AsyncLocalStorage();
-
-// ../praxis-developer/node_modules/@praxis/contracts/dist/story.js
+// ../praxis-developer/node_modules/@praxis/contracts/dist/ids.js
 var RequirementIdSchema = external_exports.string().regex(/^(REQ-[A-Z][A-Z0-9]*-\d{3,}|[A-Z][A-Z0-9]*-(?:FR|NFR|BR)\d+)$/);
 var StoryIdSchema = external_exports.string().regex(/^US-[A-Z][A-Z0-9]*-\d{3,}$/);
+var RepositoryIdSchema = external_exports.string().regex(/^[a-z0-9][a-z0-9._-]{0,62}$/);
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/story.js
 var CoverageStatusSchema = external_exports.enum([
   "PASS",
   "FAIL",
@@ -15095,6 +15092,37 @@ var StoryCriterionSchema = external_exports.object({
   when: external_exports.string().min(1),
   then: external_exports.string().min(1)
 });
+var ReviewMarkSchema = external_exports.object({
+  status: external_exports.enum(["pending", "accepted", "rejected"]).default("pending"),
+  comment: external_exports.string().optional(),
+  at: external_exports.string().optional(),
+  via: external_exports.enum(["html-review", "approved", "chat", "system"]).optional(),
+  /** When and through which channel the comment last changed. `at`/`via` above are the STATUS decision only, so editing a comment does not look like a new decision. */
+  commentAt: external_exports.string().optional(),
+  commentVia: external_exports.enum(["html-review", "approved", "chat", "system"]).optional(),
+  /** The decision this item had before its text was revised: the reason a user gave stays readable when the item goes back to pending. */
+  previous: external_exports.object({
+    status: external_exports.enum(["pending", "accepted", "rejected"]),
+    comment: external_exports.string().optional(),
+    at: external_exports.string().optional(),
+    via: external_exports.enum(["html-review", "approved", "chat", "system"]).optional(),
+    revision: external_exports.number().int().positive().optional()
+  }).optional()
+});
+var STORY_CAPABILITIES = [
+  "view",
+  "search",
+  "filter",
+  "create",
+  "edit",
+  "delete",
+  "validation",
+  "error",
+  "permissions",
+  "states",
+  "other"
+];
+var StoryCapabilitySchema = external_exports.enum(STORY_CAPABILITIES);
 var UserStorySchema = external_exports.object({
   id: StoryIdSchema,
   requirementIds: external_exports.array(RequirementIdSchema).min(1),
@@ -15115,9 +15143,32 @@ var UserStorySchema = external_exports.object({
   unresolvedDecisionIds: external_exports.array(external_exports.string()).default([]),
   serviceIds: external_exports.array(external_exports.string()).default([]),
   revision: external_exports.number().int().positive(),
-  status: external_exports.enum(["proposed", "confirmed", "superseded"]),
+  status: external_exports.enum(["proposed", "confirmed", "superseded", "excluded"]),
   confirmedBehavior: external_exports.boolean(),
-  stale: external_exports.boolean().default(false)
+  stale: external_exports.boolean().default(false),
+  /** Short title shown in the story plan and in reviews. */
+  title: external_exports.string().optional(),
+  capabilities: external_exports.array(StoryCapabilitySchema).default([]),
+  /** Prototype screens/elements this story covers. */
+  screenRefs: external_exports.array(external_exports.string()).default([]),
+  /** Registered repositories this story is implemented in. */
+  repositoryIds: external_exports.array(external_exports.string()).default([]),
+  excludedReason: external_exports.string().optional(),
+  /** Review marks by item key: "ac:<id>", "step:<n>", "alt:<n>", "neg:<n>", "edge:<n>", "rule:<n>", "result:<n>". */
+  review: external_exports.record(external_exports.string(), ReviewMarkSchema).default({})
+});
+var EvidenceSourceSchema = external_exports.object({
+  /** executed: the Runtime ran the check. browser: the Runtime drove a real browser. agent: written by an agent without a Runtime run (self-attested, never independent). */
+  kind: external_exports.enum(["executed", "browser", "agent"]),
+  runId: external_exports.string().optional(),
+  runner: external_exports.string().optional(),
+  startedAt: external_exports.string().optional(),
+  finishedAt: external_exports.string().optional(),
+  /** Digest of what was exercised (the served bundle, or the module). */
+  subjectDigest: external_exports.string().optional(),
+  /** Set only in memory by the Runtime when the bundle this result was recorded for is no longer the bundle on disk. Never persisted. */
+  drifted: external_exports.boolean().optional(),
+  artifacts: external_exports.array(external_exports.object({ path: external_exports.string(), sha256: external_exports.string(), bytes: external_exports.number().int().nonnegative().optional() })).default([])
 });
 var CoverageEntrySchema = external_exports.object({
   /** Absent for requirement-only evidence: a work item verified without a Story. */
@@ -15135,7 +15186,11 @@ var CoverageEntrySchema = external_exports.object({
   evidence: external_exports.array(external_exports.string()).default([]),
   findingId: external_exports.string().optional(),
   status: CoverageStatusSchema,
-  critical: external_exports.boolean().default(false)
+  critical: external_exports.boolean().default(false),
+  /** Revision of the acceptance criterion this scenario verified. A revised criterion is not proven by the older result. */
+  acceptanceCriterionRevision: external_exports.number().int().positive().optional(),
+  recordedAt: external_exports.string().optional(),
+  source: EvidenceSourceSchema.optional()
 });
 var ChangeRecordSchema = external_exports.object({
   id: external_exports.string().min(1),
@@ -15154,8 +15209,535 @@ var ChangeRecordSchema = external_exports.object({
   authorRole: external_exports.literal("quality")
 });
 
+// ../praxis-developer/node_modules/@praxis/contracts/dist/planning-schemas.js
+var PHASES = [
+  "request",
+  "discovery",
+  "requirements",
+  "requirements_review",
+  "prototype",
+  "story_plan",
+  "stories_review",
+  "architecture",
+  "development",
+  "quality",
+  "delivery"
+];
+var PhaseSchema = external_exports.enum(PHASES);
+var ACCEPTABLE_PHASES = ["requirements_review", "prototype", "story_plan", "stories_review"];
+var AcceptablePhaseSchema = external_exports.enum(ACCEPTABLE_PHASES);
+var PhaseAcceptanceSchema = external_exports.object({
+  /** What was accepted: the revision of the reviewed artifact at the time. */
+  revision: external_exports.number().int().nonnegative(),
+  at: external_exports.string(),
+  via: external_exports.enum(["html-review", "approved", "chat", "system"]).default("chat"),
+  /** Content fingerprint of what was accepted. The acceptance counts only while the artifact still has it. */
+  fingerprint: external_exports.string().optional()
+});
+var PhaseHistoryEntrySchema = external_exports.object({
+  at: external_exports.string(),
+  kind: external_exports.enum(["advance", "return"]),
+  from: PhaseSchema,
+  to: PhaseSchema,
+  reason: external_exports.string().default(""),
+  /** Artifacts whose acceptance was invalidated by a return. */
+  invalidated: external_exports.array(external_exports.string()).default([])
+});
+var ScopeSchema = external_exports.enum(["in", "deferred", "excluded"]);
+var WorkItemKindSchema = external_exports.enum(["feature", "change", "extension", "fix", "technical"]);
+var WorkflowModeSchema = external_exports.enum(["classic", "guided"]);
+var RepositoryInspectionSchema = external_exports.object({
+  at: external_exports.string(),
+  /** Read from the repository by the Runtime, never typed in by an agent. */
+  headSha: external_exports.string().optional(),
+  branch: external_exports.string().optional(),
+  summary: external_exports.string(),
+  frameworks: external_exports.array(external_exports.string()).default([]),
+  /** Agent-instruction files found (CLAUDE.md, AGENTS.md, skills, rules). Listed, never followed. */
+  instructionFiles: external_exports.array(external_exports.string()).default([]),
+  /** Paths the inspection actually looked at. */
+  entries: external_exports.array(external_exports.object({ path: external_exports.string(), note: external_exports.string().optional() })).default([]),
+  frontend: external_exports.object({
+    hasStyles: external_exports.boolean(),
+    styleFiles: external_exports.array(external_exports.string()).default([]),
+    componentDirs: external_exports.array(external_exports.string()).default([])
+  }).optional()
+});
+var RepositorySchema = external_exports.object({
+  id: RepositoryIdSchema,
+  name: external_exports.string().min(1),
+  /** Free text: "web frontend", "iOS app", "billing API". Any number of repositories, any roles. */
+  role: external_exports.string().default(""),
+  localPath: external_exports.string().optional(),
+  remoteUrl: external_exports.string().optional(),
+  branch: external_exports.string().optional(),
+  notes: external_exports.string().optional(),
+  registeredAt: external_exports.string(),
+  status: external_exports.enum(["registered", "inspected"]).default("registered"),
+  inspection: RepositoryInspectionSchema.optional()
+});
+var ServiceContractSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  name: external_exports.string().min(1),
+  providerServiceId: external_exports.string().min(1),
+  consumerServiceIds: external_exports.array(external_exports.string()).default([]),
+  description: external_exports.string().default(""),
+  /** Where the schema/endpoint definition lives, for example "openapi.yaml#/paths/~1orders". */
+  schemaRef: external_exports.string().optional(),
+  requirementIds: external_exports.array(RequirementIdSchema).default([]),
+  storyIds: external_exports.array(StoryIdSchema).default([]),
+  status: external_exports.enum(["proposed", "agreed"]).default("proposed"),
+  /** Who agreed it: only the user can (see isUserDecision). Absent while proposed. */
+  agreement: external_exports.object({ at: external_exports.string(), via: external_exports.enum(["html-review", "approved", "system"]) }).optional(),
+  /** The user agreed this contract at some point. Kept when it becomes proposed again, so it cannot be deleted by the agent. */
+  everAgreed: external_exports.boolean().optional()
+});
+var EvidenceRefSchema = external_exports.object({
+  repositoryId: RepositoryIdSchema,
+  path: external_exports.string().min(1),
+  note: external_exports.string().optional()
+});
+var ImpactSchema = external_exports.object({
+  revision: external_exports.number().int().positive(),
+  recordedAt: external_exports.string(),
+  baseline: external_exports.object({
+    summary: external_exports.string().min(1),
+    /** Behaviour that exists today and must keep working unless the change says otherwise. */
+    behaviors: external_exports.array(external_exports.object({ id: external_exports.string().min(1), statement: external_exports.string().min(1), evidence: external_exports.array(EvidenceRefSchema).default([]) })).default([])
+  }),
+  affected: external_exports.array(external_exports.object({
+    repositoryId: RepositoryIdSchema,
+    path: external_exports.string().optional(),
+    area: external_exports.string().min(1),
+    change: external_exports.string().min(1),
+    risk: external_exports.string().optional()
+  })).default([]),
+  regressionChecks: external_exports.array(external_exports.object({
+    id: external_exports.string().min(1),
+    statement: external_exports.string().min(1),
+    requirementIds: external_exports.array(RequirementIdSchema).default([]),
+    serviceId: external_exports.string().optional()
+  })).default([])
+});
+var PrototypeStateSchema = external_exports.enum(["default", "loading", "empty", "error", "success", "denied"]);
+var ELEMENT_KINDS = [
+  "heading",
+  "text",
+  "table",
+  "list",
+  "form",
+  "field",
+  "button",
+  "link",
+  "filter",
+  "search",
+  "tabs",
+  "badge",
+  "modal",
+  "drawer",
+  "message"
+];
+var ElementKindSchema = external_exports.enum(ELEMENT_KINDS);
+var ShowWhenSchema = external_exports.object({
+  param: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9_-]*$/).refine((n) => !(n in Object.prototype), "a parameter name must not be an Object property name"),
+  equals: external_exports.string().optional(),
+  notEquals: external_exports.string().optional(),
+  /** true: the parameter is set; false: it is not set. */
+  present: external_exports.boolean().optional()
+});
+var ParamNameSchema = external_exports.string().regex(/^[A-Za-z][A-Za-z0-9_-]*$/).refine((n) => !(n in Object.prototype), "a parameter name must not be an Object property name such as toString or constructor");
+var PrototypeElementSchema = external_exports.object({
+  id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/),
+  kind: ElementKindSchema,
+  label: external_exports.string().default(""),
+  /** What using this element means: lets coverage see view/search/create/edit/delete/permissions. */
+  intent: StoryCapabilitySchema.optional(),
+  /** table/list: mock collection shown. form/field: collection edited. */
+  collection: external_exports.string().optional(),
+  /** field: the collection field it edits. table/list: columns (field keys) to show. */
+  field: external_exports.string().optional(),
+  columns: external_exports.array(external_exports.string()).default([]),
+  /** button/link: screen it opens. */
+  navigatesTo: external_exports.string().optional(),
+  /** button: what it does to the mock data. */
+  action: external_exports.enum(["navigate", "add-row", "edit-row", "delete-row", "submit", "open-modal", "close-modal", "none"]).optional(),
+  /** Roles that may use the element; others see the "denied" state. Empty means everyone. */
+  allowedRoles: external_exports.array(external_exports.string()).default([]),
+  text: external_exports.string().optional(),
+  requirementIds: external_exports.array(RequirementIdSchema).default([]),
+  acIds: external_exports.array(external_exports.string()).default([]),
+  /**
+   * Behaviour, all optional: an older prototype without any of it renders as before. Everything runs on mock data and the
+   * prototype's own virtual address (query string), never on a real system.
+   */
+  /** filter/tabs/drawer/modal/table: the URL query parameter the element reads and writes. */
+  param: ParamNameSchema.optional(),
+  /** filter/tabs: the choices. A filter on an enum field takes the field's options when this is empty. */
+  options: external_exports.array(external_exports.object({ value: external_exports.string(), label: external_exports.string().optional() })).default([]),
+  /** filter: label of the "no filter" choice. */
+  allLabel: external_exports.string().optional(),
+  /** table/list: rows are narrowed by these query parameters (field equals the parameter value; an unknown value shows no rows). */
+  filters: external_exports.array(external_exports.object({
+    param: ParamNameSchema,
+    field: external_exports.string(),
+    /** "all": a value that is not one of the field's options is ignored (shows everything). Default: it matches nothing. */
+    unknown: external_exports.enum(["all", "empty"]).optional()
+  })).default([]),
+  /** table/list: field that identifies a row (default "id", then the first column). drawer/modal: field matched against the parameter. */
+  idField: external_exports.string().optional(),
+  /** table/list: id of the drawer or modal (same screen) a click on a row opens. */
+  rowOpens: external_exports.string().optional(),
+  /** drawer/modal: what is shown for the opened record. */
+  detailFields: external_exports.array(external_exports.object({ field: external_exports.string(), label: external_exports.string().optional() })).default([]),
+  /** table/list: shown in the empty state as a button that clears the listed query parameters. {param} in emptyText is replaced by that parameter's value. */
+  emptyAction: external_exports.object({ label: external_exports.string().min(1), clear: external_exports.array(ParamNameSchema).default([]) }).optional(),
+  /** drawer/modal: the opened record must be one of this table's rows (after its filters). */
+  withinTable: external_exports.string().optional(),
+  /** drawer/modal: when the record is missing (or outside withinTable): "close" removes the parameter and shows nothing; "message" (default) shows notFoundText. */
+  onMissing: external_exports.enum(["close", "message"]).optional(),
+  /** drawer/modal: rows of another collection that belong to the opened record (for example the lines of an order). */
+  related: external_exports.array(external_exports.object({ collection: external_exports.string(), matchField: external_exports.string(), columns: external_exports.array(external_exports.string()).default([]), label: external_exports.string().optional() })).default([]),
+  /** Texts for the situations a reviewer must see: nothing matches / the record is missing / a value is missing. */
+  emptyText: external_exports.string().optional(),
+  /** table/list: shown when the collection itself has no rows (as opposed to a filter that matches none). */
+  noDataText: external_exports.string().optional(),
+  notFoundText: external_exports.string().optional(),
+  missingText: external_exports.string().optional(),
+  /** tabs: the tabs. The first is the default. */
+  tabs: external_exports.array(external_exports.object({ id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/), label: external_exports.string().min(1) })).default([]),
+  showWhen: ShowWhenSchema.optional(),
+  /** field: the value must be filled before a submit works. */
+  required: external_exports.boolean().default(false)
+});
+var PrototypeScenarioSchema = external_exports.object({
+  id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/),
+  title: external_exports.string().min(1),
+  description: external_exports.string().default(""),
+  screen: external_exports.string().optional(),
+  dataset: external_exports.string().optional(),
+  role: external_exports.string().optional(),
+  /** Query string the scenario starts from. */
+  query: external_exports.record(external_exports.string(), external_exports.string()).default({}),
+  expect: external_exports.object({
+    /** Rows shown by a table/list element. */
+    rows: external_exports.array(external_exports.object({ element: external_exports.string(), count: external_exports.number().int().nonnegative() })).default([]),
+    /** State of a drawer/modal: open with a record, closed, or open on a missing record. */
+    overlay: external_exports.array(external_exports.object({ element: external_exports.string(), state: external_exports.enum(["open", "closed", "not-found"]) })).default([]),
+    /** Texts that must / must not appear in the screen. */
+    contains: external_exports.array(external_exports.string()).default([]),
+    absent: external_exports.array(external_exports.string()).default([]),
+    /** Query parameters that must have these values afterwards, and ones that must be gone. */
+    query: external_exports.record(external_exports.string(), external_exports.string()).default({}),
+    noQuery: external_exports.array(external_exports.string()).default([])
+  }).optional(),
+  requirementIds: external_exports.array(RequirementIdSchema).default([]),
+  acIds: external_exports.array(external_exports.string()).default([])
+});
+var PrototypeDatasetSchema = external_exports.object({
+  id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/),
+  label: external_exports.string().min(1),
+  description: external_exports.string().default(""),
+  rows: external_exports.record(external_exports.string(), external_exports.array(external_exports.record(external_exports.string(), external_exports.union([external_exports.string(), external_exports.number(), external_exports.boolean(), external_exports.null()]))).max(200)).default({})
+});
+var PrototypeScreenSchema = external_exports.object({
+  id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/),
+  title: external_exports.string().min(1),
+  description: external_exports.string().default(""),
+  /** Which states the screen shows. The reviewer can switch between them. */
+  states: external_exports.array(PrototypeStateSchema).default(["default"]),
+  elements: external_exports.array(PrototypeElementSchema).default([]),
+  /** Text shown in states other than default, per state. */
+  stateMessages: external_exports.record(external_exports.string(), external_exports.string()).default({})
+});
+var MockFieldSchema = external_exports.object({
+  key: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9_]*$/),
+  label: external_exports.string().min(1),
+  type: external_exports.enum(["string", "number", "boolean", "date", "enum"]).default("string"),
+  options: external_exports.array(external_exports.string()).optional()
+});
+var MockCollectionSchema = external_exports.object({
+  id: external_exports.string().regex(/^[A-Za-z][A-Za-z0-9._-]*$/),
+  name: external_exports.string().min(1),
+  fields: external_exports.array(MockFieldSchema).min(1),
+  rows: external_exports.array(external_exports.record(external_exports.string(), external_exports.union([external_exports.string(), external_exports.number(), external_exports.boolean(), external_exports.null()]))).max(200).default([])
+});
+var ApiEndpointSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  method: external_exports.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
+  path: external_exports.string().min(1),
+  summary: external_exports.string().default(""),
+  auth: external_exports.string().optional(),
+  requirementIds: external_exports.array(RequirementIdSchema).default([]),
+  acIds: external_exports.array(external_exports.string()).default([]),
+  request: external_exports.unknown().optional(),
+  responses: external_exports.array(external_exports.object({ status: external_exports.number().int(), description: external_exports.string().default(""), example: external_exports.unknown().optional() })).default([])
+});
+var PrototypeTokensSchema = external_exports.object({
+  colors: external_exports.record(external_exports.string(), external_exports.string()).default({}),
+  fonts: external_exports.record(external_exports.string(), external_exports.string()).default({}),
+  radius: external_exports.string().optional(),
+  spacing: external_exports.string().optional(),
+  /** Files the styles were read from. Empty means neutral defaults were used and the prototype says so. */
+  sources: external_exports.array(external_exports.object({ repositoryId: external_exports.string().optional(), file: external_exports.string(), note: external_exports.string().optional() })).default([])
+});
+var PrototypeFeedbackSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  target: external_exports.string().min(1),
+  comment: external_exports.string().min(1),
+  at: external_exports.string(),
+  resolved: external_exports.boolean().default(false)
+});
+var PrototypeSchema = external_exports.object({
+  id: external_exports.string().min(1).default("PROTO-1"),
+  /** "ui" shows screens on mock data. "api" is a technical prototype: endpoints with request/response examples. */
+  kind: external_exports.enum(["ui", "api"]),
+  title: external_exports.string().min(1),
+  revision: external_exports.number().int().positive(),
+  status: external_exports.enum(["draft", "accepted"]).default("draft"),
+  notes: external_exports.string().default(""),
+  styles: PrototypeTokensSchema.default({ colors: {}, fonts: {}, sources: [] }),
+  screens: external_exports.array(PrototypeScreenSchema).default([]),
+  startScreen: external_exports.string().optional(),
+  mock: external_exports.array(MockCollectionSchema).default([]),
+  datasets: external_exports.array(PrototypeDatasetSchema).default([]),
+  scenarios: external_exports.array(PrototypeScenarioSchema).default([]),
+  /** What this prototype does not reproduce (components, behaviour, data). Shown to the reviewer instead of implying a full replica. */
+  limitations: external_exports.array(external_exports.string()).default([]),
+  endpoints: external_exports.array(ApiEndpointSchema).default([]),
+  roles: external_exports.array(external_exports.string()).default([]),
+  feedback: external_exports.array(PrototypeFeedbackSchema).default([]),
+  history: external_exports.array(external_exports.object({ revision: external_exports.number().int().positive(), at: external_exports.string(), summary: external_exports.string() })).default([])
+});
+var StoryPlanEntrySchema = external_exports.object({
+  id: StoryIdSchema,
+  title: external_exports.string().min(1),
+  /** What will be implemented. */
+  implementation: external_exports.string().min(1),
+  /** What the user gets. */
+  userGets: external_exports.string().min(1),
+  /** Data that appears or changes. */
+  data: external_exports.array(external_exports.string()).default([]),
+  /** Prototype screens/elements covered ("screen", "screen#element"). */
+  screenRefs: external_exports.array(external_exports.string()).default([]),
+  requirementIds: external_exports.array(RequirementIdSchema).min(1),
+  acIds: external_exports.array(external_exports.string()).default([]),
+  repositoryIds: external_exports.array(external_exports.string()).default([]),
+  serviceIds: external_exports.array(external_exports.string()).default([]),
+  dependsOn: external_exports.array(StoryIdSchema).default([]),
+  capabilities: external_exports.array(StoryCapabilitySchema).default([]),
+  status: external_exports.enum(["planned", "detailed", "excluded"]).default("planned"),
+  excludedReason: external_exports.string().optional(),
+  /** User's review of this plan line. */
+  review: ReviewMarkSchema.default({ status: "pending" })
+});
+var StoryPlanSchema = external_exports.object({
+  revision: external_exports.number().int().positive(),
+  status: external_exports.enum(["draft", "agreed"]).default("draft"),
+  entries: external_exports.array(StoryPlanEntrySchema).default([]),
+  history: external_exports.array(external_exports.object({ revision: external_exports.number().int().positive(), at: external_exports.string(), summary: external_exports.string() })).default([])
+});
+var StoryHistoryEntrySchema = external_exports.object({
+  storyId: StoryIdSchema,
+  /** The revision this snapshot is OF (the one that was replaced). */
+  revision: external_exports.number().int().positive(),
+  at: external_exports.string(),
+  kind: external_exports.enum(["edit", "exclude", "restore", "split", "merge", "scope", "requirement-change"]),
+  summary: external_exports.string(),
+  /** Compact snapshot of what changed hands: narrative and acceptance criteria. */
+  previous: external_exports.object({
+    narrative: external_exports.string(),
+    objective: external_exports.string(),
+    acceptanceCriteria: external_exports.array(external_exports.object({ id: external_exports.string(), given: external_exports.string(), when: external_exports.string(), then: external_exports.string() })),
+    status: external_exports.string(),
+    confirmedBehavior: external_exports.boolean()
+  })
+});
+var SessionNoteSchema = external_exports.object({
+  at: external_exports.string(),
+  role: external_exports.string().optional(),
+  summary: external_exports.string().min(1),
+  nextAction: external_exports.string().optional()
+});
+var CoverageWaiverSchema = external_exports.object({
+  id: external_exports.string().min(1),
+  /** A capability ("view", "permissions", ...) or "requirement-without-story". */
+  kind: external_exports.string().min(1),
+  requirementId: RequirementIdSchema.optional(),
+  reason: external_exports.string().min(1),
+  at: external_exports.string(),
+  /** How the person decided (the review page, or an approved batch). Absent on waivers recorded before this existed. */
+  decidedVia: external_exports.enum(["html-review", "approved", "chat", "system"]).optional(),
+  /** What asked for the capability when the person waived it (the phrase or prototype element): lets a reader check the waiver closes that and not a real requirement. */
+  gap: external_exports.string().optional()
+});
+var PlanningStateFields = {
+  mode: WorkflowModeSchema.default("classic"),
+  phase: PhaseSchema.default("request"),
+  phaseAcceptance: external_exports.record(external_exports.string(), PhaseAcceptanceSchema).default({}),
+  phaseHistory: external_exports.array(PhaseHistoryEntrySchema).default([]),
+  repositories: external_exports.array(RepositorySchema).default([]),
+  contracts: external_exports.array(ServiceContractSchema).default([]),
+  impact: ImpactSchema.optional(),
+  prototype: PrototypeSchema.optional(),
+  storyPlan: StoryPlanSchema.optional(),
+  storyHistory: external_exports.array(StoryHistoryEntrySchema).default([]),
+  sessionLog: external_exports.array(SessionNoteSchema).default([]),
+  waivers: external_exports.array(CoverageWaiverSchema).default([]),
+  /** Earlier content of requirements, the prototype and the story plan (JSON text), so a revision never loses what it replaced. */
+  artifactHistory: external_exports.array(external_exports.object({ kind: external_exports.enum(["requirement", "prototype", "story-plan"]), id: external_exports.string(), revision: external_exports.number().int().positive(), at: external_exports.string(), snapshot: external_exports.string() })).default([]),
+  updatedAt: external_exports.string().optional()
+};
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/user-approval.js
+var import_node_async_hooks = require("node:async_hooks");
+var USER_APPROVAL_TTL_MS = 10 * 60 * 1e3;
+var channelStore = new import_node_async_hooks.AsyncLocalStorage();
+var lease = new import_node_async_hooks.AsyncLocalStorage();
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/planning.js
+var Via = external_exports.enum(["html-review", "approved", "chat", "system"]).default("chat");
+var ReviewStatus = external_exports.enum(["pending", "accepted", "rejected"]);
+var AcDecision = external_exports.object({
+  id: external_exports.string().min(1),
+  status: ReviewStatus.optional(),
+  comment: external_exports.string().optional(),
+  statement: external_exports.string().min(1).refine((v) => v.trim().length > 0, "must not be blank").optional()
+});
+var RequirementDecision = external_exports.object({
+  requirementId: RequirementIdSchema,
+  statement: external_exports.string().min(1).refine((v) => v.trim().length > 0, "must not be blank").optional(),
+  scope: ScopeSchema.optional(),
+  scopeNote: external_exports.string().optional(),
+  comment: external_exports.string().optional(),
+  acceptance: external_exports.array(AcDecision).default([]),
+  addAcceptance: external_exports.array(external_exports.object({ statement: external_exports.string().min(1) })).default([]),
+  removeAcceptance: external_exports.array(external_exports.string()).default([])
+});
+var PrototypeInput = PrototypeSchema.omit({ revision: true, status: true, history: true, feedback: true }).partial({ id: true, styles: true });
+var PrototypeOperation = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("set-meta"), title: external_exports.string().min(1).optional(), notes: external_exports.string().optional(), startScreen: external_exports.string().optional(), roles: external_exports.array(external_exports.string()).optional(), limitations: external_exports.array(external_exports.string()).optional() }),
+  external_exports.object({ op: external_exports.literal("set-dataset"), dataset: PrototypeDatasetSchema }),
+  external_exports.object({ op: external_exports.literal("remove-dataset"), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("set-scenario"), scenario: PrototypeScenarioSchema }),
+  external_exports.object({ op: external_exports.literal("remove-scenario"), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("add-screen"), screen: PrototypeScreenSchema }),
+  external_exports.object({ op: external_exports.literal("update-screen"), id: external_exports.string(), patch: PrototypeScreenSchema.omit({ id: true, elements: true }).partial() }),
+  external_exports.object({ op: external_exports.literal("remove-screen"), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("add-element"), screenId: external_exports.string(), element: PrototypeElementSchema, index: external_exports.number().int().nonnegative().optional() }),
+  external_exports.object({ op: external_exports.literal("update-element"), screenId: external_exports.string(), id: external_exports.string(), patch: PrototypeElementSchema.omit({ id: true }).partial() }),
+  external_exports.object({ op: external_exports.literal("remove-element"), screenId: external_exports.string(), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("set-mock"), collection: MockCollectionSchema }),
+  external_exports.object({ op: external_exports.literal("remove-mock"), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("set-tokens"), styles: PrototypeTokensSchema }),
+  external_exports.object({ op: external_exports.literal("set-endpoint"), endpoint: ApiEndpointSchema }),
+  external_exports.object({ op: external_exports.literal("remove-endpoint"), id: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("link"), screenId: external_exports.string(), elementId: external_exports.string(), requirementIds: external_exports.array(RequirementIdSchema).optional(), acIds: external_exports.array(external_exports.string()).optional() })
+]);
+var PlanOperation = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("add"), entry: StoryPlanEntrySchema.omit({ status: true, review: true }) }),
+  external_exports.object({ op: external_exports.literal("update"), id: StoryIdSchema, patch: StoryPlanEntrySchema.omit({ id: true, status: true, review: true }).partial() }),
+  external_exports.object({ op: external_exports.literal("exclude"), id: StoryIdSchema, reason: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("restore"), id: StoryIdSchema }),
+  external_exports.object({ op: external_exports.literal("review"), id: StoryIdSchema, status: ReviewStatus, comment: external_exports.string().optional() })
+]);
+var StoryPatch = external_exports.object({
+  title: external_exports.string().optional(),
+  actor: external_exports.string().min(1).optional(),
+  narrative: external_exports.string().min(1).optional(),
+  objective: external_exports.string().min(1).optional(),
+  userValue: external_exports.string().min(1).optional(),
+  preconditions: external_exports.array(external_exports.string()).optional(),
+  happyPath: external_exports.array(external_exports.string()).min(1).optional(),
+  alternatives: external_exports.array(external_exports.string()).optional(),
+  negative: external_exports.array(external_exports.string()).optional(),
+  edgeCases: external_exports.array(external_exports.string()).optional(),
+  businessRules: external_exports.array(external_exports.string()).optional(),
+  expectedResults: external_exports.array(external_exports.string()).min(1).optional(),
+  dependencies: external_exports.array(external_exports.string()).optional(),
+  requirementIds: external_exports.array(RequirementIdSchema).min(1).optional(),
+  capabilities: external_exports.array(StoryCapabilitySchema).optional(),
+  screenRefs: external_exports.array(external_exports.string()).optional(),
+  repositoryIds: external_exports.array(external_exports.string()).optional(),
+  serviceIds: external_exports.array(external_exports.string()).optional()
+});
+var CriterionOp = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("set"), id: external_exports.string().min(1), given: external_exports.string().min(1), when: external_exports.string().min(1), then: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("add"), id: external_exports.string().min(1).optional(), given: external_exports.string().min(1), when: external_exports.string().min(1), then: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("remove"), id: external_exports.string().min(1) })
+]);
+var NewStoryFromOriginal = StoryPatch.extend({
+  id: StoryIdSchema,
+  /** Acceptance criteria of the original that move to this story. */
+  moveAcceptance: external_exports.array(external_exports.string()).default([]),
+  acceptanceCriteria: external_exports.array(external_exports.object({ id: external_exports.string().min(1).optional(), given: external_exports.string().min(1), when: external_exports.string().min(1), then: external_exports.string().min(1) })).default([])
+});
+var PlanningCommandSchemas = [
+  external_exports.object({ action: external_exports.literal("review-requirements"), via: Via, decisions: external_exports.array(RequirementDecision).min(1) }),
+  /** Changes the text of single acceptance criteria by their stable id; nothing else is touched. */
+  external_exports.object({ action: external_exports.literal("revise-acceptance"), edits: external_exports.array(external_exports.object({ id: external_exports.string().min(1), statement: external_exports.string().min(1).refine((v) => v.trim().length > 0, "must not be blank"), expectedRevision: external_exports.number().int().positive().optional() })).min(1) }),
+  external_exports.object({ action: external_exports.literal("accept-requirements"), via: Via, requirementIds: external_exports.array(RequirementIdSchema).optional() }),
+  external_exports.object({ action: external_exports.literal("set-requirement-scope"), requirementIds: external_exports.array(RequirementIdSchema).min(1), scope: ScopeSchema, note: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("set-prototype"), prototype: PrototypeInput, summary: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("update-prototype"), operations: external_exports.array(PrototypeOperation).min(1), summary: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("prototype-feedback"), items: external_exports.array(external_exports.object({ target: external_exports.string().min(1), comment: external_exports.string().min(1) })).default([]), resolve: external_exports.array(external_exports.string()).default([]), via: Via }),
+  external_exports.object({ action: external_exports.literal("accept-prototype"), via: Via }),
+  external_exports.object({ action: external_exports.literal("set-story-plan"), entries: external_exports.array(StoryPlanEntrySchema.omit({ status: true, review: true })).min(1) }),
+  external_exports.object({ action: external_exports.literal("update-story-plan"), operations: external_exports.array(PlanOperation).min(1), via: Via }),
+  external_exports.object({ action: external_exports.literal("agree-story-plan"), via: Via }),
+  external_exports.object({ action: external_exports.literal("update-story"), id: StoryIdSchema, patch: StoryPatch.default({}), criteria: external_exports.array(CriterionOp).default([]), reason: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("exclude-story"), id: StoryIdSchema, reason: external_exports.string().min(1) }),
+  external_exports.object({ action: external_exports.literal("restore-story"), id: StoryIdSchema }),
+  external_exports.object({ action: external_exports.literal("split-story"), id: StoryIdSchema, into: external_exports.array(NewStoryFromOriginal).min(2), reason: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("merge-stories"), ids: external_exports.array(StoryIdSchema).min(2), into: StoryPatch.extend({ id: StoryIdSchema }), reason: external_exports.string().optional() }),
+  external_exports.object({
+    action: external_exports.literal("review-stories"),
+    via: Via,
+    items: external_exports.array(external_exports.object({ storyId: StoryIdSchema, revision: external_exports.number().int().positive(), key: external_exports.string().min(1), status: ReviewStatus, comment: external_exports.string().optional() })).default([]),
+    acceptStories: external_exports.array(external_exports.object({ storyId: StoryIdSchema, revision: external_exports.number().int().positive() })).default([])
+  }),
+  external_exports.object({ action: external_exports.literal("accept-stories"), via: Via }),
+  external_exports.object({ action: external_exports.literal("register-repository"), repository: RepositorySchema.pick({ id: true, name: true }).extend({ role: external_exports.string().default(""), localPath: external_exports.string().optional(), remoteUrl: external_exports.string().optional(), branch: external_exports.string().optional(), notes: external_exports.string().optional() }) }),
+  external_exports.object({ action: external_exports.literal("assign-repositories"), repositoryIds: external_exports.array(RepositoryIdSchema).min(1), storyIds: external_exports.array(StoryIdSchema).default([]), requirementIds: external_exports.array(RequirementIdSchema).default([]), serviceIds: external_exports.array(external_exports.string()).default([]) }),
+  external_exports.object({ action: external_exports.literal("record-repository-inspection"), repositoryId: RepositoryIdSchema, inspection: RepositoryInspectionSchema }),
+  external_exports.object({ action: external_exports.literal("set-contract"), via: Via, contract: ServiceContractSchema.omit({ agreement: true, everAgreed: true }) }),
+  external_exports.object({ action: external_exports.literal("set-mode"), mode: WorkflowModeSchema, reason: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("remove-contract"), via: Via, id: external_exports.string().min(1) }),
+  external_exports.object({ action: external_exports.literal("record-impact"), impact: ImpactSchema.omit({ revision: true, recordedAt: true }) }),
+  external_exports.object({ action: external_exports.literal("advance-phase"), to: PhaseSchema, reason: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("return-to-phase"), to: PhaseSchema, reason: external_exports.string().min(1) }),
+  external_exports.object({ action: external_exports.literal("log-session"), summary: external_exports.string().min(1), nextAction: external_exports.string().optional(), role: external_exports.string().optional() }),
+  external_exports.object({ action: external_exports.literal("waive-coverage"), kind: external_exports.string().min(1), requirementId: RequirementIdSchema.optional(), reason: external_exports.string().min(1) }),
+  external_exports.object({ action: external_exports.literal("set-work-item-kind"), kind: WorkItemKindSchema })
+];
+var PLANNING_ACTIONS = new Set(PlanningCommandSchemas.map((schema) => schema.shape.action.value));
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/approval-audit.js
+var APPROVAL_TRUST = ["independent-human", "review-page", "host-attested", "test-only"];
+var ApprovalSubjectSchema = external_exports.object({
+  type: external_exports.enum(["story", "decision", "service", "requirement", "criterion", "review", "work-item"]),
+  id: external_exports.string(),
+  revision: external_exports.number().int().optional(),
+  contentFingerprint: external_exports.string().optional()
+});
+var ApprovalRecordSchema = external_exports.object({
+  id: external_exports.string(),
+  at: external_exports.string(),
+  action: external_exports.string(),
+  subjects: external_exports.array(ApprovalSubjectSchema).default([]),
+  summary: external_exports.string(),
+  /** Digest of the exact content the person was shown and approved (dialog channels). */
+  subjectDigest: external_exports.string().optional(),
+  channel: external_exports.string(),
+  assurance: external_exports.string(),
+  trust: external_exports.enum(APPROVAL_TRUST),
+  /** Reserved: clients do not identify the person today. */
+  actor: external_exports.string().optional(),
+  /** Work item revision after this decision was applied: the link to its history entry. */
+  workItemRevision: external_exports.number().int()
+});
+
 // ../praxis-developer/node_modules/@praxis/contracts/dist/workflow.js
-var WORKFLOW_CONTRACT_VERSION = "1.0.0";
+var SUPPORTED_WORKFLOW_VERSIONS = ["1.0.0", "1.1.0"];
 var WorkflowStageSchema = external_exports.enum([
   "draft",
   "clarification_required",
@@ -15191,7 +15773,6 @@ var QualityVerdictSchema = external_exports.enum([
   "PASS_WITH_RISKS",
   "FAIL"
 ]);
-var RequirementIdSchema2 = external_exports.string().regex(/^(REQ-[A-Z][A-Z0-9]*-\d{3,}|[A-Z][A-Z0-9]*-(?:FR|NFR|BR)\d+)$/);
 var WorkItemSourceSchema = external_exports.enum([
   "local",
   "markdown",
@@ -15222,22 +15803,33 @@ var WorkItemSchema = external_exports.object({
   instanceId: external_exports.string().min(1).optional(),
   status: WorkflowStageSchema,
   revision: external_exports.number().int().nonnegative(),
-  links: external_exports.array(WorkItemLinkSchema).optional()
+  links: external_exports.array(WorkItemLinkSchema).optional(),
+  /** A new feature, a change to existing behaviour, an extension, a fix or a technical change across services. */
+  kind: WorkItemKindSchema.default("feature")
 });
 var AcceptanceCriterionSchema = external_exports.object({
   id: external_exports.string().min(1),
-  requirementId: RequirementIdSchema2,
+  requirementId: RequirementIdSchema,
   statement: external_exports.string().min(1),
-  revision: external_exports.number().int().positive()
+  revision: external_exports.number().int().positive(),
+  /** The user's decision about this one criterion. */
+  review: ReviewMarkSchema.default({ status: "pending" })
 });
 var RequirementSchema = external_exports.object({
-  id: RequirementIdSchema2,
+  id: RequirementIdSchema,
   statement: external_exports.string().min(1),
   revision: external_exports.number().int().positive(),
   status: external_exports.enum(["proposed", "approved", "superseded"]),
   acceptanceCriteria: external_exports.array(AcceptanceCriterionSchema),
   serviceIds: external_exports.array(external_exports.string()),
-  assumptionIds: external_exports.array(external_exports.string())
+  assumptionIds: external_exports.array(external_exports.string()),
+  /** "in" is the current scope; "deferred" and "excluded" take the requirement out of what stories and development must cover. */
+  scope: ScopeSchema.default("in"),
+  scopeNote: external_exports.string().optional(),
+  repositoryIds: external_exports.array(external_exports.string()).default([]),
+  comment: external_exports.string().optional(),
+  /** Ids of criteria that were removed: never handed out again, so a result recorded for the old one cannot count for a new one. */
+  retiredCriteria: external_exports.array(external_exports.string()).default([])
 });
 var ServiceSchema = external_exports.object({
   id: external_exports.string().min(1),
@@ -15252,13 +15844,15 @@ var ServiceSchema = external_exports.object({
     "external"
   ]),
   repository: external_exports.string().optional(),
+  /** The registered repository this service lives in. */
+  repositoryId: external_exports.string().optional(),
   localPath: external_exports.string().optional(),
   remoteUrl: external_exports.string().optional(),
   branch: external_exports.string().optional(),
   commitSha: external_exports.string().optional(),
   changeRequest: external_exports.string().optional(),
   responsibilities: external_exports.array(external_exports.string()),
-  requirementIds: external_exports.array(RequirementIdSchema2),
+  requirementIds: external_exports.array(RequirementIdSchema),
   dependsOn: external_exports.array(external_exports.string()),
   status: WorkflowStageSchema
 });
@@ -15270,14 +15864,14 @@ var ArtifactRefSchema = external_exports.object({
 });
 var RoleHandoffSchema = external_exports.object({
   contract: external_exports.literal("praxis.role.handoff"),
-  version: external_exports.literal(WORKFLOW_CONTRACT_VERSION),
+  version: external_exports.enum(SUPPORTED_WORKFLOW_VERSIONS),
   workflowId: external_exports.string().min(1),
   workItemId: external_exports.string().min(1),
   handoffId: external_exports.string().min(1),
   sourceRole: WorkflowRoleSchema,
   targetRole: WorkflowRoleSchema,
   serviceIds: external_exports.array(external_exports.string()),
-  requirementIds: external_exports.array(RequirementIdSchema2),
+  requirementIds: external_exports.array(RequirementIdSchema),
   acceptanceCriterionIds: external_exports.array(external_exports.string()),
   storyIds: external_exports.array(external_exports.string()).default([]),
   artifactRefs: external_exports.array(ArtifactRefSchema),
@@ -15306,7 +15900,7 @@ var RoleHandoffSchema = external_exports.object({
 });
 var FindingSchema = external_exports.object({
   id: external_exports.string().min(1),
-  requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+  requirementIds: external_exports.array(RequirementIdSchema).min(1),
   serviceIds: external_exports.array(external_exports.string()),
   owner: WorkflowRoleSchema,
   summary: external_exports.string().min(1),
@@ -15328,7 +15922,7 @@ var VerdictRecordSchema = external_exports.object({
   scopeId: external_exports.string().min(1),
   verdict: QualityVerdictSchema,
   evidenceRefs: external_exports.array(external_exports.string()),
-  requirementIds: external_exports.array(RequirementIdSchema2),
+  requirementIds: external_exports.array(RequirementIdSchema),
   stale: external_exports.boolean(),
   invalidatedBy: external_exports.string().optional()
 });
@@ -15349,7 +15943,7 @@ var CapabilitySchema = external_exports.object({
 });
 var WorkflowStateSchema = external_exports.object({
   contract: external_exports.literal("praxis.workflow.state"),
-  version: external_exports.literal(WORKFLOW_CONTRACT_VERSION),
+  version: external_exports.enum(SUPPORTED_WORKFLOW_VERSIONS),
   workflowId: external_exports.string().min(1),
   projectId: external_exports.string().min(1),
   workItem: WorkItemSchema,
@@ -15373,12 +15967,12 @@ var WorkflowStateSchema = external_exports.object({
   assumptions: external_exports.array(external_exports.object({
     id: external_exports.string(),
     statement: external_exports.string(),
-    requirementIds: external_exports.array(RequirementIdSchema2)
+    requirementIds: external_exports.array(RequirementIdSchema)
   })),
   implementationUnits: external_exports.array(external_exports.object({
     id: external_exports.string().min(1),
     serviceId: external_exports.string().min(1),
-    requirementIds: external_exports.array(RequirementIdSchema2),
+    requirementIds: external_exports.array(RequirementIdSchema),
     path: external_exports.string().min(1),
     summary: external_exports.string().min(1),
     contractRef: external_exports.string().optional(),
@@ -15386,13 +15980,18 @@ var WorkflowStateSchema = external_exports.object({
   })).default([]),
   stories: external_exports.array(UserStorySchema).default([]),
   coverage: external_exports.array(CoverageEntrySchema).default([]),
+  /** Bumped on every change to coverage: lets a writer say which coverage it saw (EVIDENCE_STALE). */
+  coverageRevision: external_exports.number().int().nonnegative().default(0),
+  /** Every decision that needed a person, with its channel and what that channel proves (approval-audit.ts). */
+  approvals: external_exports.array(ApprovalRecordSchema).default([]),
   changes: external_exports.array(ChangeRecordSchema).default([]),
   stage: WorkflowStageSchema,
   history: external_exports.array(external_exports.object({
     revision: external_exports.number().int().positive(),
     stage: WorkflowStageSchema,
     note: external_exports.string()
-  }))
+  })),
+  ...PlanningStateFields
 });
 var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
   external_exports.object({
@@ -15402,7 +16001,13 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
     request: external_exports.string().min(1),
     source: WorkItemSourceSchema.optional(),
     jiraIssueKey: external_exports.string().min(1).optional(),
-    sequence: external_exports.number().int().positive().optional()
+    sequence: external_exports.number().int().positive().optional(),
+    /** guided enforces the stage gates (requirements accepted, prototype, story plan, ...); classic keeps the alpha.48 behaviour. */
+    mode: WorkflowModeSchema.optional(),
+    /** Create a new item although one with this title exists (the store otherwise refuses: stable ids, explicit choice). */
+    newItem: external_exports.boolean().optional(),
+    /** feature, change to existing behaviour, extension, fix or technical change. */
+    changeKind: WorkItemKindSchema.optional()
   }),
   external_exports.object({
     // Resolved by the workflow store, which owns the index of work items.
@@ -15416,7 +16021,7 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
   }),
   external_exports.object({
     action: external_exports.literal("add-requirement"),
-    id: RequirementIdSchema2,
+    id: RequirementIdSchema,
     statement: external_exports.string().min(1),
     acceptanceCriteria: external_exports.array(external_exports.string().min(1)).min(1),
     serviceIds: external_exports.array(external_exports.string()).optional()
@@ -15425,7 +16030,7 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
     action: external_exports.literal("handoff"),
     sourceRole: WorkflowRoleSchema,
     targetRole: WorkflowRoleSchema,
-    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    requirementIds: external_exports.array(RequirementIdSchema).min(1),
     serviceIds: external_exports.array(external_exports.string()).default([]),
     nextActions: external_exports.array(external_exports.string()).default([]),
     openQuestions: external_exports.array(external_exports.string()).default([]),
@@ -15438,7 +16043,7 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
   }),
   external_exports.object({
     action: external_exports.literal("revise-requirement"),
-    id: RequirementIdSchema2,
+    id: RequirementIdSchema,
     statement: external_exports.string().min(1)
   }),
   external_exports.object({
@@ -15491,7 +16096,7 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
     action: external_exports.literal("record-implementation"),
     id: external_exports.string().min(1),
     serviceId: external_exports.string().min(1),
-    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    requirementIds: external_exports.array(RequirementIdSchema).min(1),
     path: external_exports.string().min(1),
     summary: external_exports.string().min(1),
     contractRef: external_exports.string().optional()
@@ -15502,7 +16107,7 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
   external_exports.object({
     action: external_exports.literal("add-story"),
     id: StoryIdSchema,
-    requirementIds: external_exports.array(RequirementIdSchema2).min(1),
+    requirementIds: external_exports.array(RequirementIdSchema).min(1),
     actor: external_exports.string().min(1),
     narrative: external_exports.string().min(1),
     objective: external_exports.string().min(1),
@@ -15524,6 +16129,11 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
     assumptionIds: external_exports.array(external_exports.string()).default([]),
     unresolvedDecisionIds: external_exports.array(external_exports.string()).default([]),
     serviceIds: external_exports.array(external_exports.string()).default([]),
+    /** Short name shown in the plan and in reviews. */
+    title: external_exports.string().min(1).optional(),
+    capabilities: external_exports.array(StoryCapabilitySchema).default([]),
+    screenRefs: external_exports.array(external_exports.string()).default([]),
+    repositoryIds: external_exports.array(external_exports.string()).default([]),
     confirmedBehavior: external_exports.boolean()
   }),
   external_exports.object({
@@ -15544,15 +16154,22 @@ var WorkflowCommandSchema = external_exports.discriminatedUnion("action", [
     independentRerun: external_exports.boolean().default(false),
     testsGreen: external_exports.boolean().optional(),
     scenarios: external_exports.array(CoverageEntrySchema).default([]),
-    findings: external_exports.array(FindingSchema).default([])
+    findings: external_exports.array(FindingSchema).default([]),
+    /** Scenario ids to remove. Only entries from the same kind of source can be removed. */
+    retire: external_exports.array(external_exports.string().min(1)).default([]),
+    /** Remove this source's earlier entries that this run did not repeat (a complete re-run). Only the caller's own source kind. */
+    replaceSource: external_exports.enum(["executed", "browser", "agent"]).optional(),
+    /** The coverageRevision the writer saw; a different current value is EVIDENCE_STALE. */
+    baseCoverageRevision: external_exports.number().int().nonnegative().optional()
   }),
   external_exports.object({
     action: external_exports.literal("record-change"),
     change: ChangeRecordSchema
   }),
+  ...PlanningCommandSchemas,
   external_exports.object({
     action: external_exports.literal("quality-check"),
-    requirementId: RequirementIdSchema2,
+    requirementId: RequirementIdSchema,
     observedBehavior: external_exports.enum(["partial-success", "all-or-nothing", "unspecified"]).optional(),
     implementationSource: external_exports.string().min(1).optional(),
     serviceId: external_exports.string().min(1).optional(),
@@ -15922,6 +16539,620 @@ var QualityWpReportSchema = ContractMeta.extend({
     qualityHandoffPath: external_exports.string().optional()
   }).optional()
 });
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/review-submission.js
+var REVIEW_VIEWS = ["requirements", "prototype", "story-plan", "stories", "contracts"];
+var ReviewViewSchema = external_exports.enum(REVIEW_VIEWS);
+var Mark = external_exports.enum(["pending", "accepted", "rejected"]);
+var RequirementsPayload = external_exports.object({
+  requirements: external_exports.array(external_exports.object({
+    id: RequirementIdSchema,
+    revision: external_exports.number().int().positive(),
+    scope: ScopeSchema.optional(),
+    scopeNote: external_exports.string().max(2e3).optional(),
+    statement: external_exports.string().min(1).max(4e3).optional(),
+    comment: external_exports.string().max(4e3).optional(),
+    /** What the page showed for the fields it sends back: a changed live value is a conflict, never an overwrite. */
+    fromScope: ScopeSchema.optional(),
+    fromScopeNote: external_exports.string().max(2e3).optional(),
+    fromComment: external_exports.string().max(4e3).optional(),
+    criteria: external_exports.array(external_exports.object({ id: external_exports.string().min(1), revision: external_exports.number().int().positive(), from: Mark.optional(), fromComment: external_exports.string().max(4e3).optional(), status: Mark.optional(), comment: external_exports.string().max(4e3).optional(), statement: external_exports.string().min(1).max(4e3).optional() })).default([]),
+    addCriteria: external_exports.array(external_exports.object({ statement: external_exports.string().min(1).max(4e3) })).default([]),
+    removeCriteria: external_exports.array(external_exports.string()).default([])
+  })).default([]),
+  /** Accept every pending criterion of every in-scope requirement the user saw (the "accept all" button). */
+  acceptAll: external_exports.boolean().default(false)
+});
+var PrototypePayload = external_exports.object({
+  feedback: external_exports.array(external_exports.object({ target: external_exports.string().min(1).max(200), comment: external_exports.string().min(1).max(4e3) })).default([]),
+  resolve: external_exports.array(external_exports.string()).default([]),
+  accept: external_exports.boolean().default(false)
+});
+var PlanPayload = external_exports.object({
+  entries: external_exports.array(external_exports.object({
+    id: StoryIdSchema,
+    status: Mark.optional(),
+    comment: external_exports.string().max(4e3).optional(),
+    title: external_exports.string().min(1).max(300).optional(),
+    implementation: external_exports.string().min(1).max(4e3).optional(),
+    userGets: external_exports.string().min(1).max(4e3).optional(),
+    exclude: external_exports.string().min(1).max(2e3).optional(),
+    restore: external_exports.boolean().optional(),
+    /** planEntryBase of the line as the page showed it (see there). */
+    base: external_exports.string().max(100).optional()
+  })).default([]),
+  agree: external_exports.boolean().default(false)
+});
+var StoriesPayload = external_exports.object({
+  items: external_exports.array(external_exports.object({ storyId: StoryIdSchema, revision: external_exports.number().int().positive(), key: external_exports.string().min(1), from: Mark.optional(), fromComment: external_exports.string().max(4e3).optional(), status: Mark, comment: external_exports.string().max(4e3).optional() })).default([]),
+  stories: external_exports.array(external_exports.object({
+    storyId: StoryIdSchema,
+    revision: external_exports.number().int().positive(),
+    acceptAll: external_exports.boolean().optional(),
+    exclude: external_exports.string().min(1).max(2e3).optional(),
+    restore: external_exports.boolean().optional(),
+    narrative: external_exports.string().min(1).max(2e3).optional(),
+    objective: external_exports.string().min(1).max(2e3).optional()
+  })).default([]),
+  accept: external_exports.boolean().default(false)
+});
+var ReviewSubmissionSchema = external_exports.object({
+  contract: external_exports.literal("praxis.review.submission"),
+  version: external_exports.literal(1),
+  reviewId: external_exports.string().min(1).max(100),
+  view: ReviewViewSchema,
+  workItemId: external_exports.string().min(1),
+  /** Fingerprint of the artifact when the page was rendered. */
+  baseFingerprint: external_exports.string().min(1),
+  /**
+   * workStateStamp of the work item when the decisions were made. A mode change or a waiver is a decision about the item as a
+   * whole (gates, coverage), so it is applied only if the item is still as it was then.
+   */
+  baseState: external_exports.string().max(100).optional(),
+  /** reviewStamp of what the page showed. A save whose stamp is not the live one is from an out-of-date page. */
+  baseStamp: external_exports.string().max(100).optional(),
+  submittedAt: external_exports.string().optional(),
+  requirements: RequirementsPayload.optional(),
+  prototype: PrototypePayload.optional(),
+  plan: PlanPayload.optional(),
+  stories: StoriesPayload.optional(),
+  /** Contracts the user agrees. Implementation across services waits for it; an agent can propose a contract, never agree it. */
+  contracts: external_exports.object({ agree: external_exports.array(external_exports.string().min(1)).default([]), remove: external_exports.array(external_exports.string().min(1)).default([]) }).optional(),
+  /** Leaving guided mode switches the gates off, so it is the user's call. */
+  modeChange: external_exports.object({ to: external_exports.enum(["classic", "guided"]), reason: external_exports.string().max(1e3).optional() }).optional(),
+  /** Gaps the user chooses not to cover (a prototype for a pure refactor, a capability a requirement does not need). Only the user may waive. */
+  waivers: external_exports.array(external_exports.object({ kind: external_exports.string().min(1).max(100), requirementId: RequirementIdSchema.optional(), reason: external_exports.string().min(3).max(1e3) })).default([])
+});
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/prototype-viewer.js
+var PROTOTYPE_CSS = `
+main.wide{max-width:1360px}
+.pv-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 10px}
+.pv-bar{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:flex-end;margin:0 0 12px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.pv-bar label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted)}.pv-bar select{width:auto;min-width:120px;padding:3px 6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.seg button{border:0;border-radius:0;background:transparent;padding:5px 12px;font-size:13px}
+.seg button+button{border-left:1px solid var(--line)}.seg button[aria-pressed=true]{background:var(--accent);color:var(--on-accent)}
+.pv-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:1000px){.pv-grid{grid-template-columns:minmax(0,1fr)}}
+.pv-side{border:1px solid var(--line);border-radius:10px;background:var(--card);position:sticky;top:8px;max-height:calc(100vh - 90px);overflow:auto}
+@media (max-width:1000px){.pv-side{position:static;max-height:none}}
+.pv-tabs{display:flex;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:1}
+.pv-tabs button{flex:1;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:9px 6px;font-size:13px}
+.pv-tabs button[aria-selected=true]{border-bottom-color:var(--accent);font-weight:600}
+.pv-panel{padding:10px 12px}.pv-panel[hidden]{display:none}
+.pv-panel h3{margin:10px 0 4px}.pv-panel ul{margin:4px 0;padding-left:18px}
+.pv-device{margin:0 auto;max-width:100%}.pv-device.mobile{max-width:390px}
+.pv-addr{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;padding:6px 10px;background:var(--card);font-size:12px;color:var(--muted)}
+.pv-addr input{flex:1;font:12px ui-monospace,Menlo,monospace;padding:3px 6px}
+.proto{--pc-bg:var(--p-background,#fff);--pc-text:var(--p-text,#1d2330);--pc-primary:var(--p-primary,#2457d6);--pc-on-primary:var(--p-on-primary,#fff);--pc-danger:var(--p-danger,#b42318);--pc-success:var(--p-success,#17803d);--pc-warning:var(--p-warning,#a15c00);
+--pc-surface:var(--p-surface,color-mix(in srgb,var(--pc-text) 4%,var(--pc-bg)));--pc-border:var(--p-border,color-mix(in srgb,var(--pc-text) 16%,var(--pc-bg)));--pc-muted:color-mix(in srgb,var(--pc-text) 62%,var(--pc-bg));
+--pc-r:var(--p-radius,8px);--pc-s:var(--p-space,8px);
+container-type:inline-size;container-name:proto;border:1px solid var(--line);border-radius:0 0 10px 10px;overflow:hidden;background:var(--pc-bg);color:var(--pc-text);font:14px/1.45 var(--p-font,system-ui,-apple-system,"Segoe UI",sans-serif)}
+.proto .nav{display:flex;gap:calc(var(--pc-s)*.5);padding:var(--pc-s);border-bottom:1px solid var(--pc-border);background:var(--pc-surface);overflow-x:auto}
+.proto .nav button{white-space:nowrap;background:transparent;color:var(--pc-text);border:1px solid transparent;border-radius:var(--pc-r);padding:4px 10px;font:inherit}
+.proto .nav button.on{background:var(--pc-primary);color:var(--pc-on-primary)}
+.proto .screen{position:relative;min-height:440px;padding:calc(var(--pc-s)*2.5);overflow:hidden;outline:0}
+.proto h2{font-weight:600;font-size:20px;line-height:1.25;font-family:var(--p-font-heading,var(--p-font,system-ui,-apple-system,sans-serif));margin:0 0 var(--pc-s)}.proto h3{font-weight:600;font-size:15px;line-height:1.3;font-family:var(--p-font-heading,var(--p-font,system-ui,-apple-system,sans-serif));margin:0}
+.proto .lead{color:var(--pc-muted);margin:0 0 calc(var(--pc-s)*2)}
+.proto .el{position:relative;margin:calc(var(--pc-s)*1.5) 0;border-radius:var(--pc-r)}
+.proto .row-el{display:flex;gap:var(--pc-s);align-items:flex-end;flex-wrap:wrap}
+.proto label.lab{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--pc-muted)}
+.proto input,.proto select{font:inherit;color:var(--pc-text);background:var(--pc-bg);border:1px solid var(--pc-border);border-radius:var(--pc-r);padding:6px 10px;min-width:160px;width:auto}
+.proto input:focus-visible,.proto select:focus-visible,.proto button:focus-visible,.proto tr:focus-visible,.proto [tabindex]:focus-visible{outline:2px solid var(--pc-primary);outline-offset:2px}
+.proto .btn{background:var(--pc-primary);color:var(--pc-on-primary);border:1px solid var(--pc-primary);border-radius:var(--pc-r);padding:6px 14px;font:inherit;font-weight:600;cursor:pointer}
+.proto .btn.sec{background:transparent;color:var(--pc-primary)}.proto .btn.danger{background:var(--pc-danger);border-color:var(--pc-danger)}
+.proto table{border-collapse:collapse;width:100%}.proto th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--pc-muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--pc-border);background:var(--pc-surface)}
+.proto td{padding:9px 12px;border-bottom:1px solid var(--pc-border)}
+.proto .tblwrap{border:1px solid var(--pc-border);border-radius:var(--pc-r);overflow:auto}.proto .tblwrap tr:last-child td{border-bottom:0}
+.proto tr[data-row]{cursor:pointer}.proto tr[data-row]:hover td{background:var(--pc-surface)}.proto tr[data-row][aria-selected=true] td{background:color-mix(in srgb,var(--pc-primary) 12%,var(--pc-bg))}
+.proto .count{font-size:12px;color:var(--pc-muted);margin:4px 2px}
+.proto .miss{color:var(--pc-muted);font-style:italic}
+.proto .badge{display:inline-block;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:600;border:1px solid var(--pc-border);background:var(--pc-surface)}
+.proto .badge.info{color:var(--pc-primary);border-color:var(--pc-primary)}.proto .badge.ok{color:var(--pc-success);border-color:var(--pc-success)}.proto .badge.warn{color:var(--pc-warning);border-color:var(--pc-warning)}.proto .badge.bad{color:var(--pc-danger);border-color:var(--pc-danger)}
+.proto .state-msg{padding:calc(var(--pc-s)*3);text-align:center;color:var(--pc-muted);border:1px dashed var(--pc-border);border-radius:var(--pc-r)}
+.proto .state-msg.error{color:var(--pc-danger);border-color:var(--pc-danger)}.proto .state-msg.loading{animation:pvpulse 1.2s ease-in-out infinite}
+@keyframes pvpulse{50%{opacity:.5}}
+.proto .msg{padding:var(--pc-s) calc(var(--pc-s)*1.5);border-radius:var(--pc-r);border:1px solid var(--pc-border);background:var(--pc-surface)}
+.proto .msg.ok{border-color:var(--pc-success)}.proto .err{color:var(--pc-danger);font-size:12px}
+.proto .denied{padding:var(--pc-s);border:1px dashed var(--pc-danger);color:var(--pc-danger);border-radius:var(--pc-r)}
+.proto .tabs{display:flex;gap:2px;border-bottom:1px solid var(--pc-border)}
+.proto .tabs button{background:transparent;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--pc-muted);padding:8px 14px;font:inherit;cursor:pointer}
+.proto .tabs button[aria-selected=true]{color:var(--pc-text);border-bottom-color:var(--pc-primary);font-weight:600}
+.proto .screen.with-drawer{padding-right:calc(380px + var(--pc-s)*2.5)}
+.proto .pv-overlay{position:absolute;top:0;right:0;bottom:0;width:min(380px,100%);background:var(--pc-bg);border-left:1px solid var(--pc-border);box-shadow:-8px 0 24px rgba(0,0,0,.12);display:flex;flex-direction:column;z-index:3;outline:0}
+.proto .pv-overlay.modal{top:50%;right:auto;bottom:auto;left:50%;transform:translate(-50%,-50%);width:min(440px,92%);max-height:90%;border:1px solid var(--pc-border);border-radius:var(--pc-r)}
+.proto .pv-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:2}
+.proto .pv-overlay header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(var(--pc-s)*1.5) calc(var(--pc-s)*2);border-bottom:1px solid var(--pc-border)}
+.proto .pv-overlay .x{background:transparent;border:0;font-size:22px;line-height:1;color:var(--pc-muted);cursor:pointer;padding:2px 8px;border-radius:var(--pc-r)}
+.proto .pv-overlay .body{padding:calc(var(--pc-s)*2);overflow:auto}
+.proto dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 16px;margin:0}.proto dt{color:var(--pc-muted);font-size:12px;font-weight:600;padding-top:2px}.proto dd{margin:0}
+@container proto (max-width:760px){.proto .screen.with-drawer{padding-right:calc(var(--pc-s)*1.5);min-height:640px}}
+@container proto (max-width:620px){.proto .screen{padding:calc(var(--pc-s)*1.5)}.proto .pv-overlay{width:100%;border-left:0}.proto input,.proto select{min-width:0;width:100%}.proto .row-el>*{flex:1 1 100%}.proto th,.proto td{padding:8px}.proto dl{grid-template-columns:1fr}}
+.proto[data-mode=inspect] .screen *,.proto[data-mode=review] .screen *{pointer-events:none}
+.proto[data-mode=inspect] .screen [data-el],.proto[data-mode=review] .screen [data-el]{pointer-events:auto;cursor:crosshair}
+.proto[data-mode=inspect] .screen [data-el]:hover,.proto[data-mode=review] .screen [data-el]:hover{outline:2px dashed var(--pc-primary);outline-offset:2px}
+.proto .screen [data-el].sel{outline:2px solid var(--pc-primary);outline-offset:2px}
+.proto[data-mode=inspect] .screen .el,.proto[data-mode=review] .screen .el{margin-top:calc(var(--pc-s)*3.2)}
+.proto[data-mode=inspect] .screen [data-el]:hover::after,.proto[data-mode=inspect] .screen [data-el].sel::after,.proto[data-mode=review] .screen [data-el].sel::after{content:attr(data-tag);position:absolute;top:-10px;right:4px;font-size:11px;padding:0 6px;border-radius:4px;background:var(--pc-primary);color:var(--pc-on-primary);pointer-events:none;z-index:5}
+.proto .pv-cbtn{display:none}.proto[data-mode=review] .pv-cbtn{display:inline-block;pointer-events:auto;position:absolute;top:-10px;left:4px;font-size:11px;padding:0 6px;background:var(--pc-surface);color:var(--pc-text);border:1px solid var(--pc-border);border-radius:4px;cursor:pointer;z-index:5}
+.pv-side .sc{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;margin:4px 0;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.pv-side .sc .dot{flex:none;width:18px;text-align:center;font-weight:700}.pv-side .sc .dot.ok{color:var(--ok)}.pv-side .sc .dot.bad{color:var(--bad)}
+.pv-side .sc.cur{border-color:var(--accent)}.pv-side .sc small{display:block;color:var(--muted)}
+.pv-side .fail{color:var(--bad);font-size:12px;margin:2px 0 0 26px}
+.fbcard{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px;margin:8px 0}.fbcard textarea{margin-top:4px}
+.fbcard .top{display:flex;justify-content:space-between;gap:6px}
+details.pv-cov,details.pv-about{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+details.pv-cov>summary,details.pv-about>summary{cursor:pointer;padding:10px 14px;font-weight:600}
+details.pv-cov .covbody,details.pv-about .covbody{padding:0 14px 12px}
+.cov-req{border-top:1px solid var(--line);padding:8px 0}.cov-req>summary{cursor:pointer}.cov-req ul{margin:4px 0;padding-left:20px;font-size:13px}
+.cov-req .gt{border:0;background:none;color:var(--accent);padding:0;text-decoration:underline;font-size:13px}
+`;
+var PROTOTYPE_SCRIPT = String.raw`
+// prototype viewer
+if(D.view==='prototype'&&D.proto&&D.proto.kind==='ui'){(function(){
+var P=D.proto;P.datasets=P.datasets||[];P.scenarios=P.scenarios||[];P.screens=P.screens||[];P.mock=P.mock||[];
+var host=$('#proto-screen'),frame=$('#proto-frame'),urlIn=$('#proto-url'),device=$('#pv-device');
+var startId=P.startScreen||(P.screens[0]&&P.screens[0].id);
+var live={},search={},form={},formErr={},dsId='',role0=(P.roles&&P.roles[0])||'',role=role0,stateName='default',mode='preview',sel=null,cur=startId,q={},opened={},opener=null,results={},curScenario=null;
+function by(attr,val,root){return $$('['+attr+']',root||document).filter(function(e){return e.getAttribute(attr)===val})[0]||null}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function h(t,a,c){var e=document.createElement(t);for(var k in (a||{})){if(a[k]===null||a[k]===undefined)continue;if(k==='class')e.className=a[k];else e.setAttribute(k,a[k])}(c||[]).forEach(function(x){if(x===null||x===undefined)return;e.appendChild(typeof x==='string'?document.createTextNode(x):x)});return e}
+function T(s){return document.createTextNode(s)}
+function collDef(id){return P.mock.filter(function(c){return c.id===id})[0]}
+function fieldDef(cid,key){var c=collDef(cid);return c?c.fields.filter(function(f){return f.key===key})[0]:undefined}
+function screenById(id){return P.screens.filter(function(s){return s.id===id})[0]}
+function loadData(){live={};P.mock.forEach(function(c){live[c.id]=clone(c.rows)});var ds=P.datasets.filter(function(d){return d.id===dsId})[0];if(ds)Object.keys(ds.rows).forEach(function(k){live[k]=clone(ds.rows[k])})}
+loadData();
+// ---- virtual address: /screen?param=value, kept in the page #hash
+function dec(x){try{return decodeURIComponent(x.replace(/\+/g,' '))}catch(e){return x}}
+function parseUrl(s){s=String(s||'').replace(/^#/,'').trim();var i=s.indexOf('?');var path=(i>=0?s.slice(0,i):s).replace(/^\/+/,'').replace(/\/+$/,'');var out={};(i>=0?s.slice(i+1):'').split('&').forEach(function(p){if(!p)return;var j=p.indexOf('=');var k=dec(j>=0?p.slice(0,j):p);var v=j>=0?dec(p.slice(j+1)):'';if(k&&Object.keys(out).length<20)out[k.slice(0,60)]=v.slice(0,200)});return {screen:path,query:out}}
+function buildUrl(screen,query){var parts=Object.keys(query).filter(function(k){return query[k]!==''&&query[k]!==undefined}).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(query[k])});return '/'+(screen||'')+(parts.length?'?'+parts.join('&'):'')}
+function fromUrl(u){if(!u.screen){cur=startId}else cur=u.screen;q=u.query}
+var quiet=false;
+function pushUrl(replace){var url='#'+buildUrl(cur,q);if(!replace&&!quiet&&url===location.hash)return;try{if(replace||quiet)history.replaceState(null,'',url);else history.pushState(null,'',url)}catch(e){}}
+function go(screen,query,replace){cur=screen;q=query||{};pushUrl(replace);render()}
+function setParam(name,value,replace){var n=clone(q);if(value===''||value===undefined||value===null)delete n[name];else n[name]=value;q=n;pushUrl(replace);render()}
+function defaults(scr){var d={};(scr?scr.elements:[]).forEach(function(e){if(e.kind==='tabs'&&e.tabs&&e.tabs.length)d[e.param||'tab']=e.tabs[0].id});return d}
+function pv(name,scr){if(q[name]!==undefined&&q[name]!=='')return q[name];var d=defaults(scr||screenById(cur));return d[name]||''}
+function shown(el,scr){var w=el.showWhen;if(!w)return true;var v=pv(w.param,scr);if(w.equals!==undefined&&v!==w.equals)return false;if(w.notEquals!==undefined&&v===w.notEquals)return false;if(w.present!==undefined&&(v!=='')!==w.present)return false;return true}
+// ---- data helpers
+function idField(el){if(el.idField)return el.idField;var c=collDef(el.collection);if(c&&c.fields.some(function(f){return f.key==='id'}))return 'id';return (el.columns&&el.columns[0])||(c&&c.fields[0]&&c.fields[0].key)||'id'}
+function knownValues(coll,field){var f=fieldDef(coll,field);if(f&&f.options&&f.options.length)return f.options;var seen={};(live[coll]||[]).forEach(function(r){if(r[field]!==null&&r[field]!==undefined)seen[String(r[field])]=1});return Object.keys(seen)}
+function ignored(f,coll,v){return f.unknown==='all'&&v!==''&&knownValues(coll,f.field).indexOf(v)<0}
+function unknownAll(param,scr){var hit=false;(scr?scr.elements:[]).forEach(function(e){(e.filters||[]).forEach(function(f){if(f.param===param&&f.unknown==='all')hit=true})});return hit}
+function rowsFor(el){var all=live[el.collection]||[];var out=all.filter(function(r){return (el.filters||[]).every(function(f){var v=pv(f.param);return v===''||ignored(f,el.collection,v)||String(r[f.field])===v})});var sq=search[el.collection];if(sq)out=out.filter(function(r){return JSON.stringify(r).toLowerCase().indexOf(sq.toLowerCase())>=0});return out}
+function fmt(v,f){if(typeof v==='boolean')return v?'Yes':'No';return String(v)}
+function tone(v){var t=String(v).toLowerCase();return /cancel|reject|fail|error|declin|denied|block/.test(t)?'bad':/deliver|done|complete|paid|active|approv|success|resolved|closed/.test(t)?'ok':/progress|pending|wait|review|hold|process/.test(t)?'warn':/new|open|draft|created/.test(t)?'info':''}
+function badge(v,f){var i=f&&f.options?f.options.indexOf(String(v)):-1;return h('span',{class:'badge '+(i<0?'':tone(v)),'data-v':String(v),title:i<0&&f&&f.options?'Value not in the known list':null},[String(v)])}
+function valueNode(f,v,el,table){if(v===null||v===undefined||v===''){return h('span',{class:'miss'},[el.missingText||(table?'—':'Not provided')])}if(f&&f.type==='enum')return badge(v,f);return T(fmt(v,f))}
+function emptyMsg(text){return h('div',{class:'state-msg','data-empty':'1'},[text])}
+// ---- element renderers
+function renderTable(scr,el){
+  var box=h('div',{});var c=collDef(el.collection);
+  if(!c){box.appendChild(emptyMsg('No data'));return box}
+  var cols=el.columns&&el.columns.length?el.columns:c.fields.map(function(f){return f.key});
+  var rows=rowsFor(el),id=idField(el),target=el.rowOpens&&scr.elements.filter(function(x){return x.id===el.rowOpens})[0],openId=target&&target.param?q[target.param]:undefined;
+  if(!rows.length){var noData=!(live[el.collection]||[]).length;var em=emptyMsg(noData?(el.noDataText||'There is no data yet.'):(el.emptyText||'No rows').replace(/\{(\w[\w-]*)\}/g,function(m,p){return pv(p,scr)}));if(el.emptyAction&&!noData){var ab=h('button',{type:'button',class:'btn sec',style:'margin-top:8px','data-fk':'empty-action:'+scr.id+'#'+el.id},[el.emptyAction.label]);ab.addEventListener('click',function(){if(mode!=='preview')return;var n=clone(q);(el.emptyAction.clear||[]).forEach(function(k){delete n[k]});q=n;pushUrl(false);render()});em.appendChild(h('div',{},[ab]))}box.appendChild(em);box.appendChild(h('div',{class:'count','data-count':'0'},['0 of '+(live[el.collection]||[]).length]));return box}
+  var t=h('table',{},[]);t.appendChild(h('thead',{},[h('tr',{},cols.map(function(k){var f=fieldDef(el.collection,k);return h('th',{scope:'col'},[f?f.label:k])}))]));
+  var tb=h('tbody',{});
+  rows.forEach(function(r){
+    var rid=String(r[id]===undefined||r[id]===null?'':r[id]);
+    var tr=h('tr',{'data-row':rid},cols.map(function(k){return h('td',{},[valueNode(fieldDef(el.collection,k),r[k],el,true)])}));
+    if(target&&target.param){
+      tr.setAttribute('tabindex','0');tr.setAttribute('aria-selected',String(openId===rid));tr.setAttribute('data-fk','row:'+scr.id+'#'+el.id+':'+rid);
+      var open=function(){if(mode!=='preview')return;opener={fk:tr.getAttribute('data-fk')};setParam(target.param,rid)};
+      tr.addEventListener('click',open);
+      tr.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+    }
+    tb.appendChild(tr)
+  });
+  t.appendChild(tb);box.appendChild(h('div',{class:'tblwrap'},[t]));
+  box.appendChild(h('div',{class:'count','data-count':String(rows.length)},['Showing '+rows.length+' of '+(live[el.collection]||[]).length]));
+  return box
+}
+function renderFilter(scr,el){
+  var c=collDef(el.collection),f=c&&el.filters&&el.filters[0]?fieldDef(el.collection,el.filters[0].field):null;
+  var opts=(el.options&&el.options.length?el.options:((f&&f.options)||[]).map(function(o){return {value:o}}));
+  var sel=h('select',{'data-filter':el.param,'data-fk':'filter:'+el.param,'aria-label':el.label||el.param});
+  sel.appendChild(h('option',{value:''},[el.allLabel||'All']));
+  var cur=q[el.param]||'',known=false;
+  opts.forEach(function(o){var op=h('option',{value:o.value},[o.label||o.value]);if(o.value===cur){op.selected=true;known=true}sel.appendChild(op)});
+  if(cur&&!known&&!unknownAll(el.param,scr)){var bad=h('option',{value:cur},['Unknown: '+cur]);bad.selected=true;sel.appendChild(bad)}
+  sel.addEventListener('change',function(){if(mode!=='preview')return;setParam(el.param,sel.value)});
+  return h('label',{class:'lab'},[el.label||'Filter',sel])
+}
+function renderTabs(scr,el){
+  var param=el.param||'tab',val=pv(param,scr);var bar=h('div',{class:'tabs',role:'tablist','aria-label':el.label||'Tabs'});
+  el.tabs.forEach(function(t,i){
+    var b=h('button',{type:'button',role:'tab','aria-selected':String(t.id===val),tabindex:t.id===val?'0':'-1','data-tab':t.id,'data-fk':'tab:'+param+':'+t.id},[t.label]);
+    b.addEventListener('click',function(){if(mode!=='preview')return;setParam(param,t.id)});
+    b.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d||mode!=='preview')return;e.preventDefault();var n=el.tabs[(i+d+el.tabs.length)%el.tabs.length];want='tab:'+param+':'+n.id;setParam(param,n.id)});
+    bar.appendChild(b)});
+  return bar
+}
+function renderField(scr,el){
+  var key=scr.id+'#'+el.id,fd=el.collection&&el.field?fieldDef(el.collection,el.field):null,ctl;
+  if(fd&&fd.type==='enum'){ctl=h('select',{});ctl.appendChild(h('option',{value:''},['Select...']));(fd.options||[]).forEach(function(o){ctl.appendChild(h('option',{value:o},[o]))})}
+  else if(fd&&fd.type==='boolean')ctl=h('input',{type:'checkbox'});
+  else ctl=h('input',{type:fd&&fd.type==='number'?'number':fd&&fd.type==='date'?'date':'text',placeholder:el.text||''});
+  ctl.setAttribute('data-fk','field:'+key);if(el.required)ctl.setAttribute('aria-required','true');if(formErr[key])ctl.setAttribute('aria-invalid','true');
+  if(form[key]!==undefined){if(ctl.type==='checkbox')ctl.checked=!!form[key];else ctl.value=form[key]}
+  var upd=function(){form[key]=ctl.type==='checkbox'?ctl.checked:ctl.value;if(formErr[key]&&form[key]!==''){delete formErr[key];render()}};
+  ctl.addEventListener('input',upd);ctl.addEventListener('change',upd);
+  return h('label',{class:'lab'},[(el.label||el.field||'')+(el.required?' *':''),ctl,formErr[key]?h('span',{class:'err',role:'alert'},['Required']):null])
+}
+function renderButton(scr,el){
+  var b=h('button',{class:'btn'+(el.kind==='link'?' sec':''),type:'button','data-fk':'btn:'+scr.id+'#'+el.id},[el.label||'Button']);
+  b.addEventListener('click',function(e){e.stopPropagation();if(mode!=='preview')return;
+    var c=el.collection&&collDef(el.collection);
+    if(el.navigatesTo){stateName='default';go(el.navigatesTo,{})}
+    else if(el.action==='add-row'&&c){var row={};c.fields.forEach(function(f){row[f.key]=f.type==='number'?live[c.id].length+1:f.type==='boolean'?false:f.type==='enum'&&f.options&&f.options[0]?f.options[0]:'New '+f.label});live[c.id].push(row);render()}
+    else if(el.action==='delete-row'&&c){live[c.id].pop();render()}
+    else if(el.action==='open-modal'&&el.rowOpens){var t=scr.elements.filter(function(x){return x.id===el.rowOpens})[0];if(t&&t.param){opener={fk:b.getAttribute('data-fk')};setParam(t.param,'1')}}
+    else if(el.action==='close-modal'&&el.rowOpens){var t2=scr.elements.filter(function(x){return x.id===el.rowOpens})[0];if(t2&&t2.param)setParam(t2.param,'')}
+    else if(el.action==='submit'){
+      var bad=false;scr.elements.forEach(function(x){if(x.kind==='field'&&x.required){var k=scr.id+'#'+x.id;var v=form[k];if(v===undefined||v===''||v===false){formErr[k]=true;bad=true}}});
+      if(bad){render();return}
+      if(scr.states.indexOf('success')>=0){stateName='success'}else{form._ok=scr.id}
+      render()}
+  });
+  return b
+}
+function recordFor(scr,el,val){var tbl=el.withinTable&&scr.elements.filter(function(x){return x.id===el.withinTable})[0];var rows=tbl?rowsFor(tbl):(live[el.collection]||[]);var id=el.idField||(tbl?idField(tbl):idField(el));return rows.filter(function(r){return String(r[id])===val})[0]}
+function normalize(scr){var changed=false;(scr?scr.elements:[]).forEach(function(el){if((el.kind==='drawer'||el.kind==='modal')&&el.param&&el.onMissing==='close'&&q[el.param]!==undefined&&q[el.param]!==''&&!recordFor(scr,el,q[el.param])){var n=clone(q);delete n[el.param];q=n;changed=true}});if(changed)pushUrl(true)}
+function renderOverlay(scr,el){
+  var param=el.param;if(!param||q[param]===undefined||q[param]==='')return null;
+  var key=scr.id+'#'+el.id,val=q[param],modal=el.kind==='modal',rec=null,state='open';
+  if(el.collection&&el.detailFields&&el.detailFields.length){
+    rec=recordFor(scr,el,val);if(!rec)state='not-found'}
+  var title='ov-'+key.replace(/[^\w]/g,'-');
+  var body=h('div',{class:'body'});
+  if(state==='not-found'){body.appendChild(h('div',{class:'msg err',role:'alert','data-notfound':'1'},[(el.notFoundText||'This record was not found.')+' ('+param+'='+val+')']))}
+  else if(rec){var dl=h('dl',{});(el.related||[]).forEach(function(){});el.detailFields.forEach(function(d){var f=fieldDef(el.collection,d.field);dl.appendChild(h('dt',{},[d.label||(f&&f.label)||d.field]));dl.appendChild(h('dd',{'data-field':d.field},[valueNode(f,rec[d.field],el,false)]))});body.appendChild(dl);(el.related||[]).forEach(function(rel){var rid=String(rec[idField(el)]),rows=(live[rel.collection]||[]).filter(function(r){return String(r[rel.matchField])===rid}),cols=rel.columns&&rel.columns.length?rel.columns:(collDef(rel.collection)?collDef(rel.collection).fields.map(function(f){return f.key}):[]);body.appendChild(h('h3',{style:'margin:16px 0 6px'},[rel.label||rel.collection]));if(!rows.length){body.appendChild(h('p',{class:'miss','data-related-empty':'1'},[el.missingText||'Not provided']));return}var t=h('table',{},[h('thead',{},[h('tr',{},cols.map(function(k){var f=fieldDef(rel.collection,k);return h('th',{scope:'col'},[f?f.label:k])}))]),h('tbody',{},rows.map(function(r){return h('tr',{},cols.map(function(k){return h('td',{},[valueNode(fieldDef(rel.collection,k),r[k],el,true)])}))}))]);body.appendChild(h('div',{class:'tblwrap'},[t]))})}
+  else if(el.text||el.label){body.appendChild(h('p',{},[el.text||'']))}
+  var x=h('button',{class:'x',type:'button','aria-label':'Close','data-fk':'close:'+key},['×']);
+  x.addEventListener('click',function(){if(mode!=='preview')return;setParam(param,'')});
+  var box=h('aside',{class:'pv-overlay '+(modal?'modal':'drawer'),role:'dialog','aria-modal':modal?'true':'false','aria-labelledby':title,tabindex:'-1','data-overlay':key,'data-state':state,'data-el':key,'data-tag':'','data-fk':'overlay:'+key},[h('header',{},[h('h3',{id:title},[el.label||'Details']),x]),body]);
+  box.setAttribute('data-tag',(el.requirementIds||[]).concat(el.acIds||[]).join(' '));
+  return {node:box,modal:modal,key:key,param:param}
+}
+function stateText(scr,s){return (scr.stateMessages&&scr.stateMessages[s])||({loading:'Loading...',empty:'Nothing here yet.',error:'Something went wrong.',success:'Done.',denied:'You do not have permission.'}[s]||s)}
+function renderEl(scr,el){
+  var k=el.kind,node=null;
+  if(k==='heading')node=h('h3',{},[el.label||el.text||'']);
+  else if(k==='text')node=h('p',{style:'margin:0'},[el.text||el.label||'']);
+  else if(k==='table'||k==='list')node=renderTable(scr,el);
+  else if(k==='filter'&&el.param)node=renderFilter(scr,el);
+  else if(k==='tabs'&&el.tabs&&el.tabs.length)node=renderTabs(scr,el);
+  else if(k==='search'){var i=h('input',{type:'text',placeholder:el.label||'Search','data-search':el.id,'data-fk':'search:'+el.id,'aria-label':el.label||'Search'});var key=el.collection||'';i.value=el.param?(q[el.param]||''):(search[key]||'');i.addEventListener('input',function(){if(mode!=='preview')return;if(el.param){setParam(el.param,i.value,true)}else{search[key]=i.value;refreshTables()}});node=i}
+  else if(k==='field')node=renderField(scr,el);
+  else if(k==='button'||k==='link')node=renderButton(scr,el);
+  else if(k==='badge')node=h('span',{class:'badge'},[el.label||el.text||'']);
+  else if(k==='message')node=h('div',{class:'msg'},[el.text||el.label||'']);
+  else if(k==='form')node=h('h3',{},[el.label||'']);
+  else if((k==='modal'||k==='drawer')&&el.param)return null;
+  else node=h('div',{},[el.label||el.text||k]);
+  var wrap=h('div',{class:'el'+(k==='filter'||k==='field'?' row-el':''),'data-el':scr.id+'#'+el.id,'data-kind':k,'data-tag':(el.requirementIds||[]).concat(el.acIds||[]).join(' ')||el.id},[node]);
+  if(sel===scr.id+'#'+el.id)wrap.classList.add('sel');
+  var cb=h('button',{type:'button',class:'pv-cbtn','aria-label':'Comment on '+el.id},['comment']);cb.addEventListener('click',function(e){e.stopPropagation();commentFor(scr.id+'#'+el.id)});wrap.appendChild(cb);
+  return wrap
+}
+// a search box only narrows the tables: the box itself is never rebuilt, so focus and caret stay where they are
+function refreshTables(){var scr=screenById(cur);if(!scr)return;$$('.el[data-kind=table],.el[data-kind=list]',host).forEach(function(w){var p=w.getAttribute('data-el').split('#');var el=scr.elements.filter(function(e){return e.id===p[1]})[0];if(el)w.replaceChild(renderTable(scr,el),w.firstChild)})}
+// ---- main render
+var want=null;
+function render(){
+  var a=document.activeElement,fk=a&&a.getAttribute&&a.getAttribute('data-fk'),selStart=null;
+  if(fk&&a.setSelectionRange&&a.type==='text'){try{selStart=[a.selectionStart,a.selectionEnd]}catch(e){}}
+  host.textContent='';
+  var scr=screenById(cur);
+  $$('#proto-nav button').forEach(function(b){var on=b.getAttribute('data-screen')===cur;b.classList.toggle('on',on);b.setAttribute('aria-selected',String(on))});
+  var sw=$('#proto-state');
+  if(!scr){sw.textContent='';sw.disabled=true;host.appendChild(h('h2',{},['Page not found']));host.appendChild(emptyMsg('There is no screen "'+cur+'" in this prototype.'));if(document.activeElement!==urlIn)urlIn.value=buildUrl(cur,q);inspectorShow();return}
+  sw.disabled=false;sw.textContent='';var states=scr.states&&scr.states.length?scr.states:['default'];states.forEach(function(s){var o=h('option',{value:s},[s]);if(s===stateName)o.selected=true;sw.appendChild(o)});
+  if(states.indexOf(stateName)<0)stateName='default';
+  host.appendChild(h('h2',{},[scr.title]));if(scr.description)host.appendChild(h('p',{class:'lead'},[scr.description]));
+  var overlays=[];
+  if(stateName==='default')normalize(scr);
+  if(stateName==='empty'){
+    // an empty screen still has its controls (filter, tabs, search); only the data areas say there is nothing
+    scr.elements.forEach(function(el){
+      if(!shown(el,scr)||el.kind==='modal'||el.kind==='drawer')return;
+      if(el.kind==='table'||el.kind==='list'){host.appendChild(h('div',{class:'state-msg empty','data-state':'empty'},[stateText(scr,'empty')]));return}
+      var w=renderEl(scr,el);if(w)host.appendChild(w)});
+  }
+  else if(stateName!=='default'){host.appendChild(h('div',{class:'state-msg '+stateName,'data-state':stateName},[stateText(scr,stateName)]))}
+  else{
+    scr.elements.forEach(function(el){
+      if(!shown(el,scr))return;
+      if(el.allowedRoles&&el.allowedRoles.length&&el.allowedRoles.indexOf(role)<0){host.appendChild(h('div',{class:'el','data-el':scr.id+'#'+el.id},[h('div',{class:'denied'},['Not available for role "'+role+'"'])]));return}
+      if((el.kind==='modal'||el.kind==='drawer')&&el.param){var o=renderOverlay(scr,el);if(o)overlays.push(o);return}
+      var w=renderEl(scr,el);if(w)host.appendChild(w)});
+    if(form._ok===scr.id)host.appendChild(h('div',{class:'msg ok',role:'status'},['Saved (mock data only).']));
+  }
+  var openNow={};
+  host.classList.toggle('with-drawer',overlays.some(function(o){return !o.modal}));
+  overlays.forEach(function(o){openNow[o.key]=true;if(o.modal)host.appendChild(h('div',{class:'pv-backdrop'}));host.appendChild(o.node)});
+  // focus: a newly opened overlay takes focus; a closed one gives it back; otherwise keep the control the person was using
+  var fresh=overlays.filter(function(o){return !opened[o.key]})[0],closed=Object.keys(opened).filter(function(k){return !openNow[k]});
+  var target=null;
+  if(fresh&&mode==='preview')target=fresh.node;
+  else if(closed.length&&opener)target=by('data-fk',opener.fk,host);
+  else if(fk)target=by('data-fk',fk,host);
+  if(want){target=by('data-fk',want,host)||target;want=null}
+  opened=openNow;
+  if(target&&target.focus){try{target.focus({preventScroll:false});if(selStart&&target.setSelectionRange)target.setSelectionRange(selStart[0],selStart[1])}catch(e){}}
+  // the address shows what the page really has AFTER normalization (a dropped order must not linger in it)
+  if(document.activeElement!==urlIn)urlIn.value=buildUrl(cur,q);
+  inspectorShow();
+}
+// ---- keyboard: Escape closes the top overlay; Tab stays inside a modal
+document.addEventListener('keydown',function(e){
+  if(mode!=='preview')return;
+  var ovs=$$('.pv-overlay',host);if(!ovs.length)return;
+  var top=ovs.filter(function(o){return o.classList.contains('modal')})[0]||ovs[ovs.length-1];
+  if(e.key==='Escape'){var el=null;var scr=screenById(cur);if(scr)scr.elements.forEach(function(x){if(scr.id+'#'+x.id===top.getAttribute('data-overlay'))el=x});if(el&&el.param){e.preventDefault();setParam(el.param,'')}}
+  else if(e.key==='Tab'&&top.classList.contains('modal')){var f=$$('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])',top).filter(function(x){return !x.disabled});if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===top)){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
+});
+// ---- modes: Preview (use it), Inspect (what does it cover), Review (comment on it)
+function setMode(m){mode=m;frame.setAttribute('data-mode',m);$$('#pv-mode button').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-mode')===m))});if(m==='inspect')showSide('inspect');if(m==='review')showSide('review')}
+$$('#pv-mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.getAttribute('data-mode'))})});
+function showSide(name){$$('[data-side]').forEach(function(b){b.setAttribute('aria-selected',String(b.getAttribute('data-side')===name))});$$('[data-sidepanel]').forEach(function(p){p.hidden=p.getAttribute('data-sidepanel')!==name})}
+$$('[data-side]').forEach(function(b){b.addEventListener('click',function(){showSide(b.getAttribute('data-side'))})});
+host.addEventListener('click',function(e){if(mode==='preview')return;var w=e.target.closest&&e.target.closest('[data-el]');if(!w||(e.target.closest&&e.target.closest('.pv-cbtn')))return;e.preventDefault();e.stopPropagation();select(w.getAttribute('data-el'));if(mode==='review')commentFor(w.getAttribute('data-el'))},true);
+function select(key){sel=key;$$('[data-el]',host).forEach(function(n){n.classList.toggle('sel',n.getAttribute('data-el')===key)});inspectorShow()}
+function elOf(key){var p=String(key||'').split('#');var s=screenById(p[0]);return s?{scr:s,el:s.elements.filter(function(e){return e.id===p[1]})[0]}:null}
+function label(key){var o=elOf(key);return o&&o.el?(o.scr.title+' > '+(o.el.label||o.el.text||o.el.kind)):key}
+function behaviour(el){var out=[];if(el.param&&(el.kind==='filter'||el.kind==='tabs'||el.kind==='drawer'||el.kind==='modal'))out.push('Reads and writes the URL parameter "'+el.param+'"');(el.filters||[]).forEach(function(f){out.push('Rows are narrowed by "'+f.param+'" on field "'+f.field+'"')});if(el.rowOpens)out.push('A click on a row opens '+el.rowOpens);if(el.showWhen)out.push('Shown only while '+el.showWhen.param+(el.showWhen.equals!==undefined?' = '+el.showWhen.equals:el.showWhen.notEquals!==undefined?' is not '+el.showWhen.notEquals:el.showWhen.present?' is set':' is not set'));if(el.allowedRoles&&el.allowedRoles.length)out.push('Roles: '+el.allowedRoles.join(', '));return out}
+function inspectorShow(){
+  var box=$('#pv-inspector');if(!box)return;box.textContent='';
+  var o=elOf(sel);
+  if(!o||!o.el){box.appendChild(h('p',{class:'muted'},['Switch to Inspect and click anything in the prototype to see which requirement and criteria it covers.']));return}
+  var el=o.el;box.appendChild(h('h3',{},[el.label||el.text||el.kind]));box.appendChild(h('p',{class:'meta'},[el.kind+' on "'+o.scr.title+'"'+(el.intent?' - '+el.intent:'')+' - '+o.scr.id+'#'+el.id]));
+  var reqs=el.requirementIds||[],acs=el.acIds||[];
+  if(!reqs.length&&!acs.length)box.appendChild(h('p',{class:'meta'},['Not linked to a requirement.']));
+  reqs.forEach(function(id){var r=D.trace&&D.trace[id];box.appendChild(h('h3',{},[id]));if(r)box.appendChild(h('p',{style:'margin:2px 0'},[r.statement]))});
+  if(acs.length){box.appendChild(h('h3',{},['Acceptance criteria']));var ul=h('ul',{});acs.forEach(function(id){var t=D.acText&&D.acText[id];ul.appendChild(h('li',{},[id+(t?': '+t:'')]))});box.appendChild(ul)}
+  var b=behaviour(el);if(b.length){box.appendChild(h('h3',{},['Behaviour']));var u2=h('ul',{});b.forEach(function(x){u2.appendChild(h('li',{},[x]))});box.appendChild(u2)}
+}
+// ---- comments
+function addFb(target,text){var box=$('#fb-list');var ta=h('textarea',{'data-fb':target,'aria-label':'Comment on '+label(target),rows:'3'});if(text)ta.value=text;
+  var rm=h('button',{type:'button','aria-label':'Remove this comment'},['Remove']);var card=h('div',{class:'fbcard'},[h('div',{class:'top'},[h('div',{class:'meta'},[target==='prototype'?'About the prototype':label(target)]),rm]),ta]);rm.addEventListener('click',function(){card.remove()});box.appendChild(card);return ta}
+function commentFor(key){showSide('review');var ta=by('data-fb',key);if(!ta)ta=addFb(key);if(ta.scrollIntoView)ta.scrollIntoView({block:'center'});ta.focus()}
+var add=$('#fb-add');if(add)add.addEventListener('click',function(){showSide('review');addFb('prototype').focus()});
+// ---- navigation, toolbar
+$$('#proto-nav button').forEach(function(b){b.addEventListener('click',function(){stateName='default';go(b.getAttribute('data-screen'),{})})});
+var swEl=$('#proto-state');swEl.addEventListener('change',function(){stateName=swEl.value;render()});
+var rl=$('#proto-role');if(rl){rl.addEventListener('change',function(){role=rl.value;render()})}
+var dsSel=$('#proto-data');if(dsSel){dsSel.addEventListener('change',function(){dsId=dsSel.value;loadData();search={};render()})}
+var rs=$('#proto-reset');if(rs)rs.addEventListener('click',function(){loadData();search={};form={};formErr={};render()});
+$$('#pv-vp button').forEach(function(b){b.addEventListener('click',function(){var m=b.getAttribute('data-vp')==='mobile';device.classList.toggle('mobile',m);$$('#pv-vp button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))})})});
+$('#proto-addr').addEventListener('submit',function(e){e.preventDefault();var u=parseUrl(urlIn.value);stateName='default';cur=u.screen||startId;q=u.query;pushUrl(false);render()});
+function syncFromHash(){var u=parseUrl(location.hash);cur=u.screen||startId;q=u.query;stateName='default';render()}
+window.addEventListener('popstate',syncFromHash);window.addEventListener('hashchange',syncFromHash);
+// ---- scenarios
+function applyScenario(sc){
+  dsId=sc.dataset||'';if(dsSel)dsSel.value=dsId;role=sc.role||role0;if(rl)rl.value=role;stateName='default';search={};form={};formErr={};loadData();cur=sc.screen||startId;q=clone(sc.query||{});curScenario=sc.id;pushUrl(false);render()}
+function checkScenario(sc){
+  var fails=[],ex=sc.expect;if(!ex)return null;
+  (ex.rows||[]).forEach(function(r){var w=by('data-el',cur+'#'+r.element,host);var n=w?$$('tr[data-row]',w).length:0;if(n!==r.count)fails.push(r.element+': '+n+' row(s), expected '+r.count)});
+  (ex.overlay||[]).forEach(function(o){var n=by('data-overlay',cur+'#'+o.element,host);var st=n?n.getAttribute('data-state'):'closed';if(st!==o.state)fails.push(o.element+' is '+st+', expected '+o.state)});
+  var txt=host.textContent;(ex.contains||[]).forEach(function(t){if(txt.indexOf(t)<0)fails.push('missing text "'+t+'"')});(ex.absent||[]).forEach(function(t){if(txt.indexOf(t)>=0)fails.push('unexpected text "'+t+'"')});
+  (ex.noQuery||[]).forEach(function(k){if(q[k]!==undefined&&q[k]!=='')fails.push('?'+k+' is still set')});Object.keys(ex.query||{}).forEach(function(k){if(q[k]!==ex.query[k])fails.push('?'+k+' is "'+(q[k]||'')+'", expected "'+ex.query[k]+'"')});
+  return fails}
+function drawScenarios(){
+  var box=$('#pv-scenarios');if(!box)return;box.textContent='';
+  if(!P.scenarios.length){box.appendChild(h('p',{class:'muted'},['This prototype defines no scenarios yet. Ask Claude to add the situations that should be checked.']));return}
+  P.scenarios.forEach(function(sc){
+    var r=results[sc.id];var dot=h('span',{class:'dot '+(r?(r.length?'bad':'ok'):'')},[r===undefined?'○':r===null?'–':r.length?'✗':'✓']);
+    var b=h('button',{type:'button',class:'sc'+(curScenario===sc.id?' cur':''),'data-scenario':sc.id},[dot,h('span',{},[sc.title,sc.description?h('small',{},[sc.description]):null])]);
+    b.addEventListener('click',function(){applyScenario(sc);results[sc.id]=checkScenario(sc);drawScenarios()});
+    box.appendChild(b);if(r&&r.length)r.forEach(function(f){box.appendChild(h('div',{class:'fail'},[f]))})});
+}
+var runAll=$('#sc-run-all');if(runAll)runAll.addEventListener('click',function(){
+  var keep={cur:cur,q:clone(q),ds:dsId,role:role,sc:curScenario};
+  quiet=true;try{P.scenarios.forEach(function(sc){applyScenario(sc);results[sc.id]=checkScenario(sc)})}finally{quiet=false}
+  dsId=keep.ds;if(dsSel)dsSel.value=dsId;role=keep.role;if(rl)rl.value=role;loadData();cur=keep.cur;q=keep.q;curScenario=keep.sc;pushUrl(true);render();drawScenarios();
+  var bad=Object.keys(results).filter(function(k){return results[k]&&results[k].length}).length,done=Object.keys(results).filter(function(k){return results[k]!==null}).length;
+  var s=$('#sc-summary');if(s)s.textContent=bad?bad+' of '+done+' checked scenarios failed':done+' of '+done+' checked scenarios passed'});
+$$('[data-goto]').forEach(function(b){b.addEventListener('click',function(){var key=b.getAttribute('data-goto');var parts=key.split('#');stateName='default';setMode('inspect');go(parts[0],{});select(key);var w=by('data-el',key,host);if(w&&w.scrollIntoView)w.scrollIntoView({block:'center'})})});
+// ---- start
+if(location.hash&&location.hash.length>1){var u0=parseUrl(location.hash);cur=u0.screen||startId;q=u0.query}
+setMode('preview');drawScenarios();render();
+})()}
+`;
+
+// ../praxis-developer/node_modules/@praxis/contracts/dist/review-html.js
+var CSS = `
+:root{--bg:#fff;--fg:#1d2330;--muted:#5d6678;--line:#d9dde6;--card:#f7f8fb;--accent:#2457d6;--ok:#17803d;--bad:#b42318;--warn:#a15c00;--okbg:#e7f6ec;--badbg:#fdeceb;--on-accent:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14171f;--fg:#e6e9f0;--muted:#9aa3b5;--line:#2c3242;--card:#1c202b;--accent:#7aa2ff;--ok:#5ad08a;--bad:#ff8a80;--warn:#ffc266;--okbg:#14301f;--badbg:#3a1a18;--on-accent:#0b1020}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px 16px 120px}
+h1{font-size:22px;margin:8px 0}h2{font-size:17px;margin:0}h3{font-size:14px;margin:12px 0 4px}
+.muted{color:var(--muted)}.meta{font-size:13px;color:var(--muted)}
+.card{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:12px 14px;margin:12px 0}
+.card.out{opacity:.6}
+.row{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}.row>.grow{flex:1;min-width:200px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 8px;font-size:12px;color:var(--muted);background:var(--bg)}
+.pill.ok{color:var(--ok);border-color:var(--ok)}.pill.bad{color:var(--bad);border-color:var(--bad)}.pill.warn{color:var(--warn);border-color:var(--warn)}
+textarea,input[type=text],select{width:100%;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+textarea{min-height:44px;resize:vertical}
+button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ac{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:8px 0;border-top:1px solid var(--line)}
+.marks{display:flex;gap:10px;align-items:center;font-size:13px}.marks label{display:flex;gap:4px;align-items:center;cursor:pointer}
+.stale{background:var(--badbg);border:1px solid var(--bad);border-radius:8px;padding:8px 12px;margin:10px 0}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:5}
+.bar .grow{flex:1;min-width:160px}
+#out{display:none;margin:12px 0}#out textarea{min-height:140px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+#toast{font-size:13px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;font-size:13px}
+.proto{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.proto .nav{display:flex;gap:6px;flex-wrap:wrap;padding:8px;border-bottom:1px solid var(--line);background:var(--card)}
+.proto .nav button.on{background:var(--p-primary,var(--accent));color:#fff;border-color:transparent}
+.proto .screen{padding:14px;font-family:var(--p-font,inherit)}
+.proto .btn{background:var(--p-primary,var(--accent));color:#fff;border:0;border-radius:var(--p-radius,6px);padding:6px 14px}
+.proto .btn.sec{background:transparent;color:var(--p-primary,var(--accent));border:1px solid var(--p-primary,var(--accent))}
+.proto table{border-collapse:collapse;width:100%;font-size:14px}.proto th,.proto td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+.el{position:relative;margin:10px 0;padding:4px;border:1px dashed transparent;border-radius:6px}
+.el:hover{border-color:var(--line)}.el .tag{font-size:11px;color:var(--muted);margin-left:6px}
+.denied{background:var(--badbg);color:var(--bad);padding:8px;border-radius:6px}
+.state-msg{padding:16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px;overflow:auto;font-size:12px;margin:4px 0}
+${PROTOTYPE_CSS}
+:root[data-theme=dark]{--bg:#14171f;--fg:#e6e9f0;--muted:#9aa3b5;--line:#2c3242;--card:#1c202b;--accent:#7aa2ff;--ok:#5ad08a;--bad:#ff8a80;--warn:#ffc266;--okbg:#14301f;--badbg:#3a1a18;--on-accent:#0b1020}
+.card.summary{position:sticky;top:0;z-index:4}
+.bigcount{font-size:15px;margin-bottom:6px}
+.pbar{display:flex;height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 6px}.pbar .a{background:var(--ok)}.pbar .r{background:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{font-size:12px;border:1px solid var(--line);border-radius:99px;padding:1px 9px;color:var(--fg);text-decoration:none;background:var(--bg)}
+.chip.accepted{border-color:var(--ok);color:var(--ok)}.chip.out{color:var(--muted)}.chip.open{border-color:var(--warn)}
+.grouph{font-size:15px;margin:22px 0 4px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.card.req{padding:14px 16px;scroll-margin-top:150px}
+.reqhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.reqhead h2{font-size:16px}.rid{font-family:ui-monospace,Menlo,monospace}
+.gap{border-top:1px solid var(--line);padding:8px 0}.card.gaps{border-color:var(--warn)}
+textarea.auto{overflow:hidden;line-height:1.55;min-height:28px}
+textarea.reqtext{font-size:16px;font-weight:500;margin:6px 0 8px;border-color:transparent;background:transparent;padding:4px 0}
+textarea.reqtext:hover,textarea.reqtext:focus{border-color:var(--line);background:var(--bg);padding:4px 8px}
+.scoperow{margin-bottom:6px}.scoperow select{width:auto}
+.achead{display:flex;justify-content:space-between;align-items:center;margin-top:10px}.achead h3{margin:0}.achead button{font-size:12px;padding:2px 8px}
+.ac{display:grid;grid-template-columns:52px 1fr;gap:4px 10px;padding:10px 0;border-top:1px solid var(--line)}
+.acid{font-size:12px;color:var(--muted);padding-top:6px}
+.acbody textarea.auto{border-color:transparent;background:transparent;padding:4px 0;min-height:0}
+.acbody textarea.auto:hover,.acbody textarea.auto:focus{border-color:var(--line);background:var(--bg);padding:4px 8px}
+.acctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.acctl input[type=text]{flex:1;min-width:140px;font-size:13px;padding:3px 8px}
+.acctl .rm{font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center;cursor:pointer}
+.prev{font-size:12px;color:var(--warn);background:var(--card);border-left:3px solid var(--warn);padding:2px 8px;margin:2px 0}
+.marks.tri{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.marks.tri label{position:relative;gap:0;margin:0}.marks.tri label+label{border-left:1px solid var(--line)}
+.marks.tri input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.marks.tri span{display:block;padding:3px 10px;font-size:13px}
+.marks.tri label:has(input:checked).m-accepted span{background:var(--ok);color:#fff}.marks.tri label:has(input:checked).m-rejected span{background:var(--bad);color:#fff}.marks.tri label:has(input:checked).m-pending span{background:var(--card);font-weight:600}
+.marks.tri label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:1px}
+.addrow{margin-top:8px}.addrow textarea{min-height:34px}
+@media (max-width:560px){.ac{grid-template-columns:1fr}.bar button{padding:4px 8px;font-size:13px}.card.summary{position:static}}
+`;
+var SCRIPT = `
+(function(){
+var D=JSON.parse(document.getElementById('praxis-data').textContent);
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function toast(t,bad){var e=$('#toast');e.textContent=t;e.style.color=bad?'var(--bad)':'var(--ok)'}
+function val(el){return el?el.value.trim():''}
+function num(el){return parseInt(el.getAttribute('data-rev'),10)}
+function markOf(root,name){var c=$('input[name="'+name+'"]:checked',root);return c?c.value:null}
+function collect(){
+  var s={contract:'praxis.review.submission',version:1,reviewId:D.reviewId,view:D.view,workItemId:D.workItemId,baseFingerprint:D.baseFingerprint,baseStamp:D.baseStamp,baseState:D.baseState,submittedAt:new Date().toISOString()};
+  if(D.view==='requirements'){
+    var reqs=[];
+    $$('[data-req]').forEach(function(card){
+      var id=card.getAttribute('data-req');var item={id:id,revision:num(card),criteria:[],addCriteria:[],removeCriteria:[]};var touched=false;
+      var st=$('[data-f=statement]',card);if(st&&val(st)!==(st.getAttribute('data-initial')||'').trim()){item.statement=val(st);touched=true}
+      var sc=$('[data-f=scope]',card);if(sc&&sc.value!==(sc.getAttribute('data-initial')||'').trim()){item.scope=sc.value;item.fromScope=(sc.getAttribute('data-initial')||'').trim();touched=true}
+      var sn=$('[data-f=scopeNote]',card);if(sn&&val(sn)!==(sn.getAttribute('data-initial')||'').trim()){item.scopeNote=val(sn);item.fromScopeNote=(sn.getAttribute('data-initial')||'').trim();touched=true}
+      var rc=$('[data-f=comment]',card);if(rc&&val(rc)!==(rc.getAttribute('data-initial')||'').trim()){item.comment=val(rc);item.fromComment=(rc.getAttribute('data-initial')||'').trim();touched=true}
+      $$('[data-ac]',card).forEach(function(row){
+        var aid=row.getAttribute('data-ac');
+        if($('[data-f=remove]',row)&&$('[data-f=remove]',row).checked){item.removeCriteria.push(aid);touched=true;return}
+        var c={id:aid,revision:num(row)};var ch=false;
+        var m=markOf(row,'m-'+aid);if(m&&m!==row.getAttribute('data-initial-status')){c.status=m;c.from=row.getAttribute('data-initial-status');ch=true}
+        var cm=$('[data-f=ac-comment]',row);if(cm&&val(cm)!==(cm.getAttribute('data-initial')||'').trim()){c.comment=val(cm);c.fromComment=cm.getAttribute('data-initial')||'';ch=true}
+        var ts=$('[data-f=ac-statement]',row);if(ts&&val(ts)!==(ts.getAttribute('data-initial')||'').trim()){c.statement=val(ts);ch=true}
+        if(ch){item.criteria.push(c);touched=true}
+      });
+      var add=$('[data-f=add-ac]',card);if(add&&val(add)){val(add).split(/\\n+/).forEach(function(l){l=l.trim();if(l)item.addCriteria.push({statement:l})});touched=true}
+      if(touched)reqs.push(item)
+    });
+    s.requirements={requirements:reqs,acceptAll:!!($('#accept-all')&&$('#accept-all').checked)};
+  }
+  if(D.view==='prototype'){
+    var fb=[];$$('[data-fb]').forEach(function(t){if(val(t))fb.push({target:t.getAttribute('data-fb'),comment:val(t)})});
+    var rs=[];$$('[data-resolve]:checked').forEach(function(c){rs.push(c.getAttribute('data-resolve'))});
+    s.prototype={feedback:fb,resolve:rs,accept:!!($('#accept-proto')&&$('#accept-proto').checked)};
+  }
+  if(D.view==='story-plan'){
+    var es=[];
+    $$('[data-entry]').forEach(function(card){
+      var id=card.getAttribute('data-entry');var e={id:id,base:card.getAttribute('data-base')};var ch=false;
+      var m=markOf(card,'m-'+id);if(m&&m!==card.getAttribute('data-initial-status')){e.status=m;ch=true}
+      var cm=$('[data-f=comment]',card);if(cm&&val(cm)){e.comment=val(cm);ch=true}
+      ['title','implementation','userGets'].forEach(function(f){var t=$('[data-f='+f+']',card);if(t&&val(t)!==(t.getAttribute('data-initial')||'').trim()){e[f]=val(t);ch=true}});
+      var ex=$('[data-f=exclude]',card);if(ex&&val(ex)){e.exclude=val(ex);ch=true}
+      var rt=$('[data-f=restore]',card);if(rt&&rt.checked){e.restore=true;ch=true}
+      if(ch)es.push(e)
+    });
+    s.plan={entries:es,agree:!!($('#agree-plan')&&$('#agree-plan').checked)};
+  }
+  if(D.view==='contracts'){
+    var ag=[],rm=[];$$('[data-contract]').forEach(function(card){var c=$('[data-f=agree]',card);if(c&&c.checked)ag.push(card.getAttribute('data-contract'));var r=$('[data-f=remove]',card);if(r&&r.checked)rm.push(card.getAttribute('data-contract'))});
+    s.contracts={agree:ag,remove:rm};
+  }
+  if(D.view==='stories'){
+    var items=[],sts=[];
+    $$('[data-story]').forEach(function(card){
+      var id=card.getAttribute('data-story');var rev=num(card);var st={storyId:id,revision:rev};var ch=false;
+      $$('[data-key]',card).forEach(function(row){
+        var key=row.getAttribute('data-key');var m=markOf(row,'m-'+id+'-'+key);
+        var cm=$('[data-f=comment]',row);
+        if(m&&(m!==row.getAttribute('data-initial-status')||(cm&&val(cm)))){var it={storyId:id,revision:rev,key:key,from:row.getAttribute('data-initial-status'),status:m};if(cm&&val(cm)){it.comment=val(cm);it.fromComment=(cm.getAttribute('data-initial')||'').trim()}items.push(it)}
+      });
+      var n=$('[data-f=narrative]',card);if(n&&val(n)!==(n.getAttribute('data-initial')||'').trim()){st.narrative=val(n);ch=true}
+      var o=$('[data-f=objective]',card);if(o&&val(o)!==(o.getAttribute('data-initial')||'').trim()){st.objective=val(o);ch=true}
+      var ex=$('[data-f=exclude]',card);if(ex&&val(ex)){st.exclude=val(ex);ch=true}
+      var rt=$('[data-f=restore]',card);if(rt&&rt.checked){st.restore=true;ch=true}
+      var all=$('[data-f=accept-story]',card);if(all&&all.checked){st.acceptAll=true;ch=true}
+      if(ch)sts.push(st)
+    });
+    s.stories={items:items,stories:sts,accept:!!($('#accept-stories')&&$('#accept-stories').checked)};
+  }
+  var wv=[];$$('[data-gap]').forEach(function(g){var c=$('[data-f=waive]',g);if(c&&c.checked)wv.push({kind:g.getAttribute('data-kind'),requirementId:g.getAttribute('data-req'),reason:val($('[data-f=waive-reason]',g))})});if(wv.length)s.waivers=wv;
+  return s
+}
+function showOut(text){var o=$('#out');o.style.display='block';$('textarea',o).value=text}
+function summary(s){return JSON.stringify(s,null,2)}
+$('#btn-save').addEventListener('click',function(){
+  var noReason=$$('[data-gap]').filter(function(g){var c=$('[data-f=waive]',g);return c&&c.checked&&val($('[data-f=waive-reason]',g)).length<3});
+  if(noReason.length){toast('Give a reason (at least 3 characters) for each gap you waive.',true);return}
+  var s=collect();var text=summary(s);
+  if(!D.saveUrl){showOut(text);toast('No live connection: copy or download the decisions and give them to Claude: it records them with praxis_review_apply after you approve them in the dialog.',false);return}
+  toast('Saving...',false);
+  fetch(D.saveUrl,{method:'POST',headers:{'content-type':'application/json','x-praxis-review-token':D.token||''},body:JSON.stringify(s)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){
+    if(!x.ok){showOut(text);toast('Not saved ('+(x.j&&x.j.error||'error')+'). Decisions are below: copy them to Claude.',true);return}
+    var c=(x.j.conflicts||[]).length;
+    toast(c?('Saved: '+(x.j.applied||0)+' change(s) applied. NOT saved, '+c+' conflict(s) - this page is out of date: '+x.j.conflicts.map(function(k){return k.item+' ('+k.reason+')'}).join('; ')+'. Reload the page to see the current state, then decide again.'):('Saved: '+(x.j.applied||0)+' change(s) applied. Reload to see the new revision.'),c>0);
+  }).catch(function(){showOut(text);toast('Cannot reach Praxis (the review session ended). Decisions are below: copy them to Claude.',true)})
+});
+$('#btn-copy').addEventListener('click',function(){var t=summary(collect());showOut(t);if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){toast('Copied.',false)},function(){toast('Select and copy the text below.',false)})}else toast('Select and copy the text below.',false)});
+$('#btn-download').addEventListener('click',function(){var t=summary(collect());var b=new Blob([t],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=D.view+'-review-'+D.workItemId+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},0)});
+var acc=$('#btn-accept-all');if(acc)acc.addEventListener('click',function(){$$('input[type=radio][value=accepted]').forEach(function(r){if(!r.closest('.card.out'))r.checked=true})});
+$$('[data-accept-card]').forEach(function(b){b.addEventListener('click',function(){$$('input[type=radio][value=accepted]',b.closest('.card')).forEach(function(r){r.checked=true})})});
+function fit(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
+$$('textarea.auto').forEach(function(t){fit(t);t.addEventListener('input',function(){fit(t)})});
+${PROTOTYPE_SCRIPT}
+})();
+`;
 
 // ../praxis-developer/node_modules/@praxis/contracts/dist/index.js
 var ContractMetaSchema = external_exports.object({

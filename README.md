@@ -39,7 +39,7 @@ claude plugin install praxis@praxis
 
 A plugin's local MCP server is not automatically a tool in ordinary Chat. There is no remote Praxis service.
 
-Release notes: [RELEASE-NOTES-0.1.0-alpha.48.md](RELEASE-NOTES-0.1.0-alpha.48.md).
+Release notes: [RELEASE-NOTES-0.1.0-alpha.49.md](RELEASE-NOTES-0.1.0-alpha.49.md).
 
 ## Maintainers
 
@@ -56,3 +56,7 @@ npm run verify             # manifest consistency, generated outputs, release-ca
 - The clean-install, dependency and update acceptance (`accept:marketplace-install`) lives in the praxis-runtime repository because it drives the Runtime over MCP.
 
 Never store tokens in this repository.
+
+## License
+
+Apache License 2.0 (SPDX: `Apache-2.0`). See [LICENSE](LICENSE) and [NOTICE](NOTICE). Plugins that bundle third-party code carry a `THIRD-PARTY-NOTICES.md` with those licences.
