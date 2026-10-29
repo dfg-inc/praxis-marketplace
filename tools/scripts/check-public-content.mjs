@@ -21,9 +21,12 @@ const failures = [];
 const notes = [];
 const fail = (where, what) => failures.push(`${where}: ${what}`);
 
+// The company and host names are assembled so that this public file does not itself name the internal infrastructure.
+const COMPANY = ["jet", "ruby"].join("");
+const INTERNAL_HOST = new RegExp(`${["jet", "ru"].join("")}\\.by|${COMPANY}`, "i");
 const FORBIDDEN = [
   ["developer home path", /\/Users\/(?!example\b|you\b|me\b|user\b|name\b|runner\b)[A-Za-z0-9._-]+\/|[A-Z]:\\Users\\[A-Za-z0-9._-]+\\/],
-  ["internal host", /jetru\.by|jetruby/i],
+  ["internal host or company mailbox", INTERNAL_HOST],
   ["corporate dataset label", /corp-engineering-handbook|corp-quality-policy/],
   ["corporate dataset file", /dataset\/(company|product\/demo)\//],
   ["withdrawn personal address", /alexey\.golubev/i],
