@@ -24,12 +24,15 @@ const fail = (where, what) => failures.push(`${where}: ${what}`);
 // The company and host names are assembled so that this public file does not itself name the internal infrastructure.
 const COMPANY = ["jet", "ruby"].join("");
 const INTERNAL_HOST = new RegExp(`${["jet", "ru"].join("")}\\.by|${COMPANY}`, "i");
+// A vendor name that was removed from the public history; assembled for the same reason.
+const WITHDRAWN_VENDOR = new RegExp(["sim", "ple[ _.-]?one"].join(""), "i");
 const FORBIDDEN = [
   ["developer home path", /\/Users\/(?!example\b|you\b|me\b|user\b|name\b|runner\b)[A-Za-z0-9._-]+\/|[A-Z]:\\Users\\[A-Za-z0-9._-]+\\/],
   ["internal host or company mailbox", INTERNAL_HOST],
   ["corporate dataset label", /corp-engineering-handbook|corp-quality-policy/],
   ["corporate dataset file", /dataset\/(company|product\/demo)\//],
   ["withdrawn personal address", /alexey\.golubev/i],
+  ["withdrawn vendor name", WITHDRAWN_VENDOR],
   ["secret shape", /ghp_[A-Za-z0-9]{30,}|glpat-[A-Za-z0-9_-]{18,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|xox[bp]-[0-9]{8,}|sk-[A-Za-z0-9]{40,}/],
 ];
 const FORBIDDEN_NAMES = /(^|\/)(\.env(\..*)?|id_rsa.*|.*\.pem|.*\.key)$/;
@@ -92,6 +95,12 @@ for (const f of ["README.md", "LICENSE", "NOTICE"]) {
   if (!existsSync(p)) { fail(f, "missing"); continue; }
   const text = readFileSync(p, "latin1");
   for (const [name, re] of FORBIDDEN) if (re.test(text)) fail(f, name);
+}
+// Docs and release notes are public but not shipped in a plugin; only the withdrawn vendor name is checked there.
+for (const f of walk(root)) {
+  const rel = relative(root, f);
+  if (rel.startsWith("plugins/") || rel.startsWith(".claude-plugin/")) continue;
+  if (WITHDRAWN_VENDOR.test(readFileSync(f).toString("latin1"))) fail(rel, "withdrawn vendor name");
 }
 for (const d of readdirSync(plugins)) {
   const p = join(plugins, d);
