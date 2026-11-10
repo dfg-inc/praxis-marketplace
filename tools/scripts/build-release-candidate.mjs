@@ -99,7 +99,7 @@ for (const entry of entries) {
   }
   plugins.push({
     name: entry.name,
-    version: pkg.version || "0.1.0-alpha.49",
+    version: pkg.version || "0.1.0-alpha.49.1",
     sourceRepository: entry.repo,
     sourceRevision: head,
     sourceBranch: branch,
