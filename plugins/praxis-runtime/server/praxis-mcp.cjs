@@ -5250,7 +5250,7 @@ async function obtainUserApproval(request, options2 = {}) {
   if (channel && answer && answer.answer !== "unavailable") {
     const answeredBy = answer.channel ?? channel.kind;
     const decidedBy = decidedByFor(answeredBy);
-    const said = { channel: answeredBy, decidedBy, ...answer.evidence ? { evidence: answer.evidence } : {}, ...answer.reason ? { reason: answer.reason } : {} };
+    const said = { channel: answeredBy, decidedBy, ...USER_CHANNELS.has(decidedBy) ? { personVerified: false } : {}, ...answer.evidence ? { evidence: answer.evidence } : {}, ...answer.reason ? { reason: answer.reason } : {} };
     if (answer.answer === "approve") {
       const clicked = answer.evidence?.decidedAt ? new Date(answer.evidence.decidedAt) : void 0;
       const approval = createUserApproval({ request, channel: answeredBy, ...clicked && Number.isFinite(clicked.getTime()) && clicked.getTime() <= Date.now() ? { now: clicked } : {} });
@@ -5262,11 +5262,11 @@ async function obtainUserApproval(request, options2 = {}) {
     const dismissed = answer.answer === "dismiss";
     if (!answer.journaled)
       logDecision(options2.repo, { ...base, decision: dismissed ? "dismissed" : "rejected", ...said });
-    const details = { executed: false, outcome: dismissed ? "dismissed" : "rejected", decidedBy, channel: answeredBy, ...answer.evidence ? { evidence: answer.evidence } : {}, ...answer.reason ? { reason: answer.reason } : {}, rejected: !dismissed, dismissed };
+    const details = { executed: false, outcome: dismissed ? "dismissed" : "rejected", decidedBy, personVerified: false, channel: answeredBy, ...answer.evidence ? { evidence: answer.evidence } : {}, ...answer.reason ? { reason: answer.reason } : {}, rejected: !dismissed, dismissed };
     if (dismissed) {
-      throw new ApprovalError("APPROVAL_DISMISSED", `${request.summary} was not run: the user closed ${whereAsked(answeredBy)} without deciding. Nothing was changed. This is not a rejection; ask the user whether to try again.`, details);
+      throw new ApprovalError("APPROVAL_DISMISSED", `${request.summary} was not run: ${whereAsked(answeredBy)} was closed without a decision. Nothing was changed. This is not a rejection; ask the user whether to try again.`, details);
     }
-    throw new ApprovalError("APPROVAL_REJECTED", `${request.summary} was rejected by the user in ${whereAsked(answeredBy)}. Nothing was changed.`, details);
+    throw new ApprovalError("APPROVAL_REJECTED", `${request.summary} was rejected in ${whereAsked(answeredBy)}, the user's own channel. Nothing was changed.`, details);
   }
   const automatic = answer?.automatic;
   const why = automatic ? `the client answered "${automatic}" ${answer?.evidence?.latencyMs ?? "?"} ms after it was asked, faster than a person can read the request${answer?.reason ? ` (${answer.reason})` : ""}; that is the client's answer, not the user's` : answer?.reason ?? "this client cannot show an approval dialog (no MCP elicitation support)";
@@ -5318,7 +5318,7 @@ function runApprovedMutation(approval, write) {
   }
   return lease.run({ action: approval.action, approval }, write);
 }
-var import_node_async_hooks, import_node_crypto, import_node_fs, import_node_os, import_node_path, USER_APPROVAL_CONTRACT, USER_APPROVAL_VERSION, USER_APPROVAL_TTL_MS, issued, subjectDigest, assuranceOf, ApprovalError, ApprovalNeedsInput, channelStore, decidedByFor, whereAsked, OUTCOME_OF_CODE, lease;
+var import_node_async_hooks, import_node_crypto, import_node_fs, import_node_os, import_node_path, USER_APPROVAL_CONTRACT, USER_APPROVAL_VERSION, USER_APPROVAL_TTL_MS, issued, subjectDigest, assuranceOf, ApprovalError, ApprovalNeedsInput, channelStore, USER_CHANNELS, decidedByFor, whereAsked, OUTCOME_OF_CODE, lease;
 var init_user_approval = __esm({
   "node_modules/@praxis/contracts/dist/user-approval.js"() {
     import_node_async_hooks = require("node:async_hooks");
@@ -5351,7 +5351,8 @@ var init_user_approval = __esm({
       }
     };
     channelStore = new import_node_async_hooks.AsyncLocalStorage();
-    decidedByFor = (channel) => channel === "trusted-client" ? "trusted-client" : channel === "host-permission" ? "host-prompt" : "user";
+    USER_CHANNELS = /* @__PURE__ */ new Set(["client-dialog", "approval-page", "terminal-prompt"]);
+    decidedByFor = (channel) => channel === "trusted-client" ? "trusted-client" : channel === "host-permission" ? "host-prompt" : channel === "approval-page" ? "approval-page" : channel === "terminal-prompt" ? "terminal-prompt" : "client-dialog";
     whereAsked = (kind) => kind === "approval-page" ? "the Praxis approval page" : kind === "terminal-prompt" ? "the terminal prompt" : "the client's approval dialog";
     OUTCOME_OF_CODE = {
       APPROVAL_PENDING: { decision: "pending", decidedBy: "nobody" },
@@ -81422,7 +81423,7 @@ var import_node_fs5 = require("node:fs");
 function runtimeBuildInfo(version4) {
   let embedded = null;
   try {
-    const raw = '{"version":"0.1.0-alpha.49.1","sourceDigest":"de31f5b7e11433564787e9ea653fdd0ac0bfe479c67be3e58f54ab67d1187ee5","coreBaseline":"7181ecd53e319b426b5c70cf0de1a7ed417186e2","inputs":38}';
+    const raw = '{"version":"0.1.0-alpha.49.1","sourceDigest":"494da79c307328fe4add8a3dafa01c31fa6872a36898c87edce1a414fced0acb","coreBaseline":"3c0f079acd243042e5d23ae0dd204d307924fec6","inputs":38}';
     if (raw)
       embedded = JSON.parse(raw);
   } catch {
@@ -81550,10 +81551,20 @@ h1{font-size:1.35em;margin:.2em 0 .6em}pre{white-space:pre-wrap;word-break:break
 .meta{color:#555;font-size:14px}.row{display:flex;gap:12px;flex-wrap:wrap;margin:1.2em 0}button{font:inherit;padding:10px 18px;border-radius:8px;border:1px solid #888;cursor:pointer}
 #approve{background:#0a7d32;color:#fff;border-color:#0a7d32}#reject{background:#b3261e;color:#fff;border-color:#b3261e}button:disabled{opacity:.5;cursor:default}
 input{font:inherit;width:100%;box-sizing:border-box;padding:8px;border-radius:6px;border:1px solid #999}#result{font-weight:600;margin-top:1em}`;
-function notOpenable(res, id) {
+function notOpenable(res, reused) {
   const nonce = (0, import_node_crypto8.randomBytes)(12).toString("base64");
   res.writeHead(403, pageHeaders(nonce));
-  res.end(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praxis approval</title><style>${STYLE}</style><body><h1>This approval link does not open here</h1><p>An approval page opens only in the browser tab Praxis opened for you, for ten minutes. If you closed that tab or the time ran out, ask Claude to apply the action again: Praxis opens a new page. Nothing was approved or rejected.</p><script nonce="${nonce}">try{var t=sessionStorage.getItem("praxis-approval-${id}");if(t&&!location.search)location.replace(location.pathname+"?t="+encodeURIComponent(t))}catch(e){}</script></body>`);
+  const why = reused ? `<h1>This approval page was already opened somewhere else</h1><p><strong>Its link works once, and it has been used.</strong> If you did not open it yourself a moment ago, something else on this computer did: do not approve anything for this request, and tell Claude to stop. Otherwise, use the tab where it opened.</p>` : `<h1>This approval link does not open here</h1><p>An approval page opens only in the browser tab Praxis opened for you, for ten minutes. If you closed that tab or the time ran out, ask Claude to apply the action again: Praxis opens a new page. Nothing was approved or rejected.</p>`;
+  res.end(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praxis approval</title><style>${STYLE}</style><body>${why}</body>`);
+}
+var cookieName = (id) => `praxis_approval_${id}`;
+function cookieOf(req, id) {
+  for (const part of String(req.headers.cookie ?? "").split(";")) {
+    const [name, ...value] = part.trim().split("=");
+    if (name === cookieName(id))
+      return value.join("=");
+  }
+  return void 0;
 }
 function renderPage(request, saveToken) {
   const nonce = (0, import_node_crypto8.randomBytes)(12).toString("base64");
@@ -81570,7 +81581,7 @@ function renderPage(request, saveToken) {
 <p id="result" role="status">${decided ? `Already decided: ${escapeHtml(request.status)}. You can close this tab.` : ""}</p>
 <script nonce="${nonce}">(function(){
 var id=${JSON.stringify(request.id)},token=${JSON.stringify(saveToken)},until=${request.expiresAt},decided=${decided};
-try{var q=new URLSearchParams(location.search).get("t");if(q)sessionStorage.setItem("praxis-approval-"+id,q);history.replaceState(null,"",location.pathname)}catch(e){}
+try{history.replaceState(null,"",location.pathname)}catch(e){}
 document.getElementById("until").textContent=new Date(until).toLocaleTimeString();
 var a=document.getElementById("approve"),r=document.getElementById("reject"),out=document.getElementById("result");
 function done(text){a.disabled=r.disabled=true;out.textContent=text}
@@ -81628,14 +81639,24 @@ async function handle(req, res) {
     return;
   }
   if (req.method === "GET" && !match[2]) {
-    if (!safeEqual(url4.searchParams.get("t") ?? "", request.loadToken))
-      return notOpenable(res, request.id);
+    const presentedLink = url4.searchParams.get("t");
+    const cookie = cookieOf(req, request.id);
+    const bound = request.loadedWith !== void 0 && cookie !== void 0 && safeEqual(cookie, request.loadedWith);
+    if (!bound) {
+      if (!presentedLink || !safeEqual(presentedLink, request.loadToken))
+        return notOpenable(res, false);
+      if (request.loadedWith !== void 0) {
+        request.reusedAt = Date.now();
+        return notOpenable(res, true);
+      }
+      request.loadedWith = (0, import_node_crypto8.randomBytes)(24).toString("hex");
+    }
     const saveToken = (0, import_node_crypto8.randomBytes)(24).toString("hex");
     request.saveTokens.add(saveToken);
     if (request.saveTokens.size > 10)
       request.saveTokens.delete(request.saveTokens.values().next().value);
     const { html, nonce } = renderPage(request, saveToken);
-    res.writeHead(200, pageHeaders(nonce));
+    res.writeHead(200, { ...pageHeaders(nonce), "set-cookie": `${cookieName(request.id)}=${request.loadedWith}; HttpOnly; SameSite=Strict; Path=/a/${request.id}; Max-Age=${Math.ceil(REQUEST_TTL_MS / 1e3)}` });
     res.end(html);
     return;
   }
@@ -81674,9 +81695,10 @@ async function handle(req, res) {
       summary: request.summary,
       subjectDigest: request.digest,
       decision: request.status,
-      decidedBy: "user",
+      decidedBy: "approval-page",
+      personVerified: false,
       channel: "approval-page",
-      evidence: { requestId: request.id, via: "approval-page click", latencyMs: request.decidedAt - (request.openedAt ?? request.createdAt), ...request.client ? { client: request.client } : {} },
+      evidence: { requestId: request.id, via: viaOf(request), latencyMs: request.decidedAt - (request.openedAt ?? request.createdAt), ...request.client ? { client: request.client } : {} },
       ...reason ? { reason } : {}
     });
     settle4(request);
@@ -81747,7 +81769,7 @@ var openApprovalPage = async (secretUrl) => {
 var testOpener;
 function pageRequestView(id) {
   const request = requests.get(id);
-  return request ? { requestId: request.id, status: request.status, expiresAt: new Date(request.expiresAt).toISOString(), openedInBrowser: request.openedAt !== void 0 } : void 0;
+  return request ? { requestId: request.id, status: request.status, expiresAt: new Date(request.expiresAt).toISOString(), openedInBrowser: request.openedAt !== void 0, ...request.reusedAt ? { linkUsedAgain: true } : {} } : void 0;
 }
 function waitForDecision(request, ms, signal) {
   if (request.status !== "pending" || ms <= 0)
@@ -81764,13 +81786,14 @@ function waitForDecision(request, ms, signal) {
     signal?.addEventListener("abort", finish, { once: true });
   });
 }
+var viaOf = (request) => request.reusedAt ? "approval-page click; the page link was used again elsewhere before the decision" : "approval-page click";
 function takeDecision(request) {
   if (request.consumed || request.status === "pending")
     return null;
   request.consumed = true;
   const evidence = {
     requestId: request.id,
-    via: "approval-page click",
+    via: viaOf(request),
     latencyMs: (request.decidedAt ?? 0) - (request.openedAt ?? request.createdAt),
     decidedAt: new Date(request.decidedAt ?? Date.now()).toISOString(),
     ...request.client ? { client: request.client } : {}
@@ -85538,6 +85561,12 @@ function withClientReport(data, client) {
       },
       minAnswerMs: minAnswerMs()
     };
+    if (client.dialog && !observed && process.env.CLAUDE_CODE_ENTRYPOINT?.trim() === "claude-desktop") {
+      target.approval = {
+        ...target.approval,
+        hint: "This is the Claude Desktop Code tab. It declares an approval dialog but, as of Claude Code 2.1.309, answers it by itself without showing it (anthropics/claude-code#89858). Praxis tries the dialog; when it is answered faster than a person could read it, Praxis asks in the approval page instead, and after two such answers uses the page directly."
+      };
+    }
     if (pageOn && (!client.dialog || observed) && target.approval.mode === "no-dialog") {
       target.approval = { ...target.approval, mode: "approval-page" };
     }
@@ -85557,13 +85586,18 @@ function withClientReport(data, client) {
   }
   return data;
 }
+var USER_CHANNEL_KINDS = /* @__PURE__ */ new Set(["client-elicitation", "approval-page", "terminal-prompt"]);
+function approvalView(item) {
+  const decidedBy = item.channel === "client-elicitation" ? "client-dialog" : item.channel === "host-permission" ? "host-prompt" : item.channel;
+  return { action: item.action, channel: item.channel, assurance: item.assurance, decidedBy, ...USER_CHANNEL_KINDS.has(item.channel) ? { personVerified: false } : {}, decidedAt: item.decidedAt };
+}
 function withApprovalNote(name, data) {
   if (!PROTECTED_TOOLS.has(name))
     return { data };
   const given = approvalsGivenInThisCall();
   if (given.length === 0)
     return { data };
-  const approval = given.map((item) => ({ action: item.action, channel: item.channel, assurance: item.assurance, decidedAt: item.decidedAt }));
+  const approval = given.map(approvalView);
   return { data: data && typeof data === "object" && !Array.isArray(data) ? { ...data, approval } : { result: data, approval } };
 }
 function preflight(name, args, ctx, version4) {
@@ -85659,7 +85693,7 @@ async function callToolInner(name, rawArgs, opts) {
           return mcpEnvelope({ ok: false, operation: name, version: opts.version, code: "CONFIRMATION_REQUIRED", errors: ["amend=true requires confirmation=YES after the user has seen the corrections (call with amend=false first)"] });
         }
         const amended = await amendJournal(ctx.repo, ctx.confirmation, opts.version);
-        const approval = approvalsGivenInThisCall().map((item) => ({ action: item.action, channel: item.channel, assurance: item.assurance, decidedAt: item.decidedAt }));
+        const approval = approvalsGivenInThisCall().map(approvalView);
         return mcpEnvelope({ ok: true, operation: name, version: opts.version, data: { ...amended, approval } });
       }
       const audit = journalAudit(ctx.repo);
