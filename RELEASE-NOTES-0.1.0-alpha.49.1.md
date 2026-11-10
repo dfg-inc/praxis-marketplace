@@ -18,17 +18,19 @@ claude plugin install praxis@praxis
 
 ## Updating from alpha.49
 
-Update the marketplace and the installed plugins:
+Update the marketplace, then every installed Praxis plugin. `claude plugin update praxis@praxis` updates only the `praxis` plugin itself, not the Runtime and roles it installed, so update those too:
 
 ```bash
 claude plugin marketplace update praxis
-```
-
-```bash
 claude plugin update praxis@praxis
+claude plugin update praxis-runtime@praxis
+claude plugin update praxis-ba@praxis
+claude plugin update praxis-architect@praxis
+claude plugin update praxis-developer@praxis
+claude plugin update praxis-quality@praxis
 ```
 
-Each installed role updates the same way (`claude plugin update praxis-ba@praxis`, and so on). Then restart the client.
+If you installed a single role, update that role and `praxis-runtime`. Then restart the client. Verified with Claude Code CLI 2.1.314 against the published marketplace: alpha.49 to alpha.49.1 in place for all six plugins.
 
 **Claude Desktop Chat** uses the extension, not a plugin: install `praxis-runtime.mcpb` from the `v0.1.0-alpha.49.1` Release of `dfg-inc/praxis-runtime`, then restart Desktop.
 
