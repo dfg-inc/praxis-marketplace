@@ -39,7 +39,7 @@ claude plugin install praxis@praxis
 
 A plugin's local MCP server is not automatically a tool in ordinary Chat. There is no remote Praxis service.
 
-Release notes: [RELEASE-NOTES-0.1.0-alpha.49.md](RELEASE-NOTES-0.1.0-alpha.49.md).
+Release notes: [RELEASE-NOTES-0.1.0-alpha.49.1.md](RELEASE-NOTES-0.1.0-alpha.49.1.md) (the patch on top of [0.1.0-alpha.49](RELEASE-NOTES-0.1.0-alpha.49.md)).
 
 ## Maintainers
 
