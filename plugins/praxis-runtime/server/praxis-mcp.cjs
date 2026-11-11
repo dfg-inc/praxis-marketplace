@@ -28539,7 +28539,7 @@ async function qualityReviewOp(ctx) {
       const reviewed = await runQualityWorkPackageReview2({
         repo,
         workPackageId,
-        runtimeVersion: "0.1.0-alpha.49.1"
+        runtimeVersion: "0.1.0-alpha.49.2"
       });
       const qualityInputs = discoverQualityInputs(repo, workPackageId);
       return {
@@ -61582,8 +61582,14 @@ var MAX_JSON = 16 * 1024 * 1024;
 var MAX_GLOBAL_JSON = 64 * 1024 * 1024;
 var MAX_MARKDOWN = 4 * 1024 * 1024;
 var MAX_WALK_ENTRIES = 2e5;
-var LAUNCH_FLAGS = /(^|[\s"'=\x00])--(settings|plugin-dir|plugin-url|agents)(?=$|[\s"'=\x00])/;
-var RUNTIME_ENV = /^(PATH|HOME|TMPDIR|TMP|TEMP|SHELL|BROWSER|NODE_.*|NPM_.*|DYLD_.*|LD_.*|GIT_.*|PRAXIS_.*|CLAUDE_.*|PLAYWRIGHT_.*|XDG_.*)$/i;
+var LAUNCH_FLAGS = /(^|[\s"'=\x00])--((?:plugin|managed)[a-z0-9-]*|setting(?!-sources(?=$|[\s"'=\x00]))[a-z0-9-]*|agents|await-initialize)(?=$|[\s"'=\x00])/i;
+var PROJECT_KEYS = /* @__PURE__ */ new Set(["$schema", "permissions", "model", "outputstyle", "includecoauthoredby", "cleanupperioddays", "disabledmcpjsonservers", "spinnertipsenabled", "alwaysthinkingenabled", "language", "respectgitignore", "sandbox", "disableallhooks"]);
+var CLIENT_CONFIG_ENV = /PLUGIN|SETTING|MARKETPLACE|HOOK|SKILL|AGENTS|CONFIG/i;
+var LOCATION_NAME = /(DIRS?|PATHS?|FILES?|URLS?|SOURCES?|ROOTS?|HOME|JSON|LOCATION)$/i;
+var looksLikeLocation = (value) => /^\s*([\\/~.{[]|[a-z]:[\\/]|[a-z]+:\/\/)/i.test(value) || /[\\/]/.test(value);
+var CLIENT_ENV_KNOWN = /* @__PURE__ */ new Set(["CLAUDE_PLUGIN_ROOT", "CLAUDE_PLUGIN_DATA", "CLAUDE_CONFIG_DIR"]);
+var CODE_INTO_CLIENT = /^(BUN_OPTIONS|BUN_INSPECT\w*|BUN_CONFIG_PRELOAD|DYLD_INSERT_LIBRARIES|DYLD_LIBRARY_PATH|DYLD_FRAMEWORK_PATH|LD_PRELOAD|LD_AUDIT|ELECTRON_RUN_AS_NODE)$/;
+var NODE_LOADS_CODE = /(^|\s)(-r|--require|--import|--loader|--experimental-loader|--inspect[\w-]*|--experimental-vm-modules)(=|\s|$)/;
 var fold = (text) => text.normalize("NFKC").toLowerCase();
 var namesElicitation = (key) => fold(key).includes("elicitation");
 function readFile(path2, max) {
@@ -61612,12 +61618,34 @@ function isLink(path2) {
     return false;
   }
 }
+function stripJsonc(text) {
+  let out = "";
+  for (let i = 0; i < text.length; i += 1) {
+    const c = text[i];
+    if (c === '"') {
+      const start = i;
+      for (i += 1; i < text.length && text[i] !== '"'; i += 1)
+        if (text[i] === "\\")
+          i += 1;
+      out += text.slice(start, i + 1);
+    } else if (c === "/" && text[i + 1] === "/") {
+      while (i < text.length && text[i] !== "\n" && text[i] !== "\r")
+        i += 1;
+      out += "\n";
+    } else if (c === "/" && text[i + 1] === "*") {
+      const end = text.indexOf("*/", i + 2);
+      i = end < 0 ? text.length : end + 1;
+    } else
+      out += c;
+  }
+  return out.replace(/,(\s*[}\]])/g, "$1");
+}
 function readJson(path2, max = MAX_JSON) {
   const text = readFile(path2, max);
   if (!text || "finding" in text)
     return text;
   try {
-    return { value: JSON.parse(text.value) };
+    return { value: JSON.parse(stripJsonc(text.value)) };
   } catch {
     return { finding: { file: path2, why: "is not valid JSON, so it cannot be checked", kind: "unverifiable" } };
   }
@@ -61654,15 +61682,26 @@ function checkSettings(path2, value, project, whole = false) {
   if (project && hooks && !answer)
     out.push({ file: path2, why: "the repository's settings run hooks as you: a project cannot authorize its own protected actions", kind: "project-hooks" });
   if (project && value && typeof value === "object" && !Array.isArray(value)) {
+    const settings = value;
+    const env = settings.env && typeof settings.env === "object" ? Object.keys(settings.env) : [];
+    if (env.length)
+      out.push({ file: path2, why: `the repository's settings set ${env.slice(0, 6).join(", ")} for the client and the Runtime it starts`, kind: "project-env" });
+    const other = Object.keys(settings).filter((k) => (!PROJECT_KEYS.has(fold(k)) || fold(k) === "disableallhooks" && settings[k] !== true) && fold(k) !== "hooks" && fold(k) !== "env");
+    if (other.length)
+      out.push({ file: path2, why: `the repository's settings configure ${other.slice(0, 6).join(", ")}, which a project may not set while it asks for protected actions`, kind: "project-config" });
+  } else if (project && value !== void 0) {
+    out.push({ file: path2, why: "is not a settings object, so it cannot be checked", kind: "unverifiable" });
+  }
+  if (!project && value && typeof value === "object" && !Array.isArray(value)) {
     const env = value.env;
-    const set2 = env && typeof env === "object" ? Object.keys(env).filter((k) => RUNTIME_ENV.test(k)) : [];
-    if (set2.length)
-      out.push({ file: path2, why: `the repository's settings set ${set2.slice(0, 6).join(", ")} for the Runtime or the programs it runs`, kind: "project-env" });
+    const pointing = env && typeof env === "object" ? Object.entries(env).filter(([name, v]) => pointsClientAtConfig(name, String(v ?? ""))).map(([name]) => name) : [];
+    if (pointing.length)
+      out.push({ file: path2, why: `its env sets ${pointing.slice(0, 4).join(", ")}, which points the client at configuration Praxis cannot check`, kind: "launch" });
   }
   return out;
 }
 function frontMatter(text) {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---(\r?\n|$)/.exec(text);
+  const match = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(\r?\n|$)/.exec(text);
   if (!match)
     return void 0;
   return fold(match[1].replace(/\\\r?\n\s*/g, "").replace(/\\x([0-9a-f]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\u([0-9a-f]{4})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\U([0-9a-f]{8})/gi, (_, h) => String.fromCodePoint(parseInt(h, 16))));
@@ -61676,7 +61715,8 @@ function checkMarkdown(path2, project) {
   const fm = frontMatter(text.value);
   if (!fm)
     return [];
-  if (!/(^|[\s{,"'])hooks["']?\s*:/.test(fm))
+  const key = /(^|\n)[ \t]*(![^\s]*[ \t]+)?["']?hooks["']?[ \t]*:/.test(fm) || /^\s*\{[\s\S]*["']?hooks["']?\s*:/.test(fm) || /(^|\n)[ \t]*<<[ \t]*:[\s\S]*hooks/.test(fm);
+  if (!key)
     return [];
   if (fm.includes("elicitation"))
     return [{ file: path2, why: "an agent, skill or command definition declares an Elicitation hook", kind: "dialog-answer" }];
@@ -61687,8 +61727,17 @@ function checkMarkdown(path2, project) {
 function walk2(dir, budget) {
   const found = [];
   const stack = [dir];
+  const visited = /* @__PURE__ */ new Set();
   while (stack.length) {
     const current = stack.pop();
+    let real = current;
+    try {
+      real = (0, import_node_fs4.realpathSync)(current);
+    } catch {
+    }
+    if (visited.has(real))
+      continue;
+    visited.add(real);
     let entries;
     try {
       entries = (0, import_node_fs4.readdirSync)(current, { withFileTypes: true });
@@ -61703,7 +61752,15 @@ function walk2(dir, budget) {
         return found;
       }
       const path2 = (0, import_node_path4.join)(current, entry.name);
-      if (entry.isDirectory()) {
+      let folder = entry.isDirectory();
+      if (entry.isSymbolicLink()) {
+        try {
+          folder = (0, import_node_fs4.statSync)(path2).isDirectory();
+        } catch {
+          folder = false;
+        }
+      }
+      if (folder) {
         if (entry.name !== ".git" && entry.name !== "node_modules")
           stack.push(path2);
       } else if (entry.isFile() || entry.isSymbolicLink())
@@ -61712,31 +61769,70 @@ function walk2(dir, budget) {
   }
   return found;
 }
-var isHookJson = (path2) => /(^|[\\/])(hooks\.json|plugin\.json)$/.test(path2) || /[\\/]hooks[\\/][^\\/]+\.json$/.test(path2);
+var isHookJson = (path2) => /(^|[\\/])(hooks\.json|plugin\.json|marketplace\.json)$/.test(path2);
 var isDefinition = (path2) => path2.endsWith(".md") && /[\\/](agents|skills|commands|output-styles)[\\/]/.test(path2);
+function hookRefs(value) {
+  const refs = [];
+  keys(value, (key, inner) => {
+    if (fold(key) !== "hooks")
+      return;
+    if (typeof inner === "string")
+      refs.push(inner);
+    else if (Array.isArray(inner)) {
+      for (const item of inner)
+        if (typeof item === "string")
+          refs.push(item);
+    }
+  });
+  return refs;
+}
+function manifestBases(file2, value) {
+  const root = /[\\/]\.claude-plugin[\\/][^\\/]+\.json$/.test(file2) ? (0, import_node_path4.dirname)((0, import_node_path4.dirname)(file2)) : (0, import_node_path4.dirname)(file2);
+  const bases = [root];
+  keys(value, (key, inner) => {
+    if (fold(key) === "source" && typeof inner === "string" && !/^[a-z]+:\/\//i.test(inner))
+      bases.push((0, import_node_path4.resolve)(root, inner));
+    if (fold(key) === "source" && inner && typeof inner === "object" && typeof inner.path === "string")
+      bases.push((0, import_node_path4.resolve)(root, inner.path));
+  });
+  return [...new Set(bases)];
+}
 function checkPluginTree(root, budget, seen) {
   const out = [];
   for (const file2 of walk2(root, budget)) {
-    if (seen.has(file2) || !isDefinition(file2) && !isHookJson(file2))
+    if (seen.has(file2))
       continue;
-    seen.add(file2);
     if (isDefinition(file2)) {
+      seen.add(file2);
       out.push(...checkMarkdown(file2, false));
       continue;
     }
+    if (!file2.endsWith(".json"))
+      continue;
+    seen.add(file2);
+    const strict = isHookJson(file2);
     const parsed = readJson(file2);
     if (!parsed)
       continue;
     if ("finding" in parsed) {
-      out.push(parsed.finding);
+      if (strict)
+        out.push(parsed.finding);
       continue;
     }
-    out.push(...checkSettings(file2, parsed.value, false, !file2.endsWith("plugin.json")));
-    if (file2.endsWith("plugin.json") && parsed.value && typeof parsed.value === "object") {
-      const pluginRoot = /[\\/]\.claude-plugin[\\/]plugin\.json$/.test(file2) ? (0, import_node_path4.dirname)((0, import_node_path4.dirname)(file2)) : (0, import_node_path4.dirname)(file2);
-      const field = parsed.value.hooks;
-      for (const ref of typeof field === "string" ? [field] : Array.isArray(field) ? field.filter((f) => typeof f === "string") : []) {
-        const target = (0, import_node_path4.resolve)(pluginRoot, ref.replace(/^\$\{CLAUDE_PLUGIN_ROOT\}[\\/]?/, ""));
+    const whole = /(^|[\\/])hooks\.json$/.test(file2) || /[\\/]hooks[\\/][^\\/]+\.json$/.test(file2);
+    out.push(...checkSettings(file2, parsed.value, false, whole).filter((f) => strict || f.kind === "dialog-answer"));
+    if (!strict)
+      continue;
+    const bases = manifestBases(file2, parsed.value);
+    for (const ref of hookRefs(parsed.value)) {
+      const clean = ref.replace(/^\$\{CLAUDE_PLUGIN_ROOT\}[\\/]?/, "");
+      const targets = (0, import_node_path4.isAbsolute)(clean) ? [clean] : bases.map((base) => (0, import_node_path4.resolve)(base, clean));
+      const found = targets.filter((t) => (0, import_node_fs4.existsSync)(t) || isLink(t));
+      if (!found.length) {
+        out.push({ file: file2, why: `names a hook file (${ref}) Praxis cannot find, so it cannot be checked`, kind: "unverifiable" });
+        continue;
+      }
+      for (const target of found) {
         if (seen.has(target))
           continue;
         seen.add(target);
@@ -61775,7 +61871,7 @@ function processOf(pid) {
     return { pid, ppid, args: (0, import_node_fs4.readFileSync)(`/proc/${pid}/cmdline`, "utf8") };
   }
   if (process.platform === "win32") {
-    const ps = (0, import_node_path4.join)(process.env.SystemRoot ?? "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+    const ps = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
     const out2 = (0, import_node_child_process.execFileSync)(ps, ["-NoProfile", "-NonInteractive", "-Command", `$p = Get-CimInstance Win32_Process -Filter "ProcessId=${pid}"; "$($p.ParentProcessId)\`n$($p.CommandLine)"`], { encoding: "utf8", timeout: 5e3 });
     const [ppid, ...rest] = out2.split(/\r?\n/);
     return { pid, ppid: Number(ppid), args: rest.join(" ") };
@@ -61794,11 +61890,25 @@ function ancestry() {
     if (!proc)
       break;
     chain.push(proc);
-    if (/claude/i.test(proc.args) || proc.ppid === pid)
+    if (proc.ppid === pid)
       break;
     pid = proc.ppid;
   }
   return chain;
+}
+function pointsClientAtConfig(name, value) {
+  if (!value.trim())
+    return false;
+  if (CODE_INTO_CLIENT.test(name) || name === "NODE_OPTIONS" && NODE_LOADS_CODE.test(value))
+    return true;
+  if (/^CLAUDE/i.test(name) && /COWORK|ZIP/i.test(name) && !/^(0|false|no|off)$/i.test(value.trim()))
+    return true;
+  if (!/^CLAUDE/i.test(name) || CLIENT_ENV_KNOWN.has(name.toUpperCase()) || !CLIENT_CONFIG_ENV.test(name))
+    return false;
+  return LOCATION_NAME.test(name) || looksLikeLocation(value);
+}
+function checkClientEnvironment() {
+  return Object.keys(process.env).filter((name) => pointsClientAtConfig(name, process.env[name] ?? "")).map((name) => ({ file: `environment ${name}`, why: CODE_INTO_CLIENT.test(name) || name === "NODE_OPTIONS" ? "loads code into the client process, which can answer its dialog from inside" : "points the client at configuration Praxis cannot check", kind: "launch" }));
 }
 function checkLaunch(read) {
   let chain;
@@ -61868,7 +61978,7 @@ function dialogAutomation(input2 = {}) {
     settingsAt((0, import_node_path4.join)(home, ".claude.json"), false, MAX_GLOBAL_JSON);
   const pluginBudget = { left: limit, limit };
   for (const dir of configDirs) {
-    for (const name of SETTINGS_NAMES)
+    for (const name of [...SETTINGS_NAMES, "cowork_settings.json"])
       settingsAt((0, import_node_path4.join)(dir, name), false);
     for (const sub of ["agents", "skills", "commands", "output-styles"]) {
       const defs = (0, import_node_path4.join)(dir, sub);
@@ -61878,15 +61988,16 @@ function dialogAutomation(input2 = {}) {
         if (file2.endsWith(".md") && !seen.has(file2))
           seen.add(file2), findings.push(...checkMarkdown(file2, false));
     }
-    const plugins = (0, import_node_path4.join)(dir, "plugins");
-    if (!(0, import_node_fs4.existsSync)(plugins))
-      continue;
-    const { roots, findings: recordFindings } = pluginRoots(plugins);
-    findings.push(...recordFindings);
-    findings.push(...checkPluginTree(plugins, pluginBudget, seen));
-    for (const root of roots)
-      if (!within((0, import_node_path4.resolve)(root), plugins) && (0, import_node_fs4.existsSync)(root))
-        findings.push(...checkPluginTree((0, import_node_path4.resolve)(root), pluginBudget, seen));
+    for (const plugins of [(0, import_node_path4.join)(dir, "plugins"), (0, import_node_path4.join)(dir, "cowork_plugins")]) {
+      if (!(0, import_node_fs4.existsSync)(plugins))
+        continue;
+      const { roots, findings: recordFindings } = pluginRoots(plugins);
+      findings.push(...recordFindings);
+      findings.push(...checkPluginTree(plugins, pluginBudget, seen));
+      for (const root of roots)
+        if (!within((0, import_node_path4.resolve)(root), plugins) && (0, import_node_fs4.existsSync)(root))
+          findings.push(...checkPluginTree((0, import_node_path4.resolve)(root), pluginBudget, seen));
+    }
   }
   if (pluginBudget.finding)
     findings.push(pluginBudget.finding);
@@ -61904,6 +62015,7 @@ function dialogAutomation(input2 = {}) {
   if (stateHome && input2.repo && within((0, import_node_path4.resolve)(stateHome), (0, import_node_path4.resolve)(input2.repo))) {
     findings.push({ file: (0, import_node_path4.resolve)(stateHome), why: "the Praxis state home (the decision journal) is inside the repository", kind: "state-home" });
   }
+  findings.push(...checkClientEnvironment());
   findings.push(...checkLaunch(input2.ancestry ?? ancestry));
   return findings;
 }
@@ -62097,7 +62209,7 @@ var PRAXIS_MCP_SDK = {
   ]
 };
 function bundleVersion() {
-  return "0.1.0-alpha.49.1";
+  return "0.1.0-alpha.49.2";
 }
 
 // packages/mcp/node_modules/zod/v4/classic/external.js
@@ -81819,7 +81931,7 @@ var import_node_fs6 = require("node:fs");
 function runtimeBuildInfo(version4) {
   let embedded = null;
   try {
-    const raw = '{"version":"0.1.0-alpha.49.1","sourceDigest":"77d4ee73873bb9af55fdd3f0983d9736043816a91db9c6874439f1b57ba7a470","coreBaseline":"1ebc57c7d5dcb6f08d766f1b643a73dd2fb20b1f","inputs":40}';
+    const raw = '{"version":"0.1.0-alpha.49.2","sourceDigest":"9c64025465ae9d9d53d0a86b48d88472c74ba0dd251d43681b83d836fd123c11","coreBaseline":"984d4f4058fbc0194def498bcb68bd0d852cbfba","inputs":40}';
     if (raw)
       embedded = JSON.parse(raw);
   } catch {
@@ -85777,6 +85889,7 @@ async function ensureServer2() {
   server2 = (0, import_node_http2.createServer)((req, res) => {
     handle2(req, res).catch((error64) => json3(res, 500, { error: error64 instanceof Error ? error64.message : String(error64) }));
   });
+  server2.keepAliveTimeout = 6e4;
   await new Promise((ok, fail2) => {
     server2.once("error", fail2);
     server2.listen(0, "127.0.0.1", () => ok());

@@ -15774,7 +15774,7 @@ var PlanningCommandSchemas = [
 var PLANNING_ACTIONS = new Set(PlanningCommandSchemas.map((schema) => schema.shape.action.value));
 
 // ../praxis-ba/node_modules/@praxis/contracts/dist/approval-audit.js
-var APPROVAL_TRUST = ["independent-human", "review-page", "host-attested", "test-only"];
+var APPROVAL_TRUST = ["client-response", "independent-human", "review-page", "host-attested", "test-only"];
 var ApprovalSubjectSchema = external_exports.object({
   type: external_exports.enum(["story", "decision", "service", "requirement", "criterion", "review", "work-item"]),
   id: external_exports.string(),
@@ -17389,6 +17389,7 @@ $('#btn-save').addEventListener('click',function(){
   toast('Saving...',false);
   fetch(D.saveUrl,{method:'POST',headers:{'content-type':'application/json','x-praxis-review-token':D.token||''},body:JSON.stringify(s)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){
     if(!x.ok){showOut(text);toast('Not saved ('+(x.j&&x.j.error||'error')+'). Decisions are below: copy them to Claude.',true);return}
+    if(x.j.handedOver){var hc=(x.j.conflicts||[]).length;toast((hc?('NOT sent, '+hc+' conflict(s) - this page is out of date: '+x.j.conflicts.map(function(k){return k.item+' ('+k.reason+')'}).join('; ')+'. Reload the page to see the current state, then decide again. The rest is handed over: '):'Handed over: ')+'nothing is recorded yet. Tell Claude to apply the review: your client then shows these exact decisions in its approval dialog, and only your answer there records them.',hc>0);return}
     var c=(x.j.conflicts||[]).length;
     toast(c?('Saved: '+(x.j.applied||0)+' change(s) applied. NOT saved, '+c+' conflict(s) - this page is out of date: '+x.j.conflicts.map(function(k){return k.item+' ('+k.reason+')'}).join('; ')+'. Reload the page to see the current state, then decide again.'):('Saved: '+(x.j.applied||0)+' change(s) applied. Reload to see the new revision.'),c>0);
   }).catch(function(){showOut(text);toast('Cannot reach Praxis (the review session ended). Decisions are below: copy them to Claude.',true)})
