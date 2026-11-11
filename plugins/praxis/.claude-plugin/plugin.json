@@ -1,6 +1,6 @@
 {
   "name": "praxis",
-  "version": "0.1.0-alpha.49.1",
+  "version": "0.1.0-alpha.49.2",
   "description": "Praxis: requirements, architecture, implementation and verification as one local workflow. Installs Praxis Runtime and the BA, Architect, Developer and Quality roles.",
   "author": {
     "name": "dfuture-co"
