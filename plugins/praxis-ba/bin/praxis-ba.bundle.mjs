@@ -39,10 +39,10 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// ../praxis-ba/node_modules/zod/v3/helpers/util.js
+// ../role-ba/node_modules/zod/v3/helpers/util.js
 var util, objectUtil, ZodParsedType, getParsedType;
 var init_util = __esm({
-  "../praxis-ba/node_modules/zod/v3/helpers/util.js"() {
+  "../role-ba/node_modules/zod/v3/helpers/util.js"() {
     (function(util2) {
       util2.assertEqual = (_) => {
       };
@@ -176,10 +176,10 @@ var init_util = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/ZodError.js
+// ../role-ba/node_modules/zod/v3/ZodError.js
 var ZodIssueCode, quotelessJson, ZodError;
 var init_ZodError = __esm({
-  "../praxis-ba/node_modules/zod/v3/ZodError.js"() {
+  "../role-ba/node_modules/zod/v3/ZodError.js"() {
     init_util();
     ZodIssueCode = util.arrayToEnum([
       "invalid_type",
@@ -300,10 +300,10 @@ var init_ZodError = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/locales/en.js
+// ../role-ba/node_modules/zod/v3/locales/en.js
 var errorMap, en_default;
 var init_en = __esm({
-  "../praxis-ba/node_modules/zod/v3/locales/en.js"() {
+  "../role-ba/node_modules/zod/v3/locales/en.js"() {
     init_ZodError();
     init_util();
     errorMap = (issue, _ctx) => {
@@ -410,7 +410,7 @@ var init_en = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/errors.js
+// ../role-ba/node_modules/zod/v3/errors.js
 function setErrorMap(map) {
   overrideErrorMap = map;
 }
@@ -419,13 +419,13 @@ function getErrorMap() {
 }
 var overrideErrorMap;
 var init_errors = __esm({
-  "../praxis-ba/node_modules/zod/v3/errors.js"() {
+  "../role-ba/node_modules/zod/v3/errors.js"() {
     init_en();
     overrideErrorMap = en_default;
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/helpers/parseUtil.js
+// ../role-ba/node_modules/zod/v3/helpers/parseUtil.js
 function addIssueToContext(ctx, issueData) {
   const overrideMap = getErrorMap();
   const issue = makeIssue({
@@ -447,7 +447,7 @@ function addIssueToContext(ctx, issueData) {
 }
 var makeIssue, EMPTY_PATH, ParseStatus, INVALID, DIRTY, OK, isAborted, isDirty, isValid, isAsync;
 var init_parseUtil = __esm({
-  "../praxis-ba/node_modules/zod/v3/helpers/parseUtil.js"() {
+  "../role-ba/node_modules/zod/v3/helpers/parseUtil.js"() {
     init_errors();
     init_en();
     makeIssue = (params) => {
@@ -542,16 +542,16 @@ var init_parseUtil = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/helpers/typeAliases.js
+// ../role-ba/node_modules/zod/v3/helpers/typeAliases.js
 var init_typeAliases = __esm({
-  "../praxis-ba/node_modules/zod/v3/helpers/typeAliases.js"() {
+  "../role-ba/node_modules/zod/v3/helpers/typeAliases.js"() {
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/helpers/errorUtil.js
+// ../role-ba/node_modules/zod/v3/helpers/errorUtil.js
 var errorUtil;
 var init_errorUtil = __esm({
-  "../praxis-ba/node_modules/zod/v3/helpers/errorUtil.js"() {
+  "../role-ba/node_modules/zod/v3/helpers/errorUtil.js"() {
     (function(errorUtil2) {
       errorUtil2.errToObj = (message2) => typeof message2 === "string" ? { message: message2 } : message2 || {};
       errorUtil2.toString = (message2) => typeof message2 === "string" ? message2 : message2?.message;
@@ -559,7 +559,7 @@ var init_errorUtil = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/types.js
+// ../role-ba/node_modules/zod/v3/types.js
 function processCreateParams(params) {
   if (!params)
     return {};
@@ -753,7 +753,7 @@ function custom(check, _params = {}, fatal) {
 }
 var ParseInputLazyPath, handleResult, ZodType, cuidRegex, cuid2Regex, ulidRegex, uuidRegex, nanoidRegex, jwtRegex, durationRegex, emailRegex, _emojiRegex, emojiRegex, ipv4Regex, ipv4CidrRegex, ipv6Regex, ipv6CidrRegex, base64Regex, base64urlRegex, dateRegexSource, dateRegex, ZodString, ZodNumber, ZodBigInt, ZodBoolean, ZodDate, ZodSymbol, ZodUndefined, ZodNull, ZodAny, ZodUnknown, ZodNever, ZodVoid, ZodArray, ZodObject, ZodUnion, getDiscriminator, ZodDiscriminatedUnion, ZodIntersection, ZodTuple, ZodRecord, ZodMap, ZodSet, ZodFunction, ZodLazy, ZodLiteral, ZodEnum, ZodNativeEnum, ZodPromise, ZodEffects, ZodOptional, ZodNullable, ZodDefault, ZodCatch, ZodNaN, BRAND, ZodBranded, ZodPipeline, ZodReadonly, late, ZodFirstPartyTypeKind, instanceOfType, stringType, numberType, nanType, bigIntType, booleanType, dateType, symbolType, undefinedType, nullType, anyType, unknownType, neverType, voidType, arrayType, objectType, strictObjectType, unionType, discriminatedUnionType, intersectionType, tupleType, recordType, mapType, setType, functionType, lazyType, literalType, enumType, nativeEnumType, promiseType, effectsType, optionalType, nullableType, preprocessType, pipelineType, ostring, onumber, oboolean, coerce, NEVER;
 var init_types = __esm({
-  "../praxis-ba/node_modules/zod/v3/types.js"() {
+  "../role-ba/node_modules/zod/v3/types.js"() {
     init_ZodError();
     init_errors();
     init_errorUtil();
@@ -4015,7 +4015,7 @@ var init_types = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/v3/external.js
+// ../role-ba/node_modules/zod/v3/external.js
 var external_exports = {};
 __export(external_exports, {
   BRAND: () => BRAND,
@@ -4127,7 +4127,7 @@ __export(external_exports, {
   void: () => voidType
 });
 var init_external = __esm({
-  "../praxis-ba/node_modules/zod/v3/external.js"() {
+  "../role-ba/node_modules/zod/v3/external.js"() {
     init_errors();
     init_parseUtil();
     init_typeAliases();
@@ -4137,17 +4137,17 @@ var init_external = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/zod/index.js
+// ../role-ba/node_modules/zod/index.js
 var init_zod = __esm({
-  "../praxis-ba/node_modules/zod/index.js"() {
+  "../role-ba/node_modules/zod/index.js"() {
     init_external();
     init_external();
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/identity.js
+// ../role-ba/node_modules/yaml/dist/nodes/identity.js
 var require_identity = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/identity.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/identity.js"(exports2) {
     "use strict";
     var ALIAS = Symbol.for("yaml.alias");
     var DOC = Symbol.for("yaml.document");
@@ -4202,9 +4202,9 @@ var require_identity = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/visit.js
+// ../role-ba/node_modules/yaml/dist/visit.js
 var require_visit = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/visit.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/visit.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var BREAK = Symbol("break visit");
@@ -4360,9 +4360,9 @@ var require_visit = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/doc/directives.js
+// ../role-ba/node_modules/yaml/dist/doc/directives.js
 var require_directives = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/doc/directives.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/doc/directives.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var visit = require_visit();
@@ -4531,9 +4531,9 @@ var require_directives = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/doc/anchors.js
+// ../role-ba/node_modules/yaml/dist/doc/anchors.js
 var require_anchors = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/doc/anchors.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/doc/anchors.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var visit = require_visit();
@@ -4601,9 +4601,9 @@ var require_anchors = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/doc/applyReviver.js
+// ../role-ba/node_modules/yaml/dist/doc/applyReviver.js
 var require_applyReviver = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/doc/applyReviver.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/doc/applyReviver.js"(exports2) {
     "use strict";
     function applyReviver(reviver, obj, key, val) {
       if (val && typeof val === "object") {
@@ -4651,9 +4651,9 @@ var require_applyReviver = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/toJS.js
+// ../role-ba/node_modules/yaml/dist/nodes/toJS.js
 var require_toJS = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/toJS.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/toJS.js"(exports2) {
     "use strict";
     var identity = require_identity();
     function toJS(value, arg, ctx) {
@@ -4681,9 +4681,9 @@ var require_toJS = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/Node.js
+// ../role-ba/node_modules/yaml/dist/nodes/Node.js
 var require_Node = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/Node.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/Node.js"(exports2) {
     "use strict";
     var applyReviver = require_applyReviver();
     var identity = require_identity();
@@ -4722,9 +4722,9 @@ var require_Node = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/Alias.js
+// ../role-ba/node_modules/yaml/dist/nodes/Alias.js
 var require_Alias = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/Alias.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/Alias.js"(exports2) {
     "use strict";
     var anchors = require_anchors();
     var visit = require_visit();
@@ -4840,9 +4840,9 @@ var require_Alias = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/Scalar.js
+// ../role-ba/node_modules/yaml/dist/nodes/Scalar.js
 var require_Scalar = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/Scalar.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/Scalar.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Node = require_Node();
@@ -4870,9 +4870,9 @@ var require_Scalar = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/doc/createNode.js
+// ../role-ba/node_modules/yaml/dist/doc/createNode.js
 var require_createNode = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/doc/createNode.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/doc/createNode.js"(exports2) {
     "use strict";
     var Alias = require_Alias();
     var identity = require_identity();
@@ -4945,9 +4945,9 @@ var require_createNode = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/Collection.js
+// ../role-ba/node_modules/yaml/dist/nodes/Collection.js
 var require_Collection = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/Collection.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/Collection.js"(exports2) {
     "use strict";
     var createNode = require_createNode();
     var identity = require_identity();
@@ -5088,9 +5088,9 @@ var require_Collection = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyComment.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyComment.js
 var require_stringifyComment = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyComment.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyComment.js"(exports2) {
     "use strict";
     var stringifyComment = (str2) => str2.replace(/^(?!$)(?: $)?/gm, "#");
     function indentComment(comment, indent) {
@@ -5105,9 +5105,9 @@ var require_stringifyComment = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/foldFlowLines.js
+// ../role-ba/node_modules/yaml/dist/stringify/foldFlowLines.js
 var require_foldFlowLines = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/foldFlowLines.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/foldFlowLines.js"(exports2) {
     "use strict";
     var FOLD_FLOW = "flow";
     var FOLD_BLOCK = "block";
@@ -5241,9 +5241,9 @@ ${indent}${text.slice(fold + 1, end2)}`;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyString.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyString.js
 var require_stringifyString = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyString.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyString.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var foldFlowLines = require_foldFlowLines();
@@ -5524,9 +5524,9 @@ ${indent}`);
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringify.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringify.js
 var require_stringify = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringify.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringify.js"(exports2) {
     "use strict";
     var anchors = require_anchors();
     var identity = require_identity();
@@ -5648,9 +5648,9 @@ ${ctx.indent}${str2}`;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyPair.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyPair.js
 var require_stringifyPair = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyPair.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyPair.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -5781,9 +5781,9 @@ ${ctx.indent}`;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/log.js
+// ../role-ba/node_modules/yaml/dist/log.js
 var require_log = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/log.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/log.js"(exports2) {
     "use strict";
     var node_process = __require("process");
     function debug(logLevel, ...messages) {
@@ -5803,9 +5803,9 @@ var require_log = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/merge.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/merge.js
 var require_merge = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/merge.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/merge.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -5863,9 +5863,9 @@ var require_merge = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/addPairToJSMap.js
+// ../role-ba/node_modules/yaml/dist/nodes/addPairToJSMap.js
 var require_addPairToJSMap = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/addPairToJSMap.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/addPairToJSMap.js"(exports2) {
     "use strict";
     var log = require_log();
     var merge = require_merge();
@@ -5927,9 +5927,9 @@ var require_addPairToJSMap = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/Pair.js
+// ../role-ba/node_modules/yaml/dist/nodes/Pair.js
 var require_Pair = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/Pair.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/Pair.js"(exports2) {
     "use strict";
     var createNode = require_createNode();
     var stringifyPair = require_stringifyPair();
@@ -5967,9 +5967,9 @@ var require_Pair = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyCollection.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyCollection.js
 var require_stringifyCollection = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyCollection.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyCollection.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var stringify2 = require_stringify();
@@ -6118,9 +6118,9 @@ ${indent}${end}`;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/YAMLMap.js
+// ../role-ba/node_modules/yaml/dist/nodes/YAMLMap.js
 var require_YAMLMap = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/YAMLMap.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/YAMLMap.js"(exports2) {
     "use strict";
     var stringifyCollection = require_stringifyCollection();
     var addPairToJSMap = require_addPairToJSMap();
@@ -6262,9 +6262,9 @@ var require_YAMLMap = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/common/map.js
+// ../role-ba/node_modules/yaml/dist/schema/common/map.js
 var require_map = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/common/map.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/common/map.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var YAMLMap = require_YAMLMap();
@@ -6284,9 +6284,9 @@ var require_map = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/nodes/YAMLSeq.js
+// ../role-ba/node_modules/yaml/dist/nodes/YAMLSeq.js
 var require_YAMLSeq = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/nodes/YAMLSeq.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/nodes/YAMLSeq.js"(exports2) {
     "use strict";
     var createNode = require_createNode();
     var stringifyCollection = require_stringifyCollection();
@@ -6400,9 +6400,9 @@ var require_YAMLSeq = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/common/seq.js
+// ../role-ba/node_modules/yaml/dist/schema/common/seq.js
 var require_seq = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/common/seq.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/common/seq.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var YAMLSeq = require_YAMLSeq();
@@ -6422,9 +6422,9 @@ var require_seq = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/common/string.js
+// ../role-ba/node_modules/yaml/dist/schema/common/string.js
 var require_string = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/common/string.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/common/string.js"(exports2) {
     "use strict";
     var stringifyString = require_stringifyString();
     var string = {
@@ -6441,9 +6441,9 @@ var require_string = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/common/null.js
+// ../role-ba/node_modules/yaml/dist/schema/common/null.js
 var require_null = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/common/null.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/common/null.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var nullTag = {
@@ -6459,9 +6459,9 @@ var require_null = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/core/bool.js
+// ../role-ba/node_modules/yaml/dist/schema/core/bool.js
 var require_bool = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/core/bool.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/core/bool.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var boolTag = {
@@ -6483,9 +6483,9 @@ var require_bool = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyNumber.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyNumber.js
 var require_stringifyNumber = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyNumber.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyNumber.js"(exports2) {
     "use strict";
     function stringifyNumber({ format, minFractionDigits, tag, value }) {
       if (typeof value === "bigint")
@@ -6510,9 +6510,9 @@ var require_stringifyNumber = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/core/float.js
+// ../role-ba/node_modules/yaml/dist/schema/core/float.js
 var require_float = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/core/float.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/core/float.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var stringifyNumber = require_stringifyNumber();
@@ -6556,9 +6556,9 @@ var require_float = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/core/int.js
+// ../role-ba/node_modules/yaml/dist/schema/core/int.js
 var require_int = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/core/int.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/core/int.js"(exports2) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     var intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -6601,9 +6601,9 @@ var require_int = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/core/schema.js
+// ../role-ba/node_modules/yaml/dist/schema/core/schema.js
 var require_schema = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/core/schema.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/core/schema.js"(exports2) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -6629,9 +6629,9 @@ var require_schema = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/json/schema.js
+// ../role-ba/node_modules/yaml/dist/schema/json/schema.js
 var require_schema2 = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/json/schema.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/json/schema.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var map = require_map();
@@ -6696,9 +6696,9 @@ var require_schema2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/binary.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/binary.js
 var require_binary = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/binary.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/binary.js"(exports2) {
     "use strict";
     var node_buffer = __require("buffer");
     var Scalar = require_Scalar();
@@ -6762,9 +6762,9 @@ var require_binary = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/pairs.js
 var require_pairs = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/pairs.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/pairs.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -6840,9 +6840,9 @@ ${cn.comment}` : item.comment;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/omap.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/omap.js
 var require_omap = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/omap.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/omap.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var toJS = require_toJS();
@@ -6918,9 +6918,9 @@ var require_omap = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/bool.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/bool.js
 var require_bool2 = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/bool.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/bool.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     function boolStringify({ value, source }, ctx) {
@@ -6950,9 +6950,9 @@ var require_bool2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/float.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/float.js
 var require_float2 = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/float.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/float.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var stringifyNumber = require_stringifyNumber();
@@ -6999,9 +6999,9 @@ var require_float2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/int.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/int.js
 var require_int2 = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/int.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/int.js"(exports2) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     var intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -7078,9 +7078,9 @@ var require_int2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/set.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/set.js
 var require_set = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/set.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/set.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -7167,9 +7167,9 @@ var require_set = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
 var require_timestamp = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js"(exports2) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     function parseSexagesimal(str2, asBigInt) {
@@ -7255,9 +7255,9 @@ var require_timestamp = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/schema.js
+// ../role-ba/node_modules/yaml/dist/schema/yaml-1.1/schema.js
 var require_schema3 = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/yaml-1.1/schema.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/yaml-1.1/schema.js"(exports2) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -7299,9 +7299,9 @@ var require_schema3 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/tags.js
+// ../role-ba/node_modules/yaml/dist/schema/tags.js
 var require_tags = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/tags.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/tags.js"(exports2) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -7393,9 +7393,9 @@ var require_tags = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/schema/Schema.js
+// ../role-ba/node_modules/yaml/dist/schema/Schema.js
 var require_Schema = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/schema/Schema.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/schema/Schema.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var map = require_map();
@@ -7425,9 +7425,9 @@ var require_Schema = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/stringify/stringifyDocument.js
+// ../role-ba/node_modules/yaml/dist/stringify/stringifyDocument.js
 var require_stringifyDocument = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/stringify/stringifyDocument.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/stringify/stringifyDocument.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var stringify2 = require_stringify();
@@ -7505,9 +7505,9 @@ var require_stringifyDocument = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/doc/Document.js
+// ../role-ba/node_modules/yaml/dist/doc/Document.js
 var require_Document = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/doc/Document.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/doc/Document.js"(exports2) {
     "use strict";
     var Alias = require_Alias();
     var Collection = require_Collection();
@@ -7814,9 +7814,9 @@ var require_Document = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/errors.js
+// ../role-ba/node_modules/yaml/dist/errors.js
 var require_errors = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/errors.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/errors.js"(exports2) {
     "use strict";
     var YAMLError = class extends Error {
       constructor(name, pos, code2, message2) {
@@ -7879,9 +7879,9 @@ ${pointer}
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-props.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-props.js
 var require_resolve_props = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-props.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-props.js"(exports2) {
     "use strict";
     function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIndent, startOnNewline }) {
       let spaceBefore = false;
@@ -8012,9 +8012,9 @@ var require_resolve_props = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/util-contains-newline.js
+// ../role-ba/node_modules/yaml/dist/compose/util-contains-newline.js
 var require_util_contains_newline = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/util-contains-newline.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/util-contains-newline.js"(exports2) {
     "use strict";
     function containsNewline(key) {
       if (!key)
@@ -8054,9 +8054,9 @@ var require_util_contains_newline = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/util-flow-indent-check.js
+// ../role-ba/node_modules/yaml/dist/compose/util-flow-indent-check.js
 var require_util_flow_indent_check = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/util-flow-indent-check.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/util-flow-indent-check.js"(exports2) {
     "use strict";
     var utilContainsNewline = require_util_contains_newline();
     function flowIndentCheck(indent, fc, onError) {
@@ -8072,9 +8072,9 @@ var require_util_flow_indent_check = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/util-map-includes.js
+// ../role-ba/node_modules/yaml/dist/compose/util-map-includes.js
 var require_util_map_includes = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/util-map-includes.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/util-map-includes.js"(exports2) {
     "use strict";
     var identity = require_identity();
     function mapIncludes(ctx, items, search) {
@@ -8088,9 +8088,9 @@ var require_util_map_includes = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-block-map.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-block-map.js
 var require_resolve_block_map = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-block-map.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-block-map.js"(exports2) {
     "use strict";
     var Pair = require_Pair();
     var YAMLMap = require_YAMLMap();
@@ -8196,9 +8196,9 @@ var require_resolve_block_map = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-block-seq.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-block-seq.js
 var require_resolve_block_seq = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-block-seq.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-block-seq.js"(exports2) {
     "use strict";
     var YAMLSeq = require_YAMLSeq();
     var resolveProps = require_resolve_props();
@@ -8247,9 +8247,9 @@ var require_resolve_block_seq = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-end.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-end.js
 var require_resolve_end = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-end.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-end.js"(exports2) {
     "use strict";
     function resolveEnd(end, offset, reqSpace, onError) {
       let comment = "";
@@ -8290,9 +8290,9 @@ var require_resolve_end = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-flow-collection.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-flow-collection.js
 var require_resolve_flow_collection = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-flow-collection.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-flow-collection.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -8484,9 +8484,9 @@ var require_resolve_flow_collection = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/compose-collection.js
+// ../role-ba/node_modules/yaml/dist/compose/compose-collection.js
 var require_compose_collection = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/compose-collection.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/compose-collection.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -8549,9 +8549,9 @@ var require_compose_collection = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-block-scalar.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-block-scalar.js
 var require_resolve_block_scalar = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-block-scalar.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-block-scalar.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     function resolveBlockScalar(ctx, scalar, onError) {
@@ -8730,9 +8730,9 @@ var require_resolve_block_scalar = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/resolve-flow-scalar.js
+// ../role-ba/node_modules/yaml/dist/compose/resolve-flow-scalar.js
 var require_resolve_flow_scalar = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/resolve-flow-scalar.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/resolve-flow-scalar.js"(exports2) {
     "use strict";
     var Scalar = require_Scalar();
     var resolveEnd = require_resolve_end();
@@ -8949,9 +8949,9 @@ var require_resolve_flow_scalar = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/compose-scalar.js
+// ../role-ba/node_modules/yaml/dist/compose/compose-scalar.js
 var require_compose_scalar = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/compose-scalar.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/compose-scalar.js"(exports2) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -9030,9 +9030,9 @@ var require_compose_scalar = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/util-empty-scalar-position.js
+// ../role-ba/node_modules/yaml/dist/compose/util-empty-scalar-position.js
 var require_util_empty_scalar_position = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/util-empty-scalar-position.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/util-empty-scalar-position.js"(exports2) {
     "use strict";
     function emptyScalarPosition(offset, before, pos) {
       if (before) {
@@ -9060,9 +9060,9 @@ var require_util_empty_scalar_position = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/compose-node.js
+// ../role-ba/node_modules/yaml/dist/compose/compose-node.js
 var require_compose_node = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/compose-node.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/compose-node.js"(exports2) {
     "use strict";
     var Alias = require_Alias();
     var identity = require_identity();
@@ -9166,9 +9166,9 @@ var require_compose_node = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/compose-doc.js
+// ../role-ba/node_modules/yaml/dist/compose/compose-doc.js
 var require_compose_doc = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/compose-doc.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/compose-doc.js"(exports2) {
     "use strict";
     var Document = require_Document();
     var composeNode = require_compose_node();
@@ -9209,9 +9209,9 @@ var require_compose_doc = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/compose/composer.js
+// ../role-ba/node_modules/yaml/dist/compose/composer.js
 var require_composer = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/compose/composer.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/compose/composer.js"(exports2) {
     "use strict";
     var node_process = __require("process");
     var directives = require_directives();
@@ -9417,9 +9417,9 @@ ${end.comment}` : end.comment;
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/cst-scalar.js
+// ../role-ba/node_modules/yaml/dist/parse/cst-scalar.js
 var require_cst_scalar = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/cst-scalar.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/cst-scalar.js"(exports2) {
     "use strict";
     var resolveBlockScalar = require_resolve_block_scalar();
     var resolveFlowScalar = require_resolve_flow_scalar();
@@ -9602,9 +9602,9 @@ var require_cst_scalar = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/cst-stringify.js
+// ../role-ba/node_modules/yaml/dist/parse/cst-stringify.js
 var require_cst_stringify = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/cst-stringify.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/cst-stringify.js"(exports2) {
     "use strict";
     var stringify2 = (cst) => "type" in cst ? stringifyToken(cst) : stringifyItem(cst);
     function stringifyToken(token) {
@@ -9663,9 +9663,9 @@ var require_cst_stringify = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/cst-visit.js
+// ../role-ba/node_modules/yaml/dist/parse/cst-visit.js
 var require_cst_visit = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/cst-visit.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/cst-visit.js"(exports2) {
     "use strict";
     var BREAK = Symbol("break visit");
     var SKIP = Symbol("skip children");
@@ -9725,9 +9725,9 @@ var require_cst_visit = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/cst.js
+// ../role-ba/node_modules/yaml/dist/parse/cst.js
 var require_cst = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/cst.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/cst.js"(exports2) {
     "use strict";
     var cstScalar = require_cst_scalar();
     var cstStringify = require_cst_stringify();
@@ -9827,9 +9827,9 @@ var require_cst = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/lexer.js
+// ../role-ba/node_modules/yaml/dist/parse/lexer.js
 var require_lexer = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/lexer.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/lexer.js"(exports2) {
     "use strict";
     var cst = require_cst();
     function isEmpty(ch) {
@@ -10411,9 +10411,9 @@ var require_lexer = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/line-counter.js
+// ../role-ba/node_modules/yaml/dist/parse/line-counter.js
 var require_line_counter = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/line-counter.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/line-counter.js"(exports2) {
     "use strict";
     var LineCounter = class {
       constructor() {
@@ -10442,9 +10442,9 @@ var require_line_counter = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/parse/parser.js
+// ../role-ba/node_modules/yaml/dist/parse/parser.js
 var require_parser = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/parse/parser.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/parse/parser.js"(exports2) {
     "use strict";
     var node_process = __require("process");
     var cst = require_cst();
@@ -11312,9 +11312,9 @@ var require_parser = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/public-api.js
+// ../role-ba/node_modules/yaml/dist/public-api.js
 var require_public_api = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/public-api.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/public-api.js"(exports2) {
     "use strict";
     var composer = require_composer();
     var Document = require_Document();
@@ -11409,9 +11409,9 @@ var require_public_api = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/yaml/dist/index.js
+// ../role-ba/node_modules/yaml/dist/index.js
 var require_dist = __commonJS({
-  "../praxis-ba/node_modules/yaml/dist/index.js"(exports2) {
+  "../role-ba/node_modules/yaml/dist/index.js"(exports2) {
     "use strict";
     var composer = require_composer();
     var Document = require_Document();
@@ -11461,7 +11461,7 @@ var require_dist = __commonJS({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/ac.js
+// ../role-ba/plugins/ba/canon-graph/dist/ac.js
 function parseAcBlock(body) {
   const lines = body.split("\n").map((line) => line.replace(/\r$/, ""));
   const headingIndex = lines.findIndex((line) => SECTION_HEADING.test(line));
@@ -11514,7 +11514,7 @@ function unverifiableAcIds(acs) {
 }
 var SECTION_HEADING, NEXT_HEADING, AC_BULLET, TOP_LEVEL_BULLET, CONTINUATION;
 var init_ac = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/ac.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/ac.js"() {
     "use strict";
     SECTION_HEADING = /^##\s+Acceptance Criteria\s*$/;
     NEXT_HEADING = /^## /;
@@ -11524,7 +11524,7 @@ var init_ac = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/schema.js
+// ../role-ba/plugins/ba/canon-graph/dist/schema.js
 function validateFrontmatter(type, fm) {
   const result = schemas[type].safeParse(fm);
   if (result.success)
@@ -11537,7 +11537,7 @@ function validateFrontmatter(type, fm) {
 }
 var EPIC_ID, FR_ID, NFR_ID, CATALOG_NFR_ID, BR_ID, CR_ID, WP_ID, BUG_ID, GOAL_ID, BASELINE_ID, DATE_KEY, isRequirementId, STATUS_VALUES, statusSchema, visionSchema, frSchema, nfrSchema, brSchema, goalSchema, crImpactSchema, crSchema, wpSchema, bugSchema, epicSchema, schemas, countersSchema, configSchema, baselineManifestSchema, pendingMarkerSchema, verifyEvidenceSchema;
 var init_schema = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/schema.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/schema.js"() {
     "use strict";
     init_zod();
     EPIC_ID = /^E\d+$/;
@@ -11731,7 +11731,7 @@ var init_schema = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/body-refs.js
+// ../role-ba/plugins/ba/canon-graph/dist/body-refs.js
 function stripLeadingFrontmatter(raw) {
   const candidate = raw.trimStart();
   if (!candidate.startsWith("---"))
@@ -11777,7 +11777,7 @@ function mergeReferencesNfr(existing, body) {
 }
 var CATALOG_NFR_RE, CANON_NFR_RE;
 var init_body_refs = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/body-refs.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/body-refs.js"() {
     "use strict";
     init_schema();
     CATALOG_NFR_RE = /\b([A-Z][A-Z0-9]{1,9}-NFR-\d{3})\b/g;
@@ -11785,9 +11785,9 @@ var init_body_refs = __esm({
   }
 });
 
-// ../praxis-ba/node_modules/kind-of/index.js
+// ../role-ba/node_modules/kind-of/index.js
 var require_kind_of = __commonJS({
-  "../praxis-ba/node_modules/kind-of/index.js"(exports2, module2) {
+  "../role-ba/node_modules/kind-of/index.js"(exports2, module2) {
     var toString = Object.prototype.toString;
     module2.exports = function kindOf2(val) {
       if (val === void 0) return "undefined";
@@ -11901,9 +11901,9 @@ var require_kind_of = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/is-extendable/index.js
+// ../role-ba/node_modules/is-extendable/index.js
 var require_is_extendable = __commonJS({
-  "../praxis-ba/node_modules/is-extendable/index.js"(exports2, module2) {
+  "../role-ba/node_modules/is-extendable/index.js"(exports2, module2) {
     "use strict";
     module2.exports = function isExtendable(val) {
       return typeof val !== "undefined" && val !== null && (typeof val === "object" || typeof val === "function");
@@ -11911,9 +11911,9 @@ var require_is_extendable = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/extend-shallow/index.js
+// ../role-ba/node_modules/extend-shallow/index.js
 var require_extend_shallow = __commonJS({
-  "../praxis-ba/node_modules/extend-shallow/index.js"(exports2, module2) {
+  "../role-ba/node_modules/extend-shallow/index.js"(exports2, module2) {
     "use strict";
     var isObject = require_is_extendable();
     module2.exports = function extend(o) {
@@ -11942,9 +11942,9 @@ var require_extend_shallow = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/section-matter/index.js
+// ../role-ba/node_modules/section-matter/index.js
 var require_section_matter = __commonJS({
-  "../praxis-ba/node_modules/section-matter/index.js"(exports2, module2) {
+  "../role-ba/node_modules/section-matter/index.js"(exports2, module2) {
     "use strict";
     var typeOf = require_kind_of();
     var extend = require_extend_shallow();
@@ -12049,9 +12049,9 @@ var require_section_matter = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/common.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/common.js
 var require_common = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/common.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/common.js"(exports2, module2) {
     "use strict";
     function isNothing(subject) {
       return typeof subject === "undefined" || subject === null;
@@ -12094,9 +12094,9 @@ var require_common = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/exception.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/exception.js
 var require_exception = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/exception.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/exception.js"(exports2, module2) {
     "use strict";
     function YAMLException(reason, mark) {
       Error.call(this);
@@ -12124,9 +12124,9 @@ var require_exception = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/mark.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/mark.js
 var require_mark = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/mark.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/mark.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     function Mark(name, buffer, position, line, column) {
@@ -12182,9 +12182,9 @@ var require_mark = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type.js
 var require_type = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type.js"(exports2, module2) {
     "use strict";
     var YAMLException = require_exception();
     var TYPE_CONSTRUCTOR_OPTIONS = [
@@ -12241,9 +12241,9 @@ var require_type = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema.js
 var require_schema4 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     var YAMLException = require_exception();
@@ -12329,9 +12329,9 @@ var require_schema4 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/str.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/str.js
 var require_str = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/str.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/str.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     module2.exports = new Type("tag:yaml.org,2002:str", {
@@ -12343,9 +12343,9 @@ var require_str = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/seq.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/seq.js
 var require_seq2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/seq.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/seq.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     module2.exports = new Type("tag:yaml.org,2002:seq", {
@@ -12357,9 +12357,9 @@ var require_seq2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/map.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/map.js
 var require_map2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/map.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/map.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     module2.exports = new Type("tag:yaml.org,2002:map", {
@@ -12371,9 +12371,9 @@ var require_map2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js
 var require_failsafe = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js"(exports2, module2) {
     "use strict";
     var Schema = require_schema4();
     module2.exports = new Schema({
@@ -12386,9 +12386,9 @@ var require_failsafe = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/null.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/null.js
 var require_null2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/null.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/null.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     function resolveYamlNull(data) {
@@ -12426,9 +12426,9 @@ var require_null2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/bool.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/bool.js
 var require_bool3 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/bool.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/bool.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     function resolveYamlBoolean(data) {
@@ -12463,9 +12463,9 @@ var require_bool3 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/int.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/int.js
 var require_int3 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/int.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/int.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     var Type = require_type();
@@ -12596,9 +12596,9 @@ var require_int3 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/float.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/float.js
 var require_float3 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/float.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/float.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     var Type = require_type();
@@ -12691,9 +12691,9 @@ var require_float3 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/json.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema/json.js
 var require_json = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/json.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema/json.js"(exports2, module2) {
     "use strict";
     var Schema = require_schema4();
     module2.exports = new Schema({
@@ -12710,9 +12710,9 @@ var require_json = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/core.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema/core.js
 var require_core = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/core.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema/core.js"(exports2, module2) {
     "use strict";
     var Schema = require_schema4();
     module2.exports = new Schema({
@@ -12723,9 +12723,9 @@ var require_core = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/timestamp.js
 var require_timestamp2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/timestamp.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/timestamp.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     var YAML_DATE_REGEXP = new RegExp(
@@ -12784,9 +12784,9 @@ var require_timestamp2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/merge.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/merge.js
 var require_merge2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/merge.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/merge.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     function resolveYamlMerge(data) {
@@ -12799,9 +12799,9 @@ var require_merge2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/binary.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/binary.js
 var require_binary2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/binary.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/binary.js"(exports2, module2) {
     "use strict";
     var NodeBuffer;
     try {
@@ -12892,9 +12892,9 @@ var require_binary2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/omap.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/omap.js
 var require_omap2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/omap.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/omap.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -12929,9 +12929,9 @@ var require_omap2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/pairs.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/pairs.js
 var require_pairs2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/pairs.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/pairs.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     var _toString = Object.prototype.toString;
@@ -12967,9 +12967,9 @@ var require_pairs2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/set.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/set.js
 var require_set2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/set.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/set.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -12994,9 +12994,9 @@ var require_set2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js
 var require_default_safe = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema/default_safe.js"(exports2, module2) {
     "use strict";
     var Schema = require_schema4();
     module2.exports = new Schema({
@@ -13017,9 +13017,9 @@ var require_default_safe = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js
 var require_undefined = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/undefined.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     function resolveJavascriptUndefined() {
@@ -13044,9 +13044,9 @@ var require_undefined = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js
 var require_regexp = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/regexp.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
     function resolveJavascriptRegExp(data) {
@@ -13088,9 +13088,9 @@ var require_regexp = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/function.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/function.js
 var require_function = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/type/js/function.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/type/js/function.js"(exports2, module2) {
     "use strict";
     var esprima;
     try {
@@ -13143,9 +13143,9 @@ var require_function = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/schema/default_full.js
 var require_default_full = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/schema/default_full.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/schema/default_full.js"(exports2, module2) {
     "use strict";
     var Schema = require_schema4();
     module2.exports = Schema.DEFAULT = new Schema({
@@ -13161,9 +13161,9 @@ var require_default_full = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/loader.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/loader.js
 var require_loader = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/loader.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/loader.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     var YAMLException = require_exception();
@@ -14293,9 +14293,9 @@ var require_loader = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml/dumper.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml/dumper.js
 var require_dumper = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml/dumper.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml/dumper.js"(exports2, module2) {
     "use strict";
     var common = require_common();
     var YAMLException = require_exception();
@@ -14841,9 +14841,9 @@ var require_dumper = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/lib/js-yaml.js
+// ../role-ba/node_modules/js-yaml/lib/js-yaml.js
 var require_js_yaml = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/lib/js-yaml.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/lib/js-yaml.js"(exports2, module2) {
     "use strict";
     var loader = require_loader();
     var dumper = require_dumper();
@@ -14876,18 +14876,18 @@ var require_js_yaml = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/js-yaml/index.js
+// ../role-ba/node_modules/js-yaml/index.js
 var require_js_yaml2 = __commonJS({
-  "../praxis-ba/node_modules/js-yaml/index.js"(exports2, module2) {
+  "../role-ba/node_modules/js-yaml/index.js"(exports2, module2) {
     "use strict";
     var yaml2 = require_js_yaml();
     module2.exports = yaml2;
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/engines.js
+// ../role-ba/node_modules/gray-matter/lib/engines.js
 var require_engines = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/engines.js"(exports, module) {
+  "../role-ba/node_modules/gray-matter/lib/engines.js"(exports, module) {
     "use strict";
     var yaml = require_js_yaml2();
     var engines = exports = module.exports;
@@ -14923,9 +14923,9 @@ var require_engines = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/strip-bom-string/index.js
+// ../role-ba/node_modules/strip-bom-string/index.js
 var require_strip_bom_string = __commonJS({
-  "../praxis-ba/node_modules/strip-bom-string/index.js"(exports2, module2) {
+  "../role-ba/node_modules/strip-bom-string/index.js"(exports2, module2) {
     "use strict";
     module2.exports = function(str2) {
       if (typeof str2 === "string" && str2.charAt(0) === "\uFEFF") {
@@ -14936,9 +14936,9 @@ var require_strip_bom_string = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/utils.js
+// ../role-ba/node_modules/gray-matter/lib/utils.js
 var require_utils = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/utils.js"(exports2) {
+  "../role-ba/node_modules/gray-matter/lib/utils.js"(exports2) {
     "use strict";
     var stripBom = require_strip_bom_string();
     var typeOf = require_kind_of();
@@ -14976,9 +14976,9 @@ var require_utils = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/defaults.js
+// ../role-ba/node_modules/gray-matter/lib/defaults.js
 var require_defaults = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/defaults.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/defaults.js"(exports2, module2) {
     "use strict";
     var engines2 = require_engines();
     var utils = require_utils();
@@ -14995,9 +14995,9 @@ var require_defaults = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/engine.js
+// ../role-ba/node_modules/gray-matter/lib/engine.js
 var require_engine = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/engine.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/engine.js"(exports2, module2) {
     "use strict";
     module2.exports = function(name, options2) {
       let engine = options2.engines[name] || options2.engines[aliase(name)];
@@ -15029,9 +15029,9 @@ var require_engine = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/stringify.js
+// ../role-ba/node_modules/gray-matter/lib/stringify.js
 var require_stringify2 = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/stringify.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/stringify.js"(exports2, module2) {
     "use strict";
     var typeOf = require_kind_of();
     var getEngine = require_engine();
@@ -15082,9 +15082,9 @@ var require_stringify2 = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/excerpt.js
+// ../role-ba/node_modules/gray-matter/lib/excerpt.js
 var require_excerpt = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/excerpt.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/excerpt.js"(exports2, module2) {
     "use strict";
     var defaults = require_defaults();
     module2.exports = function(file, options2) {
@@ -15109,9 +15109,9 @@ var require_excerpt = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/to-file.js
+// ../role-ba/node_modules/gray-matter/lib/to-file.js
 var require_to_file = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/to-file.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/to-file.js"(exports2, module2) {
     "use strict";
     var typeOf = require_kind_of();
     var stringify2 = require_stringify2();
@@ -15143,9 +15143,9 @@ var require_to_file = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/lib/parse.js
+// ../role-ba/node_modules/gray-matter/lib/parse.js
 var require_parse = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/lib/parse.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/lib/parse.js"(exports2, module2) {
     "use strict";
     var getEngine = require_engine();
     var defaults = require_defaults();
@@ -15160,9 +15160,9 @@ var require_parse = __commonJS({
   }
 });
 
-// ../praxis-ba/node_modules/gray-matter/index.js
+// ../role-ba/node_modules/gray-matter/index.js
 var require_gray_matter = __commonJS({
-  "../praxis-ba/node_modules/gray-matter/index.js"(exports2, module2) {
+  "../role-ba/node_modules/gray-matter/index.js"(exports2, module2) {
     "use strict";
     var fs = __require("fs");
     var sections = require_section_matter();
@@ -15276,7 +15276,7 @@ var require_gray_matter = __commonJS({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/parse.js
+// ../role-ba/plugins/ba/canon-graph/dist/parse.js
 import { readFileSync } from "node:fs";
 function parsePage(raw, type) {
   const { data, content } = (0, import_gray_matter.default)(raw, { engines: { yaml: yamlEngine } });
@@ -15306,7 +15306,7 @@ function peekType(raw) {
 }
 var import_gray_matter, import_yaml, yamlEngine;
 var init_parse = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/parse.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/parse.js"() {
     "use strict";
     import_gray_matter = __toESM(require_gray_matter(), 1);
     import_yaml = __toESM(require_dist(), 1);
@@ -15318,7 +15318,7 @@ var init_parse = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/serialize.js
+// ../role-ba/plugins/ba/canon-graph/dist/serialize.js
 function naturalCompare(a, b) {
   const aRuns = a.match(RUN) ?? [a];
   const bRuns = b.match(RUN) ?? [b];
@@ -15423,7 +15423,7 @@ function exportBacklog(graph) {
 }
 var import_yaml2, RUN, ALL_DIGITS, KEY_ORDER, REF_ARRAY_KEYS, STRINGIFY_OPTIONS;
 var init_serialize = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/serialize.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/serialize.js"() {
     "use strict";
     import_yaml2 = __toESM(require_dist(), 1);
     RUN = /(\d+|\D+)/g;
@@ -15496,7 +15496,7 @@ var init_serialize = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/ids.js
+// ../role-ba/plugins/ba/canon-graph/dist/ids.js
 import { closeSync, openSync, readFileSync as readFileSync2, renameSync, statSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
@@ -15788,7 +15788,7 @@ function maxGuard(repo, pages, baselines) {
 }
 var import_yaml3, LOCK_ACQUIRE_TIMEOUT_MS, STALE_LOCK_MS, LOCK_RETRY_INTERVAL_MS, DATE_KEY2, EPIC_NUM, FR_NUM, NFR_NUM, BR_NUM, CR_NUM, WP_NUM, BUG_NUM, BASELINE_NUM;
 var init_ids = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/ids.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/ids.js"() {
     "use strict";
     import_yaml3 = __toESM(require_dist(), 1);
     init_schema();
@@ -15807,7 +15807,7 @@ var init_ids = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/history.js
+// ../role-ba/plugins/ba/canon-graph/dist/history.js
 function locateHistorySection(body) {
   const sentineled = SENTINELED_HISTORY.exec(body);
   if (sentineled) {
@@ -15876,7 +15876,7 @@ ${spliced.slice(loc.headingStart)}`;
 }
 var HISTORY_HEADING_LINE, ENTRY_HEADING, SENTINEL, SENTINELED_HISTORY;
 var init_history = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/history.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/history.js"() {
     "use strict";
     HISTORY_HEADING_LINE = /^## History[ \t]*$/m;
     ENTRY_HEADING = /^### v(\d+) — (\S+) — (\S+)[ \t]*$/gm;
@@ -15885,7 +15885,7 @@ var init_history = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/fs.js
+// ../role-ba/plugins/ba/canon-graph/dist/fs.js
 import { readFileSync as readFileSync3, readdirSync, statSync as statSync2 } from "node:fs";
 import { join as join2 } from "node:path";
 function configPath(repo) {
@@ -15958,7 +15958,7 @@ function walkCanonFiles(repo) {
 }
 var import_yaml4, DEFAULT_CANON_ROOTS, EXCLUDED_DIR_NAMES, EXCLUDED_ATTACHMENT_FILENAMES;
 var init_fs = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/fs.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/fs.js"() {
     "use strict";
     import_yaml4 = __toESM(require_dist(), 1);
     init_schema();
@@ -15986,7 +15986,7 @@ var init_fs = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/versiondiff.js
+// ../role-ba/plugins/ba/canon-graph/dist/versiondiff.js
 function normalize(body) {
   const lines = body.split(/\r\n|\r|\n/).map((line) => line.trim());
   while (lines.length > 0 && lines[lines.length - 1] === "") {
@@ -16024,13 +16024,13 @@ function shouldBump(type, oldPage, newPage) {
   return canonicalBody(type, oldPage.body) !== canonicalBody(type, newPage.body);
 }
 var init_versiondiff = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/versiondiff.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/versiondiff.js"() {
     "use strict";
     init_ac();
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/scopelinks.js
+// ../role-ba/plugins/ba/canon-graph/dist/scopelinks.js
 function classify(id) {
   if (CR_ID.test(id))
     return "cr";
@@ -16112,7 +16112,7 @@ function pageAnchors(body) {
 }
 var SCOPE_HEADING, LINK_LINE, BUCKET_FOR, SUBSECTION;
 var init_scopelinks = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/scopelinks.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/scopelinks.js"() {
     "use strict";
     init_schema();
     SCOPE_HEADING = /^## Scope[ \t]*$/m;
@@ -16126,7 +16126,7 @@ var init_scopelinks = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/graph.js
+// ../role-ba/plugins/ba/canon-graph/dist/graph.js
 function nodeTypeOf(fm) {
   if (typeof fm !== "object" || fm === null || !("type" in fm))
     return void 0;
@@ -16351,7 +16351,7 @@ function buildGraph(pages, paths) {
 }
 var NODE_TYPES;
 var init_graph = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/graph.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/graph.js"() {
     "use strict";
     init_serialize();
     init_scopelinks();
@@ -16370,7 +16370,7 @@ var init_graph = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/gates.js
+// ../role-ba/plugins/ba/canon-graph/dist/gates.js
 import { dirname, relative } from "node:path";
 function byId(nodes) {
   return new Map(nodes.map((n) => [n.frontmatter.id, n]));
@@ -16612,14 +16612,14 @@ function acceptGate(graph, wpId, visionConfirmed, evidence, headCommit) {
   return toVerdict(checks);
 }
 var init_gates = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/gates.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/gates.js"() {
     "use strict";
     init_ac();
     init_scopelinks();
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/reconcile.js
+// ../role-ba/plugins/ba/canon-graph/dist/reconcile.js
 var reconcile_exports = {};
 __export(reconcile_exports, {
   crImpactsDelivered: () => crImpactsDelivered,
@@ -16674,7 +16674,7 @@ function reconcileCrs(repo, affectedCrIds, date) {
 }
 var DATE_KEY3;
 var init_reconcile = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/reconcile.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/reconcile.js"() {
     "use strict";
     init_history();
     init_serialize();
@@ -16683,7 +16683,7 @@ var init_reconcile = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/writer.js
+// ../role-ba/plugins/ba/canon-graph/dist/writer.js
 import { mkdirSync, readdirSync as readdirSync2, readFileSync as readFileSync4, renameSync as renameSync2, unlinkSync as unlinkSync2, writeFileSync as writeFileSync2 } from "node:fs";
 import { createHash, randomUUID as randomUUID2 } from "node:crypto";
 import { dirname as dirname2, join as join3, relative as relative2, sep } from "node:path";
@@ -17175,7 +17175,7 @@ async function accept(repo, wpId, evidence, date, headCommit, options2 = {}) {
 }
 var import_yaml5, DATE_KEY4, LEGAL_TRANSITIONS;
 var init_writer = __esm({
-  "../praxis-ba/plugins/ba/canon-graph/dist/writer.js"() {
+  "../role-ba/plugins/ba/canon-graph/dist/writer.js"() {
     "use strict";
     import_yaml5 = __toESM(require_dist(), 1);
     init_ids();
@@ -17212,7 +17212,7 @@ var init_writer = __esm({
   }
 });
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_zod();
 var import_yaml9 = __toESM(require_dist(), 1);
 init_ac();
@@ -17223,7 +17223,7 @@ import { userInfo } from "node:os";
 import { basename as basename2, dirname as dirname9, join as join13, relative as relative7, resolve as resolve2, sep as sep4 } from "node:path";
 import { parseArgs } from "node:util";
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/fmt.js
+// ../role-ba/plugins/ba/canon-graph/dist/fmt.js
 init_parse();
 init_serialize();
 init_writer();
@@ -17253,10 +17253,10 @@ function formatFile(repo, path) {
   return { changed: true };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_fs();
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/init.js
+// ../role-ba/plugins/ba/canon-graph/dist/init.js
 var import_yaml6 = __toESM(require_dist(), 1);
 init_fs();
 init_ids();
@@ -17472,11 +17472,11 @@ async function initCanon(repoInput, options2 = {}) {
   return { repo, dryRun, created, skipped, ...epicPlan ? { epic: epicPlan } : {}, notes, next };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_graph();
 init_gates();
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/goals.js
+// ../role-ba/plugins/ba/canon-graph/dist/goals.js
 init_serialize();
 function isOpenRequirementStatus(status) {
   return status !== "retired" && status !== "superseded";
@@ -17505,7 +17505,7 @@ function checkGoals(graph) {
   return { requirementsWithoutGoals, goalsWithoutRequirements };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/one-pager.js
+// ../role-ba/plugins/ba/canon-graph/dist/one-pager.js
 init_ac();
 init_writer();
 import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync4 } from "node:fs";
@@ -17617,10 +17617,10 @@ function writeOnePager(repo, id, outPath) {
   return { ...built, outPath: dest };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_ids();
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/migrate.js
+// ../role-ba/plugins/ba/canon-graph/dist/migrate.js
 var import_gray_matter2 = __toESM(require_gray_matter(), 1);
 var import_yaml7 = __toESM(require_dist(), 1);
 init_ac();
@@ -18113,7 +18113,7 @@ function verifyParity(v1Dir, outDir) {
   return { verdict, checks };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/migrate-v3.js
+// ../role-ba/plugins/ba/canon-graph/dist/migrate-v3.js
 var import_gray_matter3 = __toESM(require_gray_matter(), 1);
 var import_yaml8 = __toESM(require_dist(), 1);
 init_zod();
@@ -18706,12 +18706,12 @@ function verifyParityV3(snapshot, canonDir, repoRoot) {
   return { verdict, checks };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_history();
 init_parse();
 init_reconcile();
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/rules.js
+// ../role-ba/plugins/ba/canon-graph/dist/rules.js
 var import_gray_matter4 = __toESM(require_gray_matter(), 1);
 init_zod();
 init_ac();
@@ -18806,10 +18806,10 @@ function evaluateBaRules(rules, graph) {
   return violations;
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 import { fileURLToPath } from "node:url";
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/handoff.js
+// ../role-ba/plugins/ba/canon-graph/dist/handoff.js
 import { existsSync as existsSync3, mkdirSync as mkdirSync6, readFileSync as readFileSync9, writeFileSync as writeFileSync5 } from "node:fs";
 import { dirname as dirname5, join as join9, relative as relative4 } from "node:path";
 function emitBaArchitectHandoff(repo, wpId, outPath) {
@@ -18858,7 +18858,7 @@ function emitBaArchitectHandoff(repo, wpId, outPath) {
   return { path: out, handoff };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/semantic-lint.js
+// ../role-ba/plugins/ba/canon-graph/dist/semantic-lint.js
 init_body_refs();
 import { existsSync as existsSync4, readFileSync as readFileSync10 } from "node:fs";
 import { dirname as dirname6, join as join10, relative as relative5 } from "node:path";
@@ -19076,12 +19076,12 @@ function semanticLintToChecks(result) {
   });
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_schema();
 init_scopelinks();
 init_serialize();
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/status.js
+// ../role-ba/plugins/ba/canon-graph/dist/status.js
 init_ac();
 init_serialize();
 function isOpenRequirementStatus2(status) {
@@ -19156,7 +19156,7 @@ function findMissingItems(graph) {
   return items.sort((a, b) => naturalCompare(a.kind, b.kind) || naturalCompare(a.id, b.id));
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/bug-contract.js
+// ../role-ba/plugins/ba/canon-graph/dist/bug-contract.js
 init_schema();
 var HEADING = /^(?:\*\*)?(repro|reproduction|воспроизведение|expected|ожидаем(?:ое|ый)?|actual|фактическ(?:ое|ий)?)\s*:?(?:\*\*)?\s*(.*)$/i;
 function isCanonRequirementId(id) {
@@ -19229,7 +19229,7 @@ function assertBugCapture(input) {
   return parsed;
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/code-surface-scan.js
+// ../role-ba/plugins/ba/canon-graph/dist/code-surface-scan.js
 import { createHash as createHash4 } from "node:crypto";
 import { existsSync as existsSync5, mkdirSync as mkdirSync7, readFileSync as readFileSync11, readdirSync as readdirSync7, statSync as statSync4, writeFileSync as writeFileSync6 } from "node:fs";
 import { dirname as dirname7, join as join11, relative as relative6, sep as sep3 } from "node:path";
@@ -19428,7 +19428,7 @@ function scanCodeSurface(opts) {
   return { operations, warnings, newOrChanged };
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/onboard-context.js
+// ../role-ba/plugins/ba/canon-graph/dist/onboard-context.js
 init_parse();
 init_writer();
 import { existsSync as existsSync6, mkdirSync as mkdirSync8, readFileSync as readFileSync12, writeFileSync as writeFileSync7 } from "node:fs";
@@ -19507,7 +19507,7 @@ ${n.body}`);
   return out;
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/dist/cli.js
+// ../role-ba/plugins/ba/canon-graph/dist/cli.js
 init_writer();
 async function runCli(argv2, opts = {}) {
   try {
@@ -20641,7 +20641,7 @@ function fmtCommand(repo, paths, check) {
   return toResult(checks);
 }
 
-// ../praxis-ba/plugins/ba/canon-graph/bin/praxis-ba.mjs
+// ../role-ba/plugins/ba/canon-graph/bin/praxis-ba.mjs
 var argv = process.argv.slice(2);
 var wantsJson = argv.includes("--json");
 var { code, json } = await runCli(argv);
