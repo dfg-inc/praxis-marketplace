@@ -41,7 +41,9 @@ A plugin's local MCP server is not automatically a tool in ordinary Chat. There 
 
 Protected actions (commits, pushes, Jira writes, confirming Stories and decisions, recording review decisions) are approved only in the client's own approval dialog. Claude Desktop shows no usable dialog, so there they are not executed: apply them from the Claude Code CLI in a terminal.
 
-Release notes: [RELEASE-NOTES-0.1.0-alpha.49.2.md](RELEASE-NOTES-0.1.0-alpha.49.2.md), a security patch: update every Praxis plugin. Earlier: [0.1.0-alpha.49.1](RELEASE-NOTES-0.1.0-alpha.49.1.md), [0.1.0-alpha.49](RELEASE-NOTES-0.1.0-alpha.49.md).
+An acceptance in a Work Item (an accepted criterion, a confirmed story or decision, an approved service) counts only when Praxis recorded it outside the repository after that dialog; one written into the file does not. After updating from an earlier version, accept again in the review what you had accepted. Praxis never reports an approval as verified by a person.
+
+Release notes: [RELEASE-NOTES-0.1.0-alpha.49.3.md](RELEASE-NOTES-0.1.0-alpha.49.3.md), a security patch: update every Praxis plugin. Earlier: [0.1.0-alpha.49.2](RELEASE-NOTES-0.1.0-alpha.49.2.md), [0.1.0-alpha.49.1](RELEASE-NOTES-0.1.0-alpha.49.1.md), [0.1.0-alpha.49](RELEASE-NOTES-0.1.0-alpha.49.md).
 
 ## Maintainers
 
